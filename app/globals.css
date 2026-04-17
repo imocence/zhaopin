@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* ==================== 全局样式 ==================== */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== 自定义样式 ==================== */
+
+/* Flex 工具类 */
+.layui-flex-item {
+  flex: 1;
+  width: 100%;
+}
+
+/* 页面主内容区域 */
+.layui-main {
+  flex: 1;
+  width: 100%;
+}
+
+/* 修复轮播图样式问题 */
+.layui-carousel > [carousel-item] {
+  position: static !important;
+  width: 100%;
+  height: 100%;
+}
+
+.layui-carousel > [carousel-item] > div {
+  width: 100%;
+  height: 100%;
+}
+
+/* Header 背景 */
+.layui-bg-dark {
+  background-color: #2f363c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.layui-bg-dark .layui-nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background: transparent;
+}
+
+/* Logo */
+.layui-logo {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff !important;
+}
+
+/* 文字颜色 */
+.layui-font-gray {
+  color: #999;
+}
+
+.layui-font-white {
+  color: #fff;
+}
+
+.layui-font-gray-light {
+  color: #666;
+}
+
+/* 文字大小 */
+.layui-font-sm {
+  font-size: 14px;
+}
+
+.layui-font-xs {
+  font-size: 12px;
+}
+
+.layui-font-bold {
+  font-weight: bold;
+}
+
+.layui-font-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* 颜色 */
+.layui-font-cyan {
+  color: #009688;
+}
+
+.layui-font-blue {
+  color: #1e9fff;
+}
+
+.layui-font-orange {
+  color: #ffb800;
+}
+
+/* 列表样式 */
+.layui-unstyled-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 文本装饰 */
+.layui-text-decoration-none {
+  text-decoration: none;
+}
+
+/* 文本对齐 */
+.layui-text-center {
+  text-align: center;
+}
+
+/* 边框 */
+.layui-border-gray-top {
+  border-top: 1px solid #444;
+}
+
+/* 间距 */
+.layui-mt30 {
+  margin-top: 30px;
+}
+
+.layui-pt20 {
+  padding-top: 20px;
+}
+
+.layui-mb10 {
+  margin-bottom: 10px;
+}
+
+.layui-mb15 {
+  margin-bottom: 15px;
+}
+
+.layui-mb5 {
+  margin-bottom: 5px;
+}
+
+.layui-mt5 {
+  margin-top: 5px;
+}
+
+.layui-mt20 {
+  margin-top: 20px;
+}

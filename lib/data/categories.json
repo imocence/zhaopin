@@ -1,0 +1,141 @@
+[
+  {
+    "id": "tech",
+    "name": "技术类",
+    "icon": "💻",
+    "slug": "tech",
+    "subcategories": [
+      "软件工程师",
+      "前端开发",
+      "后端开发",
+      "全栈开发",
+      "数据工程师",
+      "QA工程师",
+      "DevOps",
+      "移动开发",
+      "算法工程师"
+    ]
+  },
+  {
+    "id": "design",
+    "name": "设计类",
+    "icon": "🎨",
+    "slug": "design",
+    "subcategories": [
+      "UI设计师",
+      "UX设计师",
+      "平面设计师",
+      "产品设计师",
+      "视觉设计师",
+      "交互设计师"
+    ]
+  },
+  {
+    "id": "marketing",
+    "name": "市场类",
+    "icon": "📊",
+    "slug": "marketing",
+    "subcategories": [
+      "数字营销",
+      "SEO专员",
+      "社交媒体运营",
+      "内容运营",
+      "品牌经理",
+      "市场分析师"
+    ]
+  },
+  {
+    "id": "finance",
+    "name": "金融类",
+    "icon": "💰",
+    "slug": "finance",
+    "subcategories": [
+      "会计",
+      "财务分析师",
+      "投资顾问",
+      "税务专员",
+      "审计师",
+      "风控专员"
+    ]
+  },
+  {
+    "id": "medical",
+    "name": "医疗类",
+    "icon": "🏥",
+    "slug": "medical",
+    "subcategories": [
+      "医生",
+      "护士",
+      "药剂师",
+      "医疗助理",
+      "理疗师",
+      "牙医"
+    ]
+  },
+  {
+    "id": "education",
+    "name": "教育类",
+    "icon": "📚",
+    "slug": "education",
+    "subcategories": [
+      "教师",
+      "Tutor",
+      "教育顾问",
+      "课程设计师",
+      "培训师"
+    ]
+  },
+  {
+    "id": "service",
+    "name": "服务类",
+    "icon": "🛎️",
+    "slug": "service",
+    "subcategories": [
+      "餐饮服务",
+      "零售导购",
+      "客户服务",
+      "酒店服务",
+      "旅游顾问"
+    ]
+  },
+  {
+    "id": "construction",
+    "name": "建筑类",
+    "icon": "🏗️",
+    "slug": "construction",
+    "subcategories": [
+      "建筑工人",
+      "电工",
+      "水管工",
+      "木工",
+      "油漆工",
+      "项目经理"
+    ]
+  },
+  {
+    "id": "logistics",
+    "name": "物流类",
+    "icon": "🚚",
+    "slug": "logistics",
+    "subcategories": [
+      "司机",
+      "仓库管理",
+      "快递员",
+      "物流专员",
+      "供应链管理"
+    ]
+  },
+  {
+    "id": "admin",
+    "name": "行政类",
+    "icon": "📋",
+    "slug": "admin",
+    "subcategories": [
+      "行政助理",
+      "人力资源",
+      "翻译",
+      "法律助理",
+      "秘书"
+    ]
+  }
+]

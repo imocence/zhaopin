@@ -1,0 +1,27 @@
+[
+  {
+    "id": "user1",
+    "email": "demo@example.com",
+    "name": "张三",
+    "avatar": "/images/avatars/default.png",
+    "role": "jobseeker",
+    "phone": "+1-415-123-4567",
+    "location": "旧金山",
+    "state": "CA",
+    "resume": "/resumes/demo_resume.pdf",
+    "bio": "5年前端开发经验，熟练React、Vue等框架。",
+    "createdAt": "2023-01-01"
+  },
+  {
+    "id": "user2",
+    "email": "employer@example.com",
+    "name": "李四",
+    "avatar": "/images/avatars/default.png",
+    "role": "employer",
+    "phone": "+1-650-234-5678",
+    "location": "帕洛阿尔托",
+    "state": "CA",
+    "bio": "某科技公司HR，负责技术招聘。",
+    "createdAt": "2023-02-01"
+  }
+]
