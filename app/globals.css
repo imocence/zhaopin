@@ -14,6 +14,27 @@ body {
 /* ==================== 自定义样式 ==================== */
 
 /* Flex 工具类 */
+.layui-flex {
+  display: flex;
+}
+
+.layui-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layui-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layui-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .layui-flex-item {
   flex: 1;
   width: 100%;
@@ -23,18 +44,6 @@ body {
 .layui-main {
   flex: 1;
   width: 100%;
-}
-
-/* 修复轮播图样式问题 */
-.layui-carousel > [carousel-item] {
-  position: static !important;
-  width: 100%;
-  height: 100%;
-}
-
-.layui-carousel > [carousel-item] > div {
-  width: 100%;
-  height: 100%;
 }
 
 /* Header 背景 */
@@ -70,6 +79,14 @@ body {
   color: #666;
 }
 
+.layui-font-gray-66 {
+  color: #666;
+}
+
+.layui-font-gray-99 {
+  color: #999;
+}
+
 /* 文字大小 */
 .layui-font-sm {
   font-size: 14px;
@@ -77,6 +94,22 @@ body {
 
 .layui-font-xs {
   font-size: 12px;
+}
+
+.layui-font-lg {
+  font-size: 16px;
+}
+
+.layui-font-xl {
+  font-size: 18px;
+}
+
+.layui-font-2xl {
+  font-size: 24px;
+}
+
+.layui-font-3xl {
+  font-size: 36px;
 }
 
 .layui-font-bold {
@@ -101,6 +134,10 @@ body {
   color: #ffb800;
 }
 
+.layui-font-red {
+  color: #ff4d4f;
+}
+
 /* 列表样式 */
 .layui-unstyled-list {
   list-style: none;
@@ -118,9 +155,29 @@ body {
   text-align: center;
 }
 
+.layui-text-left {
+  text-align: left;
+}
+
+.layui-text-right {
+  text-align: right;
+}
+
 /* 边框 */
 .layui-border-gray-top {
   border-top: 1px solid #444;
+}
+
+.layui-border {
+  border: 1px solid #e8e8e8;
+}
+
+.layui-border-top {
+  border-top: 1px solid #f0f0f0;
+}
+
+.layui-border-bottom {
+  border-bottom: 1px solid #f0f0f0;
 }
 
 /* 间距 */
@@ -150,4 +207,818 @@ body {
 
 .layui-mt20 {
   margin-top: 20px;
+}
+
+.layui-mb20 {
+  margin-bottom: 20px;
+}
+
+.layui-mb25 {
+  margin-bottom: 25px;
+}
+
+.layui-p20 {
+  padding: 20px;
+}
+
+.layui-p25 {
+  padding: 25px;
+}
+
+.layui-p30 {
+  padding: 30px;
+}
+
+/* 卡片增强 */
+.layui-card-enhanced {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.layui-card-enhanced:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.layui-card-header-bg {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 18px 20px;
+}
+
+.layui-card-body-p {
+  padding: 20px;
+}
+
+.layui-card-body-p25 {
+  padding: 25px;
+}
+
+/* 输入框增强 */
+.layui-input-enhanced {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+.layui-input-enhanced:focus {
+  border-color: #1e9fff;
+}
+
+/* 标签增强 */
+.layui-tag-enhanced {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.layui-tag-cyan {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.layui-tag-green {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.layui-tag-orange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.layui-tag-red {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.layui-tag-purple {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+/* 分页区域 */
+.layui-pagination-area {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* 悬浮效果 */
+.layui-hover-lift {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.layui-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 表单项增强 */
+.layui-form-item-enhanced {
+  margin-bottom: 20px;
+}
+
+.layui-form-label-enhanced {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* 按钮增强 */
+.layui-btn-enhanced {
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.layui-btn-xxs {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+/* 徽章增强 */
+.layui-badge-enhanced {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.layui-badge-cyan {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.layui-badge-green {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.layui-badge-orange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.layui-badge-purple {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+/* 渐变背景 */
+.layui-bg-gradient-cyan {
+  background: linear-gradient(135deg, #009688 0%, #16baaa 50%, #1e9fff 100%);
+}
+
+.layui-bg-gradient-blue {
+  background: linear-gradient(135deg, #1e9fff 0%, #3a8ee6 50%, #009688 100%);
+}
+
+.layui-bg-gradient-orange {
+  background: linear-gradient(135deg, #ffb800 0%, #ff5722 100%);
+}
+
+/* 图标间距 */
+.layui-icon-gap {
+  margin-right: 4px;
+}
+
+.layui-icon-gap-sm {
+  margin-right: 3px;
+}
+
+.layui-icon-gap-lg {
+  margin-right: 8px;
+}
+
+.layui-mr5 {
+  margin-right: 5px;
+}
+
+.layui-mr10 {
+  margin-right: 10px;
+}
+
+.layui-mr15 {
+  margin-right: 15px;
+}
+
+.layui-ml10 {
+  margin-left: 10px;
+}
+
+/* 统计卡片 */
+.layui-stat-card {
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.layui-stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.layui-stat-number {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.layui-stat-number-cyan {
+  color: #009688;
+}
+
+.layui-stat-number-blue {
+  color: #1e9fff;
+}
+
+.layui-stat-number-orange {
+  color: #fa8c16;
+}
+
+.layui-stat-number-teal {
+  color: #16baaa;
+}
+
+/* 筛选标签 */
+.layui-filter-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 4px;
+}
+
+.layui-filter-tag:hover {
+  color: #fff !important;
+}
+
+.layui-filter-tag-cyan {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.layui-filter-tag-cyan:hover {
+  background: #1890ff;
+}
+
+.layui-filter-tag-green {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.layui-filter-tag-green:hover {
+  background: #52c41a;
+}
+
+.layui-filter-tag-orange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.layui-filter-tag-orange:hover {
+  background: #fa8c16;
+}
+
+.layui-filter-tag-red {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.layui-filter-tag-red:hover {
+  background: #ff4d4f;
+}
+
+.layui-filter-tag-purple {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+.layui-filter-tag-purple:hover {
+  background: #722ed1;
+}
+
+/* 搜索结果栏 */
+.layui-result-bar {
+  padding: 15px 20px;
+}
+
+/* 头部区域 */
+.layui-page-header {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.layui-page-header-body {
+  padding: 40px 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.layui-header-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.layui-header-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.layui-header-decoration {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.layui-header-decoration-lg {
+  width: 200px;
+  height: 200px;
+  top: -50px;
+  right: -50px;
+}
+
+.layui-header-decoration-sm {
+  width: 100px;
+  height: 100px;
+  bottom: -30px;
+  right: 30%;
+}
+
+/* 额外的间距类 */
+.layui-mr3 {
+  margin-right: 3px;
+}
+
+.layui-mr12 {
+  margin-right: 12px;
+}
+
+.layui-ml3 {
+  margin-left: 3px;
+}
+
+.layui-ml5 {
+  margin-left: 5px;
+}
+
+.layui-pl15 {
+  padding-left: 15px;
+}
+
+.layui-pt12 {
+  padding-top: 12px;
+}
+
+.layui-border-left {
+  border-left: 1px solid #f0f0f0;
+}
+
+.layui-bg-gray {
+  background: #f5f5f5;
+}
+
+.layui-m-5 {
+  margin: -5px;
+}
+
+.layui-mt8 {
+  margin-top: 8px;
+}
+
+.layui-mb8 {
+  margin-bottom: 8px;
+}
+
+.layui-elip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.layui-gap-3 {
+  gap: 3px;
+}
+
+.layui-gap-8 {
+  gap: 8px;
+}
+
+.layui-mr5 {
+  margin-right: 5px;
+}
+
+.layui-ml5 {
+  margin-left: 5px;
+}
+
+.layui-mb0 {
+  margin-bottom: 0;
+}
+
+.layui-mt0 {
+  margin-top: 0;
+}
+
+/* Tab 相关样式 */
+.layui-tab-brief > .layui-tab-title .layui-this {
+  color: var(--layui-primary);
+  border-color: var(--layui-primary);
+}
+
+.layui-tab-brief > .layui-tab-title li {
+  padding: 12px 20px;
+  font-weight: 500;
+}
+
+/* 表单面板样式 */
+.layui-form-pane {
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+/* 验证码样式 */
+.layui-codebox {
+  display: flex;
+  gap: 10px;
+}
+
+.layui-codebox-img {
+  min-width: 100px;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 折叠面板样式 */
+.layui-colla-title {
+  padding: 12px 15px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.3s;
+}
+
+.layui-colla-title:hover {
+  color: var(--layui-primary);
+  background: #f8f8f8;
+}
+
+.layui-colla-content {
+  padding: 15px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.layui-show {
+  display: block;
+}
+
+/* 动画类 */
+.layui-anim-fadein {
+  animation: layuiFadeIn 0.3s;
+}
+
+.layui-anim-upbit {
+  animation: layuiUp 0.3s;
+}
+
+@keyframes layuiFadeIn {
+  from {
+    opacity: 0;
+  transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes layuiUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 颜色相关 */
+.layui-border-red {
+  border-color: #ff4d4f !important;
+}
+
+.layui-font-red {
+  color: #ff4d4f;
+}
+
+.layui-font-2xl {
+  font-size: 22px;
+}
+
+/* 按钮变体 */
+.layui-btn-warm {
+  background: linear-gradient(135deg, #ffb800 0%, #ff9800 100%);
+}
+
+.layui-btn-warm:hover {
+  background: linear-gradient(135deg, #ff9800 0%, #ff7800 100%);
+}
+
+/* 额外的 padding/margin 类 */
+.layui-p25 {
+  padding: 25px;
+}
+
+.layui-mb20 {
+  margin-bottom: 20px;
+}
+
+/* Tab 相关样式 */
+.layui-tab-brief > .layui-tab-title .layui-this {
+  color: var(--layui-primary);
+  border-bottom: 2px solid var(--layui-primary);
+}
+
+.layui-tab-brief > .layui-tab-title li {
+  padding: 12px 25px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.layui-tab-brief > .layui-tab-title li:hover {
+  color: var(--layui-primary);
+}
+
+/* 验证码输入框样式 */
+.layui-codebox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.layui-codebox-img {
+  min-width: 90px;
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.layui-codebox-img:hover {
+  border-color: var(--layui-primary);
+  transform: scale(1.05);
+}
+
+/* 列表垂直排列 */
+.layui-flex-col {
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* layui-input-wrap 样式 */
+.layui-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.layui-input-wrap .layui-input {
+  padding-left: 36px;
+  flex: 1;
+}
+
+.layui-input-wrap .layui-input-prefix {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  color: #999;
+  pointer-events: none;
+}
+
+.layui-input-wrap .layui-input-suffix {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 10px;
+  color: #999;
+}
+
+.layui-input-wrap .layui-input-suffix:hover {
+  color: var(--layui-primary);
+}
+.layui-flex-col {
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 复选框样式 */
+.layui-checkbox input[type="checkbox"] + span {
+  cursor: pointer;
+}
+
+/* 登录页面专用样式 */
+.layui-btn-fluid {
+  width: 100%;
+}
+
+.layui-inline-block {
+  display: inline-block;
+}
+
+/* 边框颜色 */
+.layui-border-cyan {
+  border-color: #009688 !important;
+}
+
+/* 背景颜色 */
+.layui-bg-cyan {
+  background-color: #009688 !important;
+}
+
+/* 颜色扩展 */
+.layui-font-purple {
+  color: #722ed1;
+}
+
+.layui-font-teal {
+  color: #16baaa;
+}
+
+.layui-font-pink {
+  color: #ff6b81;
+}
+
+/* 渐变按钮变体 */
+.layui-btn-purple {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
+}
+
+.layui-btn-purple:hover {
+  background: linear-gradient(135deg, #9254de 0%, #b37feb 100%);
+}
+
+.layui-btn-teal {
+  background: linear-gradient(135deg, #16baaa 0%, #009688 100%);
+}
+
+.layui-btn-teal:hover {
+  background: linear-gradient(135deg, #009688 0%, #16baaa 100%);
+}
+
+/* 阴影扩展 */
+.layui-shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.layui-shadow-md {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.layui-shadow-lg {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+}
+
+/* 圆角扩展 */
+.layui-radius-md {
+  border-radius: 8px;
+}
+
+.layui-radius-lg {
+  border-radius: 12px;
+}
+
+.layui-radius-xl {
+  border-radius: 16px;
+}
+
+/* 输入框扩展 */
+.layui-input-block {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* Tab 样式增强 */
+.layui-tab-item {
+  display: none;
+}
+
+.layui-tab-item.layui-show {
+  display: block;
+}
+
+.layui-tab-title li.layui-this {
+  color: #009688;
+}
+
+.layui-tab-brief > .layui-tab-more li.layui-this:after {
+  border-bottom: 2px solid #009688;
+}
+
+/* 表格样式增强 */
+.layui-table thead tr {
+  background-color: #fafafa;
+}
+
+.layui-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.layui-table tbody tr:hover {
+  background-color: #f8f8f8;
+}
+
+/* 分页样式增强 */
+.layui-laypage a {
+  color: #666;
+}
+
+.layui-laypage .layui-laypage-curr .layui-laypage-em {
+  background-color: #009688;
+}
+
+.layui-laypage a:hover {
+  color: #009688;
+}
+
+/* 图片上传预览 */
+.layui-upload-list {
+  margin-top: 10px;
+}
+
+.layui-upload-list li {
+  margin-bottom: 10px;
+}
+
+/* 消息提示样式增强 */
+.layui-layer-content {
+  padding: 20px;
+}
+
+.layui-layer-title {
+  background: linear-gradient(135deg, #009688 0%, #1e9fff 100%);
+  color: #fff;
+}
+
+/* 加载动画 */
+.layui-anim-rotate {
+  animation: layuiRotate 1s linear infinite;
+}
+
+@keyframes layuiRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

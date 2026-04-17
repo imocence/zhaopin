@@ -7,6 +7,8 @@ import { jobService, companyService, locationService } from '@/lib/utils/data';
 export default function HomePage() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const itemContainerRef = useRef<HTMLDivElement>(null);
+  const carouselInitialized = useRef(false);
 
   const categories = [
     { id: 'tech', name: 'IT/互联网', icon: '💻', count: 1250 },
@@ -35,23 +37,6 @@ export default function HomePage() {
         const element = layui.element;
         const form = layui.form;
 
-        // 等待 DOM 完全渲染后初始化轮播图
-        setTimeout(() => {
-          const carouselElem = document.getElementById('homeCarousel');
-          if (carouselElem) {
-            carousel.render({
-              elem: '#homeCarousel',
-              width: '100%',
-              height: '400px',
-              arrow: 'hover',
-              indicator: 'outside',
-              autoplay: true,
-              interval: 5000,
-              anim: 'default'
-            });
-          }
-        }, 200);
-
         // 渲染表单
         if (formRef.current) {
           form.render();
@@ -59,10 +44,24 @@ export default function HomePage() {
 
         // 渲染选项卡
         element.render('tab');
+
+        // 初始化轮播图 - 只初始化一次
+        if (!carouselInitialized.current && carouselRef.current && itemContainerRef.current) {
+          // 设置 carousel-item 属性
+          itemContainerRef.current.setAttribute('carousel-item', '');
+
+          carousel.render({
+            elem: '#homeCarousel',
+            width: '100%',
+            height: '400px'
+          });
+
+          carouselInitialized.current = true;
+        }
       });
     };
 
-    setTimeout(initLayui, 500);
+    initLayui();
   }, []);
 
   const hotJobs = jobService.getAll().filter(j => j.status === 'active').slice(0, 8);
@@ -113,25 +112,34 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      {/* 轮播图 */}
+    <>
+      {/* 轮播图 - 全宽 */}
       <div className="layui-carousel" id="homeCarousel" ref={carouselRef} lay-filter="homeCarousel">
-        <div carousel-item="">
-          <div style={{height: '400px', background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center'}}>
-            <h1 style={{fontSize: '42px', fontWeight: 'bold', marginBottom: '15px', color: '#fff'}}>找好工作，上168招聘网</h1>
-            <p style={{fontSize: '18px', marginBottom: '30px', color: 'rgba(255,255,255,0.9)'}}>专注为在美华人提供优质职位</p>
-            <Link href="/jobs" className="layui-btn layui-btn-lg">立即搜索</Link>
-          </div>
-        </div>
-        <div carousel-item="">
-          <div style={{height: '400px', background: 'linear-gradient(135deg, #ffb800 0%, #ff5722 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center'}}>
+        <div ref={itemContainerRef}>
+          <div style={{
+            height: '400px',
+            background: 'linear-gradient(135deg, #ffb800 0%, #ff5722 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            textAlign: 'center'
+          }}>
             <h1 style={{fontSize: '42px', fontWeight: 'bold', marginBottom: '15px', color: '#fff'}}>企业招聘首选平台</h1>
             <p style={{fontSize: '18px', marginBottom: '30px', color: 'rgba(255,255,255,0.9)'}}>快速发布职位，精准匹配人才</p>
             <Link href="/post" className="layui-btn layui-btn-lg layui-btn-primary">发布职位</Link>
           </div>
-        </div>
-        <div carousel-item="">
-          <div style={{height: '400px', background: 'linear-gradient(135deg, #16baaa 0%, #009688 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center'}}>
+          <div style={{
+            height: '400px',
+            background: 'linear-gradient(135deg, #16baaa 0%, #009688 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            textAlign: 'center'
+          }}>
             <h1 style={{fontSize: '42px', fontWeight: 'bold', marginBottom: '15px', color: '#fff'}}>海量优质企业</h1>
             <p style={{fontSize: '18px', marginBottom: '30px', color: 'rgba(255,255,255,0.9)'}}>已认证企业，求职更放心</p>
             <Link href="/companies" className="layui-btn layui-btn-lg">浏览企业</Link>
@@ -139,37 +147,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 搜索框 */}
-      <div className="layui-container" style={{position: 'relative', zIndex: 10, marginTop: '-30px'}}>
-        <div className="layui-card">
-          <div className="layui-card-body">
-            <form className="layui-form" ref={formRef} lay-filter="searchForm">
-              <div className="layui-form-item">
-                <div className="layui-input-inline" style={{width: '400px'}}>
-                  <input type="text" name="keyword" placeholder="搜索职位名称、关键词..." className="layui-input" />
-                </div>
-                <div className="layui-input-inline">
-                  <select name="state" lay-filter="state">
-                    <option value="">全部地区</option>
-                    {allStates.map(state => (
-                      <option key={state.id} value={state.id}>{state.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="layui-input-inline">
-                  <button type="button" className="layui-btn">
-                    <i className="layui-icon layui-icon-search"></i> 搜索
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      {/* 主内容 */}
-      <div className="layui-container" style={{marginTop: '30px'}}>
-        <div className="layui-row layui-col-space20">
+      {/* 主内容区域 - 限制宽度 */}
+      <div className="layui-main">
+        {/* 主内容 */}
+        <div style={{marginTop: '30px'}}>
+          <div className="layui-row layui-col-space20">
           {/* 左侧主内容 */}
           <div className="layui-col-md9">
             {/* 推荐职位 */}
@@ -323,18 +305,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-
-      {/* CTA */}
-      <div style={{background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)', padding: '50px 0', marginTop: '40px', textAlign: 'center', color: '#fff'}}>
-        <div className="layui-container">
-          <h2 style={{fontSize: '32px', fontWeight: 'bold', marginBottom: '15px', color: '#fff'}}>开始您的求职之旅</h2>
-          <p style={{fontSize: '16px', marginBottom: '30px', color: 'rgba(255,255,255,0.9)'}}>加入168招聘网，连接优质企业和职业机会</p>
-          <div style={{display: 'flex', justifyContent: 'center', gap: '15px'}}>
-            <Link href="/jobs" className="layui-btn layui-btn-lg" style={{background: '#fff', color: '#009688'}}>搜索职位</Link>
-            <Link href="/post" className="layui-btn layui-btn-lg layui-btn-primary" style={{borderColor: '#fff', color: '#fff', background: 'transparent'}}>发布职位</Link>
-          </div>
-        </div>
-      </div>
     </div>
+  </>
   );
 }
