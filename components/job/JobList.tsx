@@ -23,36 +23,55 @@ const JobList: React.FC<JobListProps> = ({
 }) => {
   if (jobs.length === 0) {
     return (
-      <div className="layui-card">
-        <div className="layui-card-body text-center py-12">
-          <svg
-            className="w-16 h-16 mx-auto text-gray-400 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            没有找到相关职位
-          </h3>
-          <p className="text-gray-500">
-            请尝试调整筛选条件或搜索关键词
-          </p>
+      <div className="layui-card" style={{
+        borderRadius: '8px',
+        textAlign: 'center',
+        padding: '60px 20px'
+      }}>
+        <div style={{
+          fontSize: '80px',
+          marginBottom: '20px',
+          opacity: '0.5'
+        }}>🔍</div>
+        <h3 style={{
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: '#333',
+          marginBottom: '10px'
+        }}>
+          没有找到相关职位
+        </h3>
+        <p style={{
+          fontSize: '14px',
+          color: '#999',
+          marginBottom: '20px'
+        }}>
+          请尝试调整筛选条件或搜索关键词
+        </p>
+        <div style={{
+          display: 'inline-flex',
+          gap: '10px'
+        }}>
+          <span style={{
+            padding: '6px 16px',
+            background: '#f5f5f5',
+            borderRadius: '20px',
+            fontSize: '13px',
+            color: '#666',
+            cursor: 'pointer'
+          }}>
+            <i className="layui-icon layui-icon-refresh" style={{fontSize: '12px'}}></i>
+            清除筛选
+          </span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* 职位列表 */}
-      <div className="space-y-4">
+      <div style={{marginBottom: '20px'}}>
         {jobs.map((job) => {
           const company = companyService.getById(job.companyId);
           return (
@@ -69,7 +88,12 @@ const JobList: React.FC<JobListProps> = ({
 
       {/* 分页 */}
       {total > pageSize && (
-        <div className="flex justify-center mt-6">
+        <div style={{
+          marginTop: '30px',
+          padding: '20px',
+          background: '#fafafa',
+          borderRadius: '8px'
+        }}>
           <Pagination
             current={page}
             total={total}

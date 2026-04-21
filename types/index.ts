@@ -29,6 +29,7 @@ export interface Company {
   industry: string;
   size: string;
   location: string;
+  city?: string;
   state: string;
   description: string;
   website?: string;
@@ -36,6 +37,7 @@ export interface Company {
   phone?: string;
   verified: boolean;
   verifiedAt?: string;
+  jobCount?: number;
   createdAt: string;
 }
 
