@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EXPERIENCE_OPTIONS, EDUCATION_OPTIONS, SALARY_TYPE_OPTIONS } from '@/lib/constants';
 import { categoryService, locationService } from '@/lib/utils/data';
@@ -9,30 +9,9 @@ const PostJobForm: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formStep, setFormStep] = useState(1);
-  const formRef = useRef<HTMLFormElement>(null);
 
   const categories = categoryService.getAllSubcategories();
   const locations = locationService.getAll();
-
-  useEffect(() => {
-    const initLayui = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLayui, 100);
-        return;
-      }
-      layui.use(['form', 'element'], function() {
-        const form = layui.form;
-        const element = layui.element;
-        if (formRef.current) {
-          form.render();
-        }
-        element.render('tab');
-      });
-    };
-    initLayui();
-  }, [formStep]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,403 +25,355 @@ const PostJobForm: React.FC = () => {
   };
 
   return (
-    <div style={{maxWidth: '900px', margin: '0 auto'}}>
-      {/* 页面头部 */}
-      <div className="layui-card layui-mb20 layui-page-header">
-        <div className="layui-page-header-body layui-bg-gradient-cyan">
-          <div className="layui-flex layui-flex-between">
+    <div className="max-w-4xl mx-auto">
+      {/* 表单头部 */}
+      <div className="layui-card mb-6">
+        <div className="layui-card-body">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="layui-font-white layui-font-3xl layui-font-bold layui-mb5">
-                发布新职位
-              </h1>
-              <p className="layui-font-gray-light layui-font-lg">
-                填写职位信息，吸引优秀人才
-              </p>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">发布新职位</h1>
+              <p className="text-gray-600">填写职位信息，吸引优秀人才</p>
             </div>
-            <div className="layui-header-icon">
-              <div style={{
-                width: '60px',
-                height: '60px',
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '28px'
-              }}>
-                💼
+            <div className="hidden md:block">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  带 * 为必填项
+                </span>
               </div>
             </div>
           </div>
 
           {/* 步骤指示器 */}
-          <div className="layui-mt30 layui-p20" style={{background: 'rgba(255,255,255,0.95)', borderRadius: '8px'}}>
-            <div className="layui-flex layui-flex-center">
-              <div className="layui-flex layui-flex-center">
-                {[1, 2, 3].map((step) => (
-                  <React.Fragment key={step}>
-                    <div className="layui-flex" style={{alignItems: 'center'}}>
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        background: formStep >= step ? '#009688' : '#e8e8e8',
-                        color: formStep >= step ? '#fff' : '#999'
-                      }}>
-                        {formStep > step ? '✓' : step}
-                      </div>
-                      <div className="layui-ml10 layui-font-sm layui-font-bold" style={{color: formStep >= step ? '#009688' : '#999'}}>
-                        {step === 1 ? '基本信息' : step === 2 ? '薪资要求' : '确认提交'}
-                      </div>
-                    </div>
-                    {step < 3 && (
-                      <div style={{
-                        width: '60px',
-                        height: '2px',
-                        margin: '0 15px',
-                        background: formStep > step ? '#009688' : '#e8e8e8'
-                      }} />
+          <div className="mt-6 flex items-center justify-center">
+            <div className="flex items-center">
+              {[1, 2, 3].map((step) => (
+                <React.Fragment key={step}>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                    formStep >= step
+                      ? 'bg-[var(--layui-primary)] text-white'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {formStep > step ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      step
                     )}
-                  </React.Fragment>
-                ))}
-              </div>
+                  </div>
+                  {step < 3 && (
+                    <div className={`w-16 h-1 mx-2 ${
+                      formStep > step ? 'bg-[var(--layui-primary)]' : 'bg-gray-200'
+                    }`} />
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      <form ref={formRef} onSubmit={handleSubmit} className="layui-form">
-        {/* 第一步：基本信息 */}
-        {formStep === 1 && (
-          <div className="layui-card layui-card-enhanced layui-mb20">
-            <div className="layui-card-header layui-card-header-bg">
-              <div className="layui-flex layui-flex-center">
-                <div className="layui-filter-tag layui-filter-tag-cyan">
-                  1
-                </div>
-                <div className="layui-ml10 layui-font-xl layui-font-bold layui-font-cyan">
-                  基本信息
-                </div>
-              </div>
-            </div>
-            <div className="layui-card-body layui-card-body-p25">
-              <div className="layui-form-item layui-form-item-enhanced">
-                <label className="layui-form-label-enhanced">
-                  职位标题 <span className="layui-font-red"> *</span>
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="例如：高级前端工程师"
-                  className="layui-input layui-input-enhanced"
-                  required
-                  lay-verify="required"
-                />
-              </div>
+      <form onSubmit={handleSubmit} className="layui-card">
+        <div className="layui-card-body">
+          {/* 第一步：基本信息 */}
+          {formStep === 1 && (
+            <div className="layui-anim layui-anim-fadein">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-[var(--layui-primary)] text-white flex items-center justify-center text-sm">1</span>
+                基本信息
+              </h3>
 
-              <div className="layui-row layui-col-space20">
-                <div className="layui-col-md6">
-                  <div className="layui-form-item layui-form-item-enhanced">
-                    <label className="layui-form-label-enhanced">
-                      职位分类 <span className="layui-font-red"> *</span>
+              <div className="space-y-5">
+                <div className="layui-form-item">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    职位标题 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="例如：高级前端工程师"
+                    className="layui-input"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="layui-form-item">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      职位分类 <span className="text-red-500">*</span>
                     </label>
-                    <select name="category" className="layui-select" required lay-verify="required">
+                    <select name="category" className="layui-select" required>
                       <option value="">请选择分类</option>
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
                     </select>
                   </div>
-                </div>
 
-                <div className="layui-col-md6">
-                  <div className="layui-form-item layui-form-item-enhanced">
-                    <label className="layui-form-label-enhanced">
-                      工作地点 <span className="layui-font-red"> *</span>
+                  <div className="layui-form-item">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      工作地点 <span className="text-red-500">*</span>
                     </label>
-                    <div className="layui-flex layui-flex-wrap" style={{gap: '10px'}}>
-                      <div style={{flex: '1'}}>
-                        <select name="state" className="layui-select" required lay-verify="required">
-                          <option value="">州</option>
-                          {locations.map((loc) => (
-                            <option key={loc.id} value={loc.stateCode}>{loc.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div style={{flex: '2'}}>
-                        <input
-                          type="text"
-                          name="city"
-                          placeholder="城市"
-                          className="layui-input layui-input-enhanced"
-                          required
-                          lay-verify="required"
-                        />
-                      </div>
+                    <div className="flex gap-2">
+                      <select name="state" className="layui-select w-1/3" required>
+                        <option value="">州</option>
+                        {locations.map((loc) => (
+                          <option key={loc.id} value={loc.stateCode}>{loc.name}</option>
+                        ))}
+                      </select>
+                      <input
+                        type="text"
+                        name="city"
+                        placeholder="城市"
+                        className="layui-input flex-1"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="layui-form-item layui-form-item-enhanced">
-                <label className="layui-form-label-enhanced">
-                  职位描述 <span className="layui-font-red"> *</span>
-                </label>
-                <textarea
-                  name="description"
-                  className="layui-textarea"
-                  style={{height: '150px'}}
-                  placeholder="请详细描述职位职责、工作内容等..."
-                  required
-                  lay-verify="required"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 第二步：薪资要求 */}
-        {formStep === 2 && (
-          <>
-            <div className="layui-card layui-card-enhanced layui-mb20">
-              <div className="layui-card-header layui-card-header-bg">
-                <div className="layui-flex layui-flex-center">
-                  <div className="layui-filter-tag layui-filter-tag-green">
-                    2
-                  </div>
-                  <div className="layui-ml10 layui-font-xl layui-font-bold layui-font-cyan">
-                    薪资与要求
-                  </div>
+                <div className="layui-form-item">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    职位描述 <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    name="description"
+                    className="layui-textarea"
+                    rows={6}
+                    placeholder="请详细描述职位职责、工作内容等..."
+                    required
+                  />
                 </div>
               </div>
-              <div className="layui-card-body layui-card-body-p25">
+            </div>
+          )}
+
+          {/* 第二步：薪资要求 */}
+          {formStep === 2 && (
+            <div className="layui-anim layui-anim-fadein">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-[var(--layui-primary)] text-white flex items-center justify-center text-sm">2</span>
+                薪资与要求
+              </h3>
+
+              <div className="space-y-5">
                 {/* 薪资信息 */}
-                <div className="layui-mb20">
-                  <h3 className="layui-font-lg layui-font-bold layui-mb15 layui-flex layui-flex-center">
-                    <i className="layui-icon layui-icon-template-1 layui-font-cyan layui-mr5"></i>
+                <div className="layui-panel">
+                  <div className="layui-panel-title flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     薪资信息
-                  </h3>
-                  <div style={{background: '#f8f8f8', padding: '20px', borderRadius: '8px'}}>
-                    <div className="layui-row layui-col-space15">
-                      <div className="layui-col-md3">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">薪资类型</label>
-                          <select name="salaryType" className="layui-select">
-                            {SALARY_TYPE_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
+                  </div>
+                  <div className="layui-panel-body">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          薪资类型
+                        </label>
+                        <select name="salaryType" className="layui-select">
+                          {SALARY_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          最低薪资 <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                          <input
+                            type="number"
+                            name="salaryMin"
+                            placeholder="0"
+                            className="layui-input pl-7"
+                            required
+                          />
                         </div>
                       </div>
 
-                      <div className="layui-col-md3">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">
-                            最低薪资 <span className="layui-font-red"> *</span>
-                          </label>
-                          <div style={{position: 'relative'}}>
-                            <span style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999'}}>$</span>
-                            <input
-                              type="number"
-                              name="salaryMin"
-                              placeholder="0"
-                              className="layui-input layui-input-enhanced"
-                              style={{paddingLeft: '25px'}}
-                              required
-                              lay-verify="required"
-                            />
-                          </div>
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          最高薪资 <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                          <input
+                            type="number"
+                            name="salaryMax"
+                            placeholder="0"
+                            className="layui-input pl-7"
+                            required
+                          />
                         </div>
                       </div>
 
-                      <div className="layui-col-md3">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">
-                            最高薪资 <span className="layui-font-red"> *</span>
-                          </label>
-                          <div style={{position: 'relative'}}>
-                            <span style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999'}}>$</span>
-                            <input
-                              type="number"
-                              name="salaryMax"
-                              placeholder="0"
-                              className="layui-input layui-input-enhanced"
-                              style={{paddingLeft: '25px'}}
-                              required
-                              lay-verify="required"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="layui-col-md3">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">货币单位</label>
-                          <select name="currency" className="layui-select">
-                            <option value="USD">美元 (USD)</option>
-                          </select>
-                        </div>
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          货币单位
+                        </label>
+                        <select name="currency" className="layui-select">
+                          <option value="USD">美元 (USD)</option>
+                        </select>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* 任职要求 */}
-                <div>
-                  <h3 className="layui-font-lg layui-font-bold layui-mb15 layui-flex layui-flex-center">
-                    <i className="layui-icon layui-icon-circle-dot layui-font-cyan layui-mr5"></i>
+                <div className="layui-panel">
+                  <div className="layui-panel-title flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
                     任职要求
-                  </h3>
-                  <div style={{background: '#f8f8f8', padding: '20px', borderRadius: '8px'}}>
-                    <div className="layui-row layui-col-space15">
-                      <div className="layui-col-md6">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">经验要求</label>
-                          <select name="experience" className="layui-select">
-                            {EXPERIENCE_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                        </div>
+                  </div>
+                  <div className="layui-panel-body">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          经验要求
+                        </label>
+                        <select name="experience" className="layui-select">
+                          {EXPERIENCE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
                       </div>
 
-                      <div className="layui-col-md6">
-                        <div className="layui-form-item layui-form-item-enhanced">
-                          <label className="layui-form-label-enhanced">学历要求</label>
-                          <select name="education" className="layui-select">
-                            {EDUCATION_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                        </div>
+                      <div className="layui-form-item">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          学历要求
+                        </label>
+                        <select name="education" className="layui-select">
+                          {EDUCATION_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="layui-form-item layui-form-item-enhanced layui-mt20">
-                  <label className="layui-form-label-enhanced">
-                    任职要求详情 <span className="layui-font-red"> *</span>
+                <div className="layui-form-item">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    任职要求详情 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="requirements"
                     className="layui-textarea"
-                    style={{height: '120px'}}
+                    rows={4}
                     placeholder="请列出具体的任职要求，每行一条..."
                     required
-                    lay-verify="required"
                   />
                 </div>
 
-                <div className="layui-form-item layui-form-item-enhanced">
-                  <label className="layui-form-label-enhanced">职位福利</label>
+                <div className="layui-form-item">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    职位福利
+                  </label>
                   <textarea
                     name="benefits"
                     className="layui-textarea"
-                    style={{height: '100px'}}
+                    rows={3}
                     placeholder="请列出职位福利，每行一条，如：五险一金、带薪年假等..."
                   />
                 </div>
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        {/* 第三步：确认提交 */}
-        {formStep === 3 && (
-          <div className="layui-card layui-card-enhanced layui-mb20">
-            <div className="layui-card-header layui-card-header-bg">
-              <div className="layui-flex layui-flex-center">
-                <div className="layui-filter-tag layui-filter-tag-orange">
-                  3
+          {/* 第三步：确认提交 */}
+          {formStep === 3 && (
+            <div className="layui-anim layui-anim-fadein">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-[var(--layui-primary)] text-white flex items-center justify-center text-sm">3</span>
+                确认信息
+              </h3>
+
+              <div className="space-y-4">
+                <div className="layui-panel">
+                  <div className="layui-panel-body text-center py-8">
+                    <svg className="w-16 h-16 mx-auto text-[var(--layui-primary)] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">准备好发布了吗？</h4>
+                    <p className="text-gray-600">请确认以上信息无误后，点击发布按钮完成职位发布</p>
+                  </div>
                 </div>
-                <div className="layui-ml10 layui-font-xl layui-font-bold layui-font-cyan">
-                  确认提交
+
+                <div className="layui-panel">
+                  <div className="layui-panel-title">发布须知</div>
+                  <div className="layui-panel-body">
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li className="flex items-start gap-2">
+                        <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>请确保职位信息真实、准确、完整</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>职位发布后将进入审核队列，审核通过后公开显示</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>您可以随时在企业管理后台编辑或下架职位</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="layui-card-body layui-card-body-p30">
-              <div className="layui-text-center layui-p30">
-                <div style={{fontSize: '80px', marginBottom: '20px'}}>✅</div>
-                <h3 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-cyan">
-                  准备好发布了吗？
-                </h3>
-                <p className="layui-font-gray-99 layui-font-lg layui-mb25">
-                  请确认以上信息无误后，点击发布按钮完成职位发布
-                </p>
-              </div>
+          )}
 
-              <div style={{background: '#f8f8f8', padding: '25px', borderRadius: '8px', marginBottom: '20px'}}>
-                <h3 className="layui-font-lg layui-font-bold layui-mb20 layui-flex layui-flex-center">
-                  <i className="layui-icon layui-icon-about layui-font-orange layui-mr5"></i>
-                  发布须知
-                </h3>
-                <ul className="layui-unstyled-list" style={{padding: '0 20px'}}>
-                  <li className="layui-flex layui-flex-center layui-mb15">
-                    <i className="layui-icon layui-icon-ok layui-font-green layui-mr10 layui-font-lg"></i>
-                    <span className="layui-font-gray-66 layui-font-lg">请确保职位信息真实、准确、完整</span>
-                  </li>
-                  <li className="layui-flex layui-flex-center layui-mb15">
-                    <i className="layui-icon layui-icon-ok layui-font-green layui-mr10 layui-font-lg"></i>
-                    <span className="layui-font-gray-66 layui-font-lg">职位发布后将进入审核队列，审核通过后公开显示</span>
-                  </li>
-                  <li className="layui-flex layui-flex-center">
-                    <i className="layui-icon layui-icon-ok layui-font-green layui-mr10 layui-font-lg"></i>
-                    <span className="layui-font-gray-66 layui-font-lg">您可以随时在企业管理后台编辑或下架职位</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 底部按钮 */}
-        <div className="layui-card layui-mb30">
-          <div className="layui-card-body layui-flex layui-flex-between layui-pt20 layui-border-top">
-            <div className="layui-flex" style={{gap: '15px'}}>
-              {formStep > 1 && (
+          {/* 底部按钮 */}
+          <div className="flex gap-4 pt-6 border-t">
+            {formStep > 1 && (
+              <button
+                type="button"
+                className="layui-btn layui-btn-outline"
+                onClick={() => setFormStep(formStep - 1)}
+              >
+                上一步
+              </button>
+            )}
+            <div className="flex-1" />
+            {formStep < 3 ? (
+              <button
+                type="button"
+                className="layui-btn"
+                onClick={() => setFormStep(formStep + 1)}
+              >
+                下一步
+              </button>
+            ) : (
+              <>
                 <button
                   type="button"
-                  className="layui-btn layui-btn-outline layui-btn-enhanced"
-                  onClick={() => setFormStep(formStep - 1)}
+                  className="layui-btn layui-btn-outline"
+                  onClick={() => router.back()}
                 >
-                  <i className="layui-icon layui-icon-left"></i> 上一步
+                  取消
                 </button>
-              )}
-            </div>
-            <div className="layui-flex" style={{gap: '15px'}}>
-              {formStep < 3 ? (
                 <button
-                  type="button"
-                  className="layui-btn layui-btn-enhanced"
-                  onClick={() => setFormStep(formStep + 1)}
+                  type="submit"
+                  className="layui-btn"
+                  disabled={loading}
                 >
-                  下一步 <i className="layui-icon layui-icon-right"></i>
+                  {loading ? '提交中...' : '确认发布'}
                 </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="layui-btn layui-btn-outline layui-btn-enhanced"
-                    onClick={() => router.back()}
-                  >
-                    取消
-                  </button>
-                  <button
-                    type="submit"
-                    className="layui-btn layui-btn-enhanced"
-                    disabled={loading}
-                  >
-                    {loading ? <><i className="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 提交中...</> : <><i className="layui-icon layui-icon-release"></i> 确认发布</>}
-                  </button>
-                </>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
       </form>

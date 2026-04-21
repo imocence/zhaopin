@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { companyService, locationService } from '@/lib/utils/data';
 import CompanyCard from '@/components/company/CompanyCard';
 
@@ -12,13 +13,9 @@ export default function CompaniesPage() {
     verified: false,
   });
   const [page, setPage] = useState(1);
-  const pageSize = 12;
-
-  const laypageRef = useRef<HTMLDivElement>(null);
-  const laypageInitialized = useRef(false);
+  const pageSize = 20;
 
   const allCompanies = useMemo(() => companyService.getAll(), []);
-  const locations = locationService.getAll();
 
   const filteredCompanies = useMemo(() => {
     let result = allCompanies;
@@ -62,57 +59,8 @@ export default function CompaniesPage() {
     return Array.from(industrySet).sort();
   }, [allCompanies]);
 
-  // 初始化 laypage 分页组件
-  useEffect(() => {
-    const initLaypage = () => {
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLaypage, 100);
-        return;
-      }
-
-      layui.use(['laypage'], function() {
-        const laypage = layui.laypage;
-
-        if (laypageRef.current && !laypageInitialized.current) {
-          if (totalPages <= 1) {
-            return;
-          }
-
-          laypage.render({
-            elem: laypageRef.current,
-            count: filteredCompanies.length,
-            limit: pageSize,
-            curr: page,
-            layout: ['count', 'prev', 'page', 'next', 'limit', 'skip'],
-            jump: function(obj: any, first: boolean) {
-              if (!first) {
-                setPage(obj.curr);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }
-          });
-
-          laypageInitialized.current = true;
-        }
-      });
-    };
-
-    initLaypage();
-  }, [filteredCompanies.length, page, pageSize]);
-
-  // 当总页数变化时，重置 laypage
-  useEffect(() => {
-    laypageInitialized.current = false;
-  }, [totalPages]);
-
   const handleFilterChange = (key: string, value: string | boolean) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-    setPage(1);
-  };
-
-  const handleResetFilters = () => {
-    setFilters({ keyword: '', state: '', industry: '', verified: false });
     setPage(1);
   };
 
@@ -120,165 +68,141 @@ export default function CompaniesPage() {
 
   return (
     <div className="layui-container layui-mt20">
-      {/* 页面头部 */}
-      <div className="layui-card layui-page-header layui-mb25">
-        <div className="layui-card-body layui-page-header-body layui-bg-gradient-blue">
-          {/* 装饰性背景元素 */}
-          <div className="layui-header-decoration layui-header-decoration-lg"></div>
-          <div className="layui-header-decoration layui-header-decoration-sm"></div>
-
-          <div style={{position: 'relative', zIndex: 1}}>
-            <div className="layui-flex layui-mb15">
-              <div className="layui-header-icon layui-mr20">
-                <i className="layui-icon layui-icon-component layui-font-white layui-font-3xl"></i>
-              </div>
-              <div>
-                <h1 className="layui-font-title layui-font-white layui-font-bold layui-mb5">企业大全</h1>
-                <p className="layui-font-sm layui-font-gray-light layui-mt5 layui-mb0">发现优秀企业，开启职业新征程</p>
-              </div>
-            </div>
-            <div className="layui-header-badge layui-font-white layui-font-lg">
-              <i className="layui-icon layui-icon-ok-circle layui-font-white layui-icon-gap-lg"></i>
-              <span className="layui-font-white">
-                发现 <span className="layui-font-3xl layui-font-bold layui-font-white layui-mr5 layui-ml5">{filteredCompanies.length}</span> 家优秀企业
-              </span>
-            </div>
+      {/* 页面标题 */}
+      <div className="layui-card">
+        <div className="layui-card-body" style={{background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)', padding: '40px'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px'}}>
+            <i className="layui-icon layui-icon-component" style={{fontSize: '36px', color: '#fff'}}></i>
+            <h1 style={{fontSize: '32px', fontWeight: 'bold', color: '#fff', margin: 0}}>企业大全</h1>
           </div>
+          <p style={{fontSize: '18px', color: 'rgba(255,255,255,0.9)'}}>
+            发现 <span style={{fontWeight: 'bold', color: '#fff'}}>{filteredCompanies.length}</span> 家优秀企业，开启职业新征程
+          </p>
         </div>
       </div>
 
       {/* 统计数据 */}
-      <div className="layui-row layui-col-space20 layui-mb25">
+      <div className="layui-row layui-col-space15 layui-mt20">
         <div className="layui-col-md3 layui-col-xs6">
-          <div className="layui-card layui-stat-card layui-card-body-p25 layui-text-center layui-hover-lift">
-            <div className="layui-stat-number layui-stat-number-cyan">{filteredCompanies.length}</div>
-            <div className="layui-font-sm layui-font-gray-light">全部企业</div>
+          <div className="layui-card">
+            <div className="layui-card-body layui-text-center">
+              <div style={{fontSize: '32px', fontWeight: 'bold', color: '#009688'}}>{filteredCompanies.length}</div>
+              <div className="layui-font-sm layui-font-gray">全部企业</div>
+            </div>
           </div>
         </div>
         <div className="layui-col-md3 layui-col-xs6">
-          <div className="layui-card layui-stat-card layui-card-body-p25 layui-text-center layui-hover-lift">
-            <div className="layui-stat-number layui-stat-number-blue">{allCompanies.filter(c => c.verified).length}</div>
-            <div className="layui-font-sm layui-font-gray-light">已认证企业</div>
+          <div className="layui-card">
+            <div className="layui-card-body layui-text-center">
+              <div style={{fontSize: '32px', fontWeight: 'bold', color: '#1e9fff'}}>
+                {allCompanies.filter(c => c.verified).length}
+              </div>
+              <div className="layui-font-sm layui-font-gray">已认证企业</div>
+            </div>
           </div>
         </div>
         <div className="layui-col-md3 layui-col-xs6">
-          <div className="layui-card layui-stat-card layui-card-body-p25 layui-text-center layui-hover-lift">
-            <div className="layui-stat-number layui-stat-number-orange">{industries.length}</div>
-            <div className="layui-font-sm layui-font-gray-light">覆盖行业</div>
+          <div className="layui-card">
+            <div className="layui-card-body layui-text-center">
+              <div style={{fontSize: '32px', fontWeight: 'bold', color: '#ffb800'}}>{industries.length}</div>
+              <div className="layui-font-sm layui-font-gray">覆盖行业</div>
+            </div>
           </div>
         </div>
         <div className="layui-col-md3 layui-col-xs6">
-          <div className="layui-card layui-stat-card layui-card-body-p25 layui-text-center layui-hover-lift">
-            <div className="layui-stat-number layui-stat-number-teal">{locations.length}</div>
-            <div className="layui-font-sm layui-font-gray-light">覆盖地区</div>
+          <div className="layui-card">
+            <div className="layui-card-body layui-text-center">
+              <div style={{fontSize: '32px', fontWeight: 'bold', color: '#16baaa'}}>{locationService.getAll().length}</div>
+              <div className="layui-font-sm layui-font-gray">覆盖地区</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="layui-row layui-col-space20">
+      <div className="layui-row layui-col-space20 layui-mt20">
         {/* 侧边栏筛选 */}
         <div className="layui-col-md3">
-          <div className="layui-card layui-card-enhanced">
-            <div className="layui-card-header layui-card-header-bg layui-flex layui-flex-between">
-              <div className="layui-flex layui-flex-center">
-                <i className="layui-icon layui-icon-template-1 layui-font-blue layui-icon-gap"></i>
-                <span className="layui-font-lg layui-font-bold layui-font-gray-light">筛选条件</span>
-              </div>
-              {hasActiveFilters && (
-                <span className="layui-badge layui-badge-enhanced layui-badge-cyan">已筛选</span>
-              )}
+          <div className="layui-card">
+            <div className="layui-card-header">
+              <span className="layui-font-bold">筛选条件</span>
+              {hasActiveFilters && <span className="layui-badge layui-bg-blue layui-fr">已筛选</span>}
             </div>
-            <div className="layui-card-body layui-p20">
+            <div className="layui-card-body">
               {/* 关键词搜索 */}
-              <div className="layui-form-item-enhanced">
-                <label className="layui-form-label-enhanced">
-                  <i className="layui-icon layui-icon-search layui-font-gray-99 layui-icon-gap"></i>
-                  关键词
-                </label>
-                <input
-                  type="text"
-                  placeholder="搜索企业名称..."
-                  className="layui-input layui-input-enhanced"
-                  value={filters.keyword}
-                  onChange={(e) => handleFilterChange('keyword', e.target.value)}
-                />
+              <div className="layui-form-item">
+                <label className="layui-form-label">关键词</label>
+                <div className="layui-input-block">
+                  <input
+                    type="text"
+                    placeholder="搜索企业名称..."
+                    className="layui-input"
+                    value={filters.keyword}
+                    onChange={(e) => handleFilterChange('keyword', e.target.value)}
+                  />
+                </div>
               </div>
 
               {/* 州筛选 */}
-              <div className="layui-form-item-enhanced">
-                <label className="layui-form-label-enhanced">
-                  <i className="layui-icon layui-icon-location layui-font-gray-99 layui-icon-gap"></i>
-                  所在州
-                </label>
-                <select
-                  className="layui-input layui-input-enhanced"
-                  value={filters.state}
-                  onChange={(e) => handleFilterChange('state', e.target.value)}
-                >
-                  <option value="">全部州</option>
-                  {locations.map(state => (
-                    <option key={state.stateCode} value={state.stateCode}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 行业筛选 */}
-              {industries.length > 0 && (
-                <div className="layui-form-item-enhanced">
-                  <label className="layui-form-label-enhanced">
-                    <i className="layui-icon layui-icon-file layui-font-gray-99 layui-icon-gap"></i>
-                    行业
-                  </label>
+              <div className="layui-form-item">
+                <label className="layui-form-label">所在州</label>
+                <div className="layui-input-block">
                   <select
-                    className="layui-input layui-input-enhanced"
-                    value={filters.industry}
-                    onChange={(e) => handleFilterChange('industry', e.target.value)}
+                    className="layui-input"
+                    value={filters.state}
+                    onChange={(e) => handleFilterChange('state', e.target.value)}
                   >
-                    <option value="">全部行业</option>
-                    {industries.map(industry => (
-                      <option key={industry} value={industry}>
-                        {industry}
+                    <option value="">全部州</option>
+                    {locationService.getAll().map(state => (
+                      <option key={state.code} value={state.code}>
+                        {state.name}
                       </option>
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* 行业筛选 */}
+              {industries.length > 0 && (
+                <div className="layui-form-item">
+                  <label className="layui-form-label">行业</label>
+                  <div className="layui-input-block">
+                    <select
+                      className="layui-input"
+                      value={filters.industry}
+                      onChange={(e) => handleFilterChange('industry', e.target.value)}
+                    >
+                      <option value="">全部行业</option>
+                      {industries.map(industry => (
+                        <option key={industry} value={industry}>
+                          {industry}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               )}
 
               {/* 认证筛选 */}
-              <div className="layui-form-item-enhanced">
-                <label className="layui-flex layui-flex-center layui-gap-8 layui-font-sm layui-font-bold layui-font-gray-light" style={{cursor: 'pointer'}}
-                  onClick={() => handleFilterChange('verified', !filters.verified)}
-                >
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    border: filters.verified ? 'none' : '1px solid #d9d9d9',
-                    borderRadius: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: filters.verified ? '#1890ff' : '#fff',
-                    color: filters.verified ? '#fff' : 'transparent'
-                  }}>
-                    {filters.verified && (
-                      <i className="layui-icon layui-icon-ok layui-font-xs"></i>
-                    )}
-                  </div>
-                  仅显示已认证企业
-                </label>
+              <div className="layui-form-item">
+                <label className="layui-form-label">认证</label>
+                <div className="layui-input-block">
+                  <input
+                    type="checkbox"
+                    checked={filters.verified}
+                    onChange={(e) => handleFilterChange('verified', e.target.checked)}
+                    title="仅显示已认证企业"
+                  />
+                </div>
               </div>
 
               {/* 重置按钮 */}
-              <div className="layui-pt20 layui-border-top">
-                <button
-                  className="layui-btn layui-btn-fluid layui-btn-primary layui-btn-enhanced layui-border"
-                  onClick={handleResetFilters}
-                >
-                  <i className="layui-icon layui-icon-search layui-icon-gap"></i>筛选
-                </button>
-              </div>
+              <button
+                className={`layui-btn layui-btn-fluid ${hasActiveFilters ? 'layui-btn-primary' : 'layui-btn-disabled'}`}
+                onClick={() => setFilters({ keyword: '', state: '', industry: '', verified: false })}
+                disabled={!hasActiveFilters}
+              >
+                重置筛选
+              </button>
             </div>
           </div>
         </div>
@@ -286,40 +210,34 @@ export default function CompaniesPage() {
         {/* 企业列表 */}
         <div className="layui-col-md9">
           {/* 结果统计 */}
-          <div className="layui-card layui-card-enhanced layui-mb15">
-            <div className="layui-card-body layui-p20">
-              <div className="layui-flex layui-flex-between layui-flex-wrap layui-m-5">
-                <div className="layui-flex layui-flex-center layui-gap-10">
-                  <i className="layui-icon layui-icon-list layui-font-gray layui-mr5"></i>
-                  <span className="layui-font-sm layui-font-gray-light">
-                    找到 <span className="layui-font-lg layui-font-bold layui-font-blue">{filteredCompanies.length}</span> 家企业
-                  </span>
+          <div className="layui-card">
+            <div className="layui-card-body">
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <span className="layui-font-sm layui-font-gray">
+                  找到 <span className="layui-font-bold layui-font-cyan">{filteredCompanies.length}</span> 家企业
                   {hasActiveFilters && (
                     <button
-                      className="layui-btn layui-btn-xxs layui-btn-primary layui-mr20"
-                      onClick={handleResetFilters}
+                      className="layui-btn layui-btn-xs layui-btn-primary"
+                      style={{marginLeft: '10px'}}
+                      onClick={() => setFilters({ keyword: '', state: '', industry: '', verified: false })}
                     >
-                      筛选
+                      清除筛选
                     </button>
                   )}
-                </div>
-                <div className="layui-flex layui-flex-center layui-gap-10">
-                  <i className="layui-icon layui-icon-template-1 layui-font-gray layui-mr5"></i>
-                  <span className="layui-font-sm layui-font-gray-light">排序：</span>
-                  <select className="layui-input layui-mr5" style={{width: '140px', padding: '6px 10px', border: '1px solid #e8e8e8', borderRadius: '4px', fontSize: '13px'}}>
-                    <option value="default">默认排序</option>
-                    <option value="jobs-desc">职位数从多到少</option>
-                    <option value="verified">已认证优先</option>
-                    <option value="name-asc">名称A-Z</option>
-                  </select>
-                </div>
+                </span>
+                <select className="layui-input" style={{display: 'inline-block', width: 'auto'}}>
+                  <option value="default">默认排序</option>
+                  <option value="jobs-desc">职位数从多到少</option>
+                  <option value="verified">已认证优先</option>
+                  <option value="name-asc">名称A-Z</option>
+                </select>
               </div>
             </div>
           </div>
 
           {/* 企业网格 */}
           {paginatedCompanies.length > 0 ? (
-            <div className="layui-row layui-col-space20">
+            <div className="layui-row layui-col-space15 layui-mt20">
               {paginatedCompanies.map((company) => (
                 <div className="layui-col-md4 layui-col-xs6" key={company.id}>
                   <CompanyCard company={company} />
@@ -327,27 +245,66 @@ export default function CompaniesPage() {
               ))}
             </div>
           ) : (
-            <div className="layui-card layui-card-enhanced layui-text-center" style={{padding: '60px 20px'}}>
-              <div style={{
-                fontSize: '80px',
-                marginBottom: '20px',
-                opacity: '0.5'
-              }}>🏢</div>
-              <h3 className="layui-font-lg layui-font-bold layui-font-gray-light layui-mb10">暂无企业</h3>
-              <p className="layui-font-sm layui-font-gray layui-mb20">没有找到符合条件的企业</p>
-              <button
-                className="layui-btn layui-btn-primary layui-btn-enhanced"
-                onClick={handleResetFilters}
-              >
-                清除筛选条件
-              </button>
+            <div className="layui-card layui-mt20">
+              <div className="layui-card-body layui-text-center" style={{padding: '60px 20px'}}>
+                <i className="layui-icon layui-icon-component" style={{fontSize: '80px', color: '#d2d2d2'}}></i>
+                <h3 className="layui-font-title layui-mt20">暂无企业</h3>
+                <p className="layui-font-gray layui-mb20">没有找到符合条件的企业</p>
+                <button
+                  className="layui-btn layui-btn-primary"
+                  onClick={() => setFilters({ keyword: '', state: '', industry: '', verified: false })}
+                >
+                  清除筛选条件
+                </button>
+              </div>
             </div>
           )}
 
           {/* 分页 */}
           {totalPages > 1 && (
-            <div className="layui-pagination-area">
-              <div ref={laypageRef}></div>
+            <div className="layui-mt20 layui-text-center">
+              <div className="layui-pagination">
+                {page > 1 && (
+                  <button
+                    className="layui-icon"
+                    onClick={() => setPage(page - 1)}
+                  >
+                    «
+                  </button>
+                )}
+
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (page <= 3) {
+                    pageNum = i + 1;
+                  } else if (page >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = page - 2 + i;
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      className={pageNum === page ? 'layui-this' : ''}
+                      onClick={() => setPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                {page < totalPages && (
+                  <button
+                    className="layui-icon"
+                    onClick={() => setPage(page + 1)}
+                  >
+                    »
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

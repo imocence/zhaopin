@@ -36,8 +36,10 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-100">
       <Header/>
-      {children}
-      <footer className="layui-bg-dark" style={{marginTop: '20px',paddingTop: '20px'}}>
+      <main className="layui-main">
+        {children}
+      </main>
+      <footer className="layui-bg-dark" style={{marginTop: 'auto',paddingTop: '20px'}}>
           <div className="layui-container">
               <div className="layui-row layui-col-space30">
                   <div className="layui-col-md4 layui-col-sm6">
@@ -100,20 +102,20 @@ export default function RootLayout({
               </div>
               <div className="layui-row layui-mt30 layui-pt20 layui-border-gray-top">
                   <div className="layui-col-md4 layui-col-sm4 layui-col-xs12 layui-text-center layui-mb15">
-                      <i className="layui-icon layui-icon-email layui-font-blue layui-font-title"></i>
-                      <p className="layui-font-gray layui-font-sm layui-mt5">support@168zhaopin.com</p>
+                      <i className="layui-icon layui-icon-email layui-font-cyan layui-font-title"></i>
+                      <p className="layui-font-sm layui-mt5">support@168zhaopin.com</p>
                   </div>
                   <div className="layui-col-md4 layui-col-sm4 layui-col-xs12 layui-text-center layui-mb15">
                       <i className="layui-icon layui-icon-cellphone layui-font-blue layui-font-title"></i>
-                      <p className="layui-font-gray layui-font-sm layui-mt5">1-800-168-1688</p>
+                      <p className="layui-font-sm layui-mt5">1-800-168-1688</p>
                   </div>
                   <div className="layui-col-md4 layui-col-sm4 layui-col-xs12 layui-text-center layui-mb15">
-                      <i className="layui-icon layui-icon-time layui-font-blue layui-font-title"></i>
-                      <p className="layui-font-gray layui-font-sm layui-mt5">周一至周五 9:00-18:00</p>
+                      <i className="layui-icon layui-icon-clock layui-font-orange layui-font-title"></i>
+                      <p className="layui-font-sm layui-mt5">周一至周五 9:00-18:00</p>
                   </div>
               </div>
               <div className="layui-mt20 layui-text-center layui-pt20 layui-border-gray-top">
-                  <p className="layui-font-gray layui-font-sm layui-mb5">
+                  <p className="layui-font-sm layui-mb5">
                       © {new Date().getFullYear()} 168招聘网. All rights reserved. 美国华人招聘平台
                   </p>
                   <p className="layui-font-xs layui-font-gray-light">

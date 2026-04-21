@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 export interface PaginationProps {
   current: number;
@@ -15,49 +13,61 @@ const Pagination: React.FC<PaginationProps> = ({
   pageSize,
   onChange
 }) => {
-  const laypageRef = useRef<HTMLDivElement>(null);
-  const laypageInitialized = useRef(false);
+  const totalPages = Math.ceil(total / pageSize);
+  const pages: (number | string)[] = [];
 
-  useEffect(() => {
-    const initLaypage = () => {
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLaypage, 100);
-        return;
-      }
+  // 最多显示5个页码
+  const showPages = 5;
 
-      layui.use(['laypage'], function() {
-        const laypage = layui.laypage;
+  if (totalPages <= showPages) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    if (current <= 3) {
+      pages.push(1, 2, 3, 4, '...', totalPages);
+    } else if (current >= totalPages - 2) {
+      pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, '...', current - 1, current, current + 1, '...', totalPages);
+    }
+  }
 
-        if (laypageRef.current && !laypageInitialized.current) {
-          const totalPages = Math.ceil(total / pageSize);
+  return (
+    <div className="layui-pagination flex gap-1">
+      <button
+        className="layui-pagination-item"
+        disabled={current === 1}
+        onClick={() => onChange?.(current - 1)}
+      >
+        上一页
+      </button>
 
-          if (totalPages <= 1) {
-            return;
-          }
+      {pages.map((page, index) => (
+        page === '...' ? (
+          <span key={`ellipsis-${index}`} className="layui-pagination-item">
+            ...
+          </span>
+        ) : (
+          <button
+            key={page}
+            className={`layui-pagination-item ${current === page ? 'layui-this' : ''}`}
+            onClick={() => onChange?.(page as number)}
+          >
+            {page}
+          </button>
+        )
+      ))}
 
-          laypage.render({
-            elem: laypageRef.current,
-            count: total,
-            limit: pageSize,
-            curr: current,
-            layout: ['count', 'prev', 'page', 'next', 'limit', 'skip'],
-            jump: function(obj: any, first: boolean) {
-              if (!first) {
-                onChange?.(obj.curr);
-              }
-            }
-          });
-
-          laypageInitialized.current = true;
-        }
-      });
-    };
-
-    initLaypage();
-  }, [total, pageSize, current, onChange]);
-
-  return <div ref={laypageRef}></div>;
+      <button
+        className="layui-pagination-item"
+        disabled={current === totalPages}
+        onClick={() => onChange?.(current + 1)}
+      >
+        下一页
+      </button>
+    </div>
+  );
 };
 
 export default Pagination;
