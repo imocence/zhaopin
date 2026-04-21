@@ -15,7 +15,8 @@
       "Bash(head -1107 app/globals.css)",
       "Bash(mv app/globals.css.tmp app/globals.css)",
       "Bash(npm run *)",
-      "Bash(curl -I http://localhost:3000/layui/css/layui.css)"
+      "Bash(curl -I http://localhost:3000/layui/css/layui.css)",
+      "Bash(curl -s http://localhost:3000/companies)"
     ]
   }
 }

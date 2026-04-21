@@ -1022,3 +1022,126 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* ==================== 企业卡片样式 ==================== */
+
+/* 15px padding */
+.layui-p15 {
+  padding: 15px;
+}
+
+/* 超小字号 */
+.layui-font-xxs {
+  font-size: 10px;
+}
+
+/* 主色调文字 */
+.layui-font-primary {
+  color: var(--layui-primary);
+}
+
+/* 浅灰色边框 */
+.layui-border-color-gray-light {
+  border-color: #e8e8e8;
+}
+
+/* 企业 Logo 容器 - 左侧布局 */
+.layui-company-logo {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.layui-company-logo-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* 企业信息区域 - 右侧布局 */
+.layui-company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 企业卡片悬浮效果 */
+.company-card-hover {
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  text-decoration: none !important;
+  display: block;
+}
+
+.company-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: var(--layui-primary);
+}
+
+.company-card-hover:hover .layui-company-logo {
+  transform: scale(1.08);
+}
+
+.company-card-hover:hover .layui-company-name {
+  color: var(--layui-primary);
+}
+
+/* 企业名称 */
+.layui-company-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+/* 企业行业 */
+.layui-company-industry {
+  font-size: 12px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 企业位置 */
+.layui-company-location {
+  font-size: 12px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 企业职位信息容器 */
+.layui-company-jobs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.layui-company-jobs-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.layui-company-jobs-count {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.layui-company-jobs-text {
+  color: #999;
+}
