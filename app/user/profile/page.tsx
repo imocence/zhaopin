@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sidebar from '@/components/layout/Sidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 
 export default function UserProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -43,7 +43,7 @@ export default function UserProfilePage() {
       <div className="layui-row layui-col-space20">
         {/* 侧边栏 */}
         <div className="layui-col-md3">
-          <Sidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="default" />
         </div>
 
         {/* 主内容区 */}

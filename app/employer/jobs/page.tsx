@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import EmployerSidebar from '@/components/layout/EmployerSidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { jobService, companyService } from '@/lib/utils/data';
 import { formatDate } from '@/lib/utils/format';
+import { getJobStatusBadge } from '@/lib/utils/status';
 
 export default function EmployerJobsPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive' | 'draft'>('all');
@@ -62,16 +63,7 @@ export default function EmployerJobsPage() {
     { key: 'messages', label: '消息通知', icon: '💬', href: '/employer/messages', badge: 3 },
   ];
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: { [key: string]: { text: string; class: string } } = {
-      active: { text: '招聘中', class: 'layui-bg-green' },
-      inactive: { text: '已下架', class: 'layui-bg-gray' },
-      draft: { text: '草稿', class: 'layui-bg-orange' },
-      closed: { text: '已关闭', class: 'layui-bg-red' },
-    };
-    const s = statusMap[status] || { text: status, class: '' };
-    return <span className={`layui-badge ${s.class}`}>{s.text}</span>;
-  };
+
 
   const handleToggleStatus = (jobId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -91,7 +83,7 @@ export default function EmployerJobsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 侧边栏 */}
-          <EmployerSidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="employer" />
 
           {/* 主内容区 */}
           <div className="flex-1">
@@ -186,7 +178,7 @@ export default function EmployerJobsPage() {
                           <td>{job.applications}</td>
                           <td>{job.views}</td>
                           <td>{formatDate(job.createdAt)}</td>
-                          <td>{getStatusBadge(job.status)}</td>
+                          <td>{getJobStatusBadge(job.status)}</td>
                           <td>
                             <div className="flex gap-2">
                               <button

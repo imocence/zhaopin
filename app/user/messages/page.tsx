@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sidebar from '@/components/layout/Sidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 
 type MessageType = 'all' | 'system' | 'application' | 'interview' | 'company';
 
@@ -115,7 +115,7 @@ export default function UserMessagesPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 侧边栏 */}
-          <Sidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="default" />
 
           {/* 主内容区 */}
           <div className="flex-1">

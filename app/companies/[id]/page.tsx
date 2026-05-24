@@ -4,8 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { companyService, jobService } from '@/lib/utils/data';
-import { formatSalary, formatDate } from '@/lib/utils/format';
-import Tag from '@/components/ui/Tag';
+import { formatDate } from '@/lib/utils/format';
 
 const DEFAULT_LOGO = '/images/logos/default.svg';
 
@@ -17,8 +16,8 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
     return (
       <div className="layui-container layui-mt20">
         <div className="layui-card">
-          <div className="layui-card-body layui-text-center" style={{padding: '60px 20px'}}>
-            <div style={{fontSize: '60px', marginBottom: '20px'}}>😕</div>
+          <div className="layui-card-body layui-text-center layui-p60-20">
+            <div className="layui-empty-icon-60">😕</div>
             <h1 className="layui-font-title layui-font-bold layui-mb15">公司不存在</h1>
             <p className="layui-font-gray layui-mb20">抱歉，找不到该公司信息</p>
             <Link href="/companies" className="layui-btn">
@@ -30,7 +29,6 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
     );
   }
 
-  // 获取该公司的所有职位
   const companyJobs = useMemo(() => {
     return jobService.getByCompanyId(params.id);
   }, [params.id]);
@@ -39,26 +37,23 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="layui-container layui-mt20">
-      {/* 公司头部信息 */}
       <div className="layui-card">
-        <div className="layui-card-body" style={{background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)', padding: '30px'}}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
-            {/* 公司 Logo */}
-            <div style={{width: '100px', height: '100px', borderRadius: '8px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}>
+        <div className="layui-card-body layui-hero-gradient">
+          <div className="layui-flex layui-align-center layui-gap-20">
+            <div className="layui-avatar-square">
               <Image
                 src={logoSrc}
                 alt={company.name}
                 width={100}
                 height={100}
-                className="object-cover"
+                className="layui-img-cover"
                 onError={() => setLogoError(true)}
               />
             </div>
 
-            {/* 公司名称和标签 */}
-            <div style={{flex: 1}}>
-              <h1 style={{fontSize: '28px', fontWeight: 'bold', color: '#fff', marginBottom: '10px'}}>{company.name}</h1>
-              <div style={{display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap'}}>
+            <div className="layui-flex-1">
+              <h1 className="layui-hero-headline">{company.name}</h1>
+              <div className="layui-flex layui-align-center layui-gap-10 layui-flex-wrap">
                 {company.verified && (
                   <span className="layui-badge layui-bg-blue">已认证企业</span>
                 )}
@@ -66,7 +61,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
                   <span className="layui-tag layui-bg-orange">{company.industry}</span>
                 )}
               </div>
-              <div style={{marginTop: '10px', display: 'flex', gap: '20px', fontSize: '14px', color: 'rgba(255,255,255,0.9)'}}>
+              <div className="layui-hero-meta-row">
                 <span>📍 {company.city}, {company.state}</span>
                 <span>👥 {company.size || '规模未知'}</span>
                 <span>💼 {companyJobs.length} 在招职位</span>
@@ -77,16 +72,14 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
       </div>
 
       <div className="layui-row layui-col-space20 layui-mt20">
-        {/* 主要内容区 */}
         <div className="layui-col-md9">
-          {/* 公司简介 */}
           <div className="layui-card">
             <div className="layui-card-header">
               <i className="layui-icon layui-icon-about"></i> 公司简介
             </div>
             <div className="layui-card-body">
               {company.description ? (
-                <p className="layui-font-gray" style={{lineHeight: '1.8', whiteSpace: 'pre-line'}}>
+                <p className="layui-font-gray layui-line-height-relaxed layui-whitespace-preline">
                   {company.description}
                 </p>
               ) : (
@@ -95,7 +88,6 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          {/* 在招职位 */}
           <div className="layui-card layui-mt20">
             <div className="layui-card-header">
               <i className="layui-icon layui-icon-list"></i> 在招职位 ({companyJobs.length})
@@ -112,28 +104,28 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
                     return (
                       <div className="layui-col-md12" key={job.id}>
                         <Link href={`/jobs/${job.id}`} className="layui-text-decoration-none">
-                          <div className="layui-card" style={{transition: 'all 0.3s'}}>
+                          <div className="layui-card layui-card-transition">
                             <div className="layui-card-body">
-                              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                <div style={{flex: 1}}>
-                                  <h4 style={{fontSize: '16px', fontWeight: 'bold', color: '#333', marginBottom: '8px'}}>
+                              <div className="layui-flex layui-justify-between layui-align-center">
+                                <div className="layui-flex-1">
+                                  <h4 className="layui-job-inline-title">
                                     {job.title}
                                   </h4>
-                                  <div style={{fontSize: '13px', color: '#999'}}>
+                                  <div className="layui-job-inline-meta">
                                     <span className="layui-tag layui-bg-gray">{job.category}</span>
-                                    <span style={{margin: '0 8px'}}>•</span>
+                                    <span className="layui-dot-sep">•</span>
                                     <span>{job.location}, {job.state}</span>
-                                    <span style={{margin: '0 8px'}}>•</span>
+                                    <span className="layui-dot-sep">•</span>
                                     <span>{job.experience}</span>
-                                    <span style={{margin: '0 8px'}}>•</span>
+                                    <span className="layui-dot-sep">•</span>
                                     <span>{job.education}</span>
                                   </div>
-                                  <div style={{fontSize: '12px', color: '#ccc', marginTop: '8px'}}>
+                                  <div className="layui-job-inline-foot">
                                     发布于 {formatDate(job.createdAt)}
                                   </div>
                                 </div>
                                 <span className={`layui-badge ${salaryClass}`}>
-                                  ${job.salaryMin.toLocaleString()}-${job.salaryMax.toLocaleString()}/{job.salaryType === 'yearly' ? '年' : '时'}
+                                  ${job.salaryMin.toLocaleString()}-{job.salaryMax.toLocaleString()}/{job.salaryType === 'yearly' ? '年' : '时'}
                                 </span>
                               </div>
                             </div>
@@ -144,8 +136,8 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
                   })}
                 </div>
               ) : (
-                <div className="layui-text-center" style={{padding: '60px 20px'}}>
-                  <div style={{fontSize: '50px', marginBottom: '15px'}}>💼</div>
+                <div className="layui-text-center layui-p60-20">
+                  <div className="layui-empty-icon-50">💼</div>
                   <p className="layui-font-gray">该公司暂无在招职位</p>
                 </div>
               )}
@@ -153,33 +145,31 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-        {/* 侧边栏 */}
         <div className="layui-col-md3">
-          {/* 公司信息 */}
           <div className="layui-card">
             <div className="layui-card-header">
               <i className="layui-icon layui-icon-template-1"></i> 公司信息
             </div>
             <div className="layui-card-body">
-              <div style={{fontSize: '13px'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+              <div className="layui-font-sm">
+                <div className="layui-kv-row">
                   <span className="layui-font-gray-light">所在地区</span>
                   <span className="layui-font-gray">{company.city}, {company.state}</span>
                 </div>
                 {company.industry && (
-                  <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                  <div className="layui-kv-row">
                     <span className="layui-font-gray-light">所属行业</span>
                     <span className="layui-font-gray">{company.industry}</span>
                   </div>
                 )}
                 {company.size && (
-                  <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                  <div className="layui-kv-row">
                     <span className="layui-font-gray-light">公司规模</span>
                     <span className="layui-font-gray">{company.size}</span>
                   </div>
                 )}
                 {company.website && (
-                  <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                  <div className="layui-kv-row">
                     <span className="layui-font-gray-light">公司网站</span>
                     <a
                       href={company.website}
@@ -195,7 +185,6 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          {/* 统计数据 */}
           <div className="layui-card layui-mt20">
             <div className="layui-card-header">
               <i className="layui-icon layui-icon-chart"></i> 统计数据
@@ -203,13 +192,13 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
             <div className="layui-card-body">
               <div className="layui-row layui-col-space10">
                 <div className="layui-col-xs6 layui-text-center">
-                  <div style={{fontSize: '24px', fontWeight: 'bold', color: '#009688'}}>
+                  <div className="layui-stat-num-md-cyan">
                     {companyJobs.length}
                   </div>
                   <div className="layui-font-xs layui-font-gray-light">在招职位</div>
                 </div>
                 <div className="layui-col-xs6 layui-text-center">
-                  <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1e9fff'}}>
+                  <div className="layui-stat-num-md-blue">
                     {company.jobCount || 0}
                   </div>
                   <div className="layui-font-xs layui-font-gray-light">历史发布</div>
@@ -218,7 +207,6 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          {/* 快捷操作 */}
           <div className="layui-card layui-mt20">
             <div className="layui-card-body">
               <Link href={`/jobs?company=${company.id}`} className="layui-btn layui-btn-fluid layui-mb10">

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Sidebar from '@/components/layout/Sidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { jobService, companyService } from '@/lib/utils/data';
 import JobCard from '@/components/job/JobCard';
 
@@ -23,7 +23,7 @@ export default function UserFavoritesPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 侧边栏 */}
-          <Sidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="default" />
 
           {/* 主内容区 */}
           <div className="flex-1">

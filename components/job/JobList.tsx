@@ -23,44 +23,17 @@ const JobList: React.FC<JobListProps> = ({
 }) => {
   if (jobs.length === 0) {
     return (
-      <div className="layui-card" style={{
-        borderRadius: '8px',
-        textAlign: 'center',
-        padding: '60px 20px'
-      }}>
-        <div style={{
-          fontSize: '80px',
-          marginBottom: '20px',
-          opacity: '0.5'
-        }}>🔍</div>
-        <h3 style={{
-          fontSize: '18px',
-          fontWeight: 'bold',
-          color: '#333',
-          marginBottom: '10px'
-        }}>
+      <div className="layui-card layui-empty-card">
+        <div className="layui-empty-card__icon">🔍</div>
+        <h3 className="layui-empty-card__title">
           没有找到相关职位
         </h3>
-        <p style={{
-          fontSize: '14px',
-          color: '#999',
-          marginBottom: '20px'
-        }}>
+        <p className="layui-empty-card__desc">
           请尝试调整筛选条件或搜索关键词
         </p>
-        <div style={{
-          display: 'inline-flex',
-          gap: '10px'
-        }}>
-          <span style={{
-            padding: '6px 16px',
-            background: '#f5f5f5',
-            borderRadius: '20px',
-            fontSize: '13px',
-            color: '#666',
-            cursor: 'pointer'
-          }}>
-            <i className="layui-icon layui-icon-refresh" style={{fontSize: '12px'}}></i>
+        <div className="layui-flex layui-flex-center layui-flex-gap-10">
+          <span className="layui-filter-tag layui-bg-gray layui-font-gray-light">
+            <i className="layui-icon layui-icon-refresh layui-icon-xs layui-mr5"></i>
             清除筛选
           </span>
         </div>
@@ -70,8 +43,7 @@ const JobList: React.FC<JobListProps> = ({
 
   return (
     <div>
-      {/* 职位列表 */}
-      <div style={{marginBottom: '20px'}}>
+      <div className="layui-mb20">
         {jobs.map((job) => {
           const company = companyService.getById(job.companyId);
           return (
@@ -86,14 +58,8 @@ const JobList: React.FC<JobListProps> = ({
         })}
       </div>
 
-      {/* 分页 */}
       {total > pageSize && (
-        <div style={{
-          marginTop: '30px',
-          padding: '20px',
-          background: '#fafafa',
-          borderRadius: '8px'
-        }}>
+        <div className="layui-pagination-bar">
           <Pagination
             current={page}
             total={total}

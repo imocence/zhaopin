@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { useLayuiNav } from '@/lib/hooks/useLayuiInit';
 
 const Header: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
+  
+  // 初始化 Layui 导航
+  useLayuiNav();
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -21,20 +25,6 @@ const Header: React.FC = () => {
     setMounted(true);
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-
-    const initLayuiNav = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLayuiNav, 100);
-        return;
-      }
-      layui.use('element', function(element: any) {
-        element.render('nav');
-      });
-    };
-
-    setTimeout(initLayuiNav, 300);
   }, []);
 
   if (!mounted) {
@@ -48,7 +38,7 @@ const Header: React.FC = () => {
 
   return (
     <div className="layui-bg-dark">
-      <ul className="layui-nav">
+      <ul className="layui-container layui-nav">
         <li className="layui-nav-item">
           <Link href="/" className="layui-logo">168招聘网</Link>
         </li>
@@ -71,15 +61,15 @@ const Header: React.FC = () => {
 
         {!isLoggedIn ? (
           <>
-            <li className="layui-nav-item" style={{float: 'right'}}>
+            <li className="layui-nav-item layui-nav-item-right">
               <Link href="/login">登录</Link>
             </li>
-            <li className="layui-nav-item" style={{float: 'right'}}>
+            <li className="layui-nav-item layui-nav-item-right">
               <Link href="/register">注册</Link>
             </li>
           </>
         ) : (
-          <li className="layui-nav-item" style={{float: 'right'}}>
+          <li className="layui-nav-item layui-nav-item-right">
             <Link href="/user">
               <i className="layui-icon layui-icon-username"></i> 用户中心
             </Link>

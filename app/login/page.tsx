@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,21 +42,9 @@ export default function LoginPage() {
       }
     }
 
-    const initLayui = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLayui, 100);
-        return;
-      }
-      layui.use(['form'], function() {
-        const form = layui.form;
-        if (formRef.current) {
-          form.render();
-        }
-      });
-    };
-    initLayui();
+    if (formRef.current) {
+      useLayuiForm();
+    }
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,48 +94,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <div style={{width: '100%', maxWidth: '450px'}}>
+    <div className="layui-auth-shell">
+      <div className="layui-auth-shell-inner">
         {/* Logo 和标题 */}
         <div className="layui-text-center layui-mb30 layui-anim layui-anim-fadein">
-          <div className="layui-inline-block layui-mb20" style={{
-            width: '80px',
-            height: '80px',
-            background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 30px rgba(0, 150, 136, 0.3)',
-            margin: '0 auto'
-          }}>
-            <span style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: '#fff'
-            }}>168</span>
+          <div className="layui-inline-block layui-mb20 layui-auth-logo-box">
+            <span className="layui-auth-logo-text">168</span>
           </div>
           <h1 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-white">
             美国华人168招聘网
           </h1>
-          <p className="layui-font-lg layui-font-gray-light" style={{opacity: 0.9}}>
+          <p className="layui-font-lg layui-font-gray-light layui-opacity-90">
             欢迎回来，请登录您的账号
           </p>
         </div>
 
         {/* 登录表单卡片 */}
-        <div className="layui-card layui-anim layui-anim-scale" style={{
-          borderRadius: '16px',
-          overflow: 'hidden',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-        }}>
+        <div className="layui-card layui-anim layui-anim-scale layui-auth-card">
           <div className="layui-card-body">
             <form ref={formRef} onSubmit={handleSubmit} className="layui-form">
               {/* 用户名/邮箱 */}
@@ -190,7 +154,7 @@ export default function LoginPage() {
                     lay-reqtext="请填写密码"
                     className={`layui-input ${errors.password ? 'layui-border-red' : ''}`}
                   />
-                  <div className="layui-input-suffix" style={{cursor: 'pointer'}} onClick={() => setShowPassword(!showPassword)}>
+                  <div className="layui-input-suffix layui-cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
                     <i className={`layui-icon ${showPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'}`}></i>
                   </div>
                 </div>
@@ -219,30 +183,14 @@ export default function LoginPage() {
                           placeholder="验证码"
                           lay-verify="required"
                           lay-reqtext="请填写验证码"
-                          className={`layui-input ${errors.captcha ? 'layui-border-red' : ''}`}
+                          className={`layui-input layui-captcha-uppercase ${errors.captcha ? 'layui-border-red' : ''}`}
                           maxLength={4}
-                          style={{textTransform: 'uppercase'}}
                         />
                       </div>
                     </div>
                     <div className="layui-col-xs5">
                       <div
-                        style={{
-                          marginLeft: '10px',
-                          height: '38px',
-                          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                          border: '1px solid #e8e8e8',
-                          borderRadius: '4px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          fontSize: '18px',
-                          fontWeight: 'bold',
-                          color: '#009688',
-                          letterSpacing: '3px',
-                          userSelect: 'none'
-                        }}
+                        className="layui-captcha-box"
                         onClick={generateCaptcha}
                         title="点击刷新"
                       >
@@ -261,7 +209,7 @@ export default function LoginPage() {
 
               {/* 记住我 & 忘记密码 */}
               <div className="layui-flex layui-flex-between layui-mb20">
-                <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '14px', color: '#666'}}>
+                <label className="layui-checkbox-row">
                   <input
                     type="checkbox"
                     id="rememberMe"
@@ -273,8 +221,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="layui-font-sm layui-font-cyan"
-                  style={{textDecoration: 'none'}}
+                  className="layui-font-sm layui-font-cyan layui-link-plain"
                 >
                   忘记密码？
                 </Link>
@@ -283,14 +230,8 @@ export default function LoginPage() {
               {/* 登录按钮 */}
               <button
                 type="submit"
-                className="layui-btn layui-btn-fluid layui-btn-lg layui-btn-enhanced"
+                className="layui-btn layui-btn-fluid layui-btn-lg layui-btn-enhanced layui-btn-gradient-submit"
                 disabled={loading}
-                style={{
-                  background: 'linear-gradient(135deg, #009688 0%, #1e9fff 100%)',
-                  height: '46px',
-                  fontSize: '16px',
-                  fontWeight: 'bold'
-                }}
               >
                 {loading ? (
                   <span className="layui-flex layui-flex-center">
@@ -307,47 +248,31 @@ export default function LoginPage() {
             </form>
 
             {/* 分割线 */}
-            <div className="layui-mt25 layui-mb25" style={{position: 'relative'}}>
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '0',
-                right: '0',
-                borderTop: '1px solid #e8e8e8'
-              }}></div>
-              <div style={{
-                position: 'relative',
-                display: 'flex',
-                justifyContent: 'center'
-              }}>
-                <span style={{
-                  padding: '0 15px',
-                  background: '#fff',
-                  color: '#999',
-                  fontSize: '13px'
-                }}>
+            <div className="layui-mt25 layui-mb25 layui-login-divider">
+              <div className="layui-login-divider-inner">
+                <span className="layui-login-divider-text">
                   社交账号登录
                 </span>
               </div>
             </div>
 
             {/* 社交登录按钮 */}
-            <div className="layui-flex layui-flex-center" style={{gap: '15px'}}>
-              <button className="layui-filter-tag layui-filter-tag-green layui-hover-lift" style={{width: '48px', height: '48px', padding: '0', borderRadius: '50%', fontSize: '20px'}}>
-                <i className="layui-icon layui-icon-login-wechat" style={{fontSize: '20px'}}></i>
+            <div className="layui-flex layui-flex-center layui-flex-gap-15">
+              <button type="button" className="layui-filter-tag layui-filter-tag-green layui-hover-lift layui-oauth-icon-btn">
+                <i className="layui-icon layui-icon-login-wechat layui-icon-md"></i>
               </button>
-              <button className="layui-filter-tag layui-filter-tag-cyan layui-hover-lift" style={{width: '48px', height: '48px', padding: '0', borderRadius: '50%', fontSize: '20px'}}>
-                <i className="layui-icon layui-icon-login-qq" style={{fontSize: '20px'}}></i>
+              <button type="button" className="layui-filter-tag layui-filter-tag-cyan layui-hover-lift layui-oauth-icon-btn">
+                <i className="layui-icon layui-icon-login-qq layui-icon-md"></i>
               </button>
-              <button className="layui-filter-tag layui-filter-tag-red layui-hover-lift" style={{width: '48px', height: '48px', padding: '0', borderRadius: '50%', fontSize: '20px'}}>
-                <i className="layui-icon layui-icon-login-weibo" style={{fontSize: '20px'}}></i>
+              <button type="button" className="layui-filter-tag layui-filter-tag-red layui-hover-lift layui-oauth-icon-btn">
+                <i className="layui-icon layui-icon-login-weibo layui-icon-md"></i>
               </button>
             </div>
 
             {/* 注册链接 */}
             <p className="layui-text-center layui-mt20 layui-font-sm layui-font-gray-66">
               还没有账号？
-              <Link href="/register" className="layui-font-cyan layui-font-bold layui-ml5" style={{textDecoration: 'none'}}>
+              <Link href="/register" className="layui-font-cyan layui-font-bold layui-ml5 layui-link-plain">
                 立即注册
               </Link>
             </p>
@@ -356,7 +281,7 @@ export default function LoginPage() {
 
         {/* 返回首页 */}
         <p className="layui-text-center layui-mt20">
-          <Link href="/" className="layui-font-sm layui-font-gray-light" style={{textDecoration: 'none', opacity: 0.9}}>
+          <Link href="/" className="layui-font-sm layui-font-gray-light layui-link-plain layui-opacity-90">
             <i className="layui-icon layui-icon-return layui-mr5"></i>
             返回首页
           </Link>

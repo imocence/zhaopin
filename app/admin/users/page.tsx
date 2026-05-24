@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { userService } from '@/lib/utils/data';
+import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
+import { userRoleMap, userStatusMap } from '@/lib/utils/status';
 
 declare global {
   interface Window {
@@ -27,8 +29,14 @@ export default function AdminUsersPage() {
     // 将数据放到 window 对象上，方便访问
     (window as any).users = users;
 
-    // 通用的用户表单函数
-    const openUserForm = (userData: User | null = null) => {
+    useLayuiTable((layui: any) => {
+      const table = layui.table;
+      const layer = layui.layer;
+      const form = layui.form;
+      const $ = layui.$;
+
+      // 通用的用户表单函数
+      const openUserForm = (userData: User | null = null) => {
       const isEdit = userData !== null;
       const title = isEdit ? '编辑用户' : '新增用户';
 
@@ -140,17 +148,7 @@ export default function AdminUsersPage() {
       });
     };
 
-    const initTable = () => {
-      const layui = window.layui;
-      if (!layui) {
-        setTimeout(initTable, 100);
-        return;
-      }
-
-      layui.use(['table', 'layer', 'form'], function(table: any, layer: any, form: any) {
-        const $ = layui.$; // 获取 jQuery 对象
-
-        // 将表单函数保存到 window 对象上，方便在工具条事件中调用
+      // 将表单函数保存到 window 对象上，方便在工具条事件中调用
         (window as any).openUserForm = openUserForm;
 
         tableRef.current = table.render({
@@ -168,12 +166,8 @@ export default function AdminUsersPage() {
               title: '角色',
               width: 100,
               templet: function(d: User) {
-                const roleMap: { [key: string]: string } = {
-                  'admin': '<span class="layui-badge layui-bg-red">管理员</span>',
-                  'employer': '<span class="layui-badge layui-bg-blue">企业用户</span>',
-                  'jobseeker': '<span class="layui-badge layui-bg-green">求职者</span>'
-                };
-                return roleMap[d.role || 'jobseeker'] || '<span class="layui-badge">用户</span>';
+                const role = userRoleMap[d.role || 'jobseeker'];
+                return `<span class="layui-badge ${role.class}">${role.text}</span>`;
               }
             },
             {
@@ -181,9 +175,8 @@ export default function AdminUsersPage() {
               title: '状态',
               width: 100,
               templet: function(d: User) {
-                return d.status === 'active'
-                  ? '<span class="layui-badge layui-bg-green">正常</span>'
-                  : '<span class="layui-badge layui-bg-gray">禁用</span>';
+                const status = userStatusMap[d.status || 'active'];
+                return `<span class="layui-badge ${status.class}">${status.text}</span>`;
               }
             },
             {
@@ -232,9 +225,7 @@ export default function AdminUsersPage() {
           }
         });
       });
-    };
-
-    initTable();
+    });
   }, []);
 
   const handleAddUser = () => {

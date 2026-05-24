@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { companyService } from '@/lib/utils/data';
+import { companyStatusMap } from '@/lib/utils/status';
+import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 
 declare global {
   interface Window {
@@ -15,14 +17,10 @@ export default function AdminCompaniesPage() {
     const companies = companyService.getAll();
     (window as any).companies = companies;
 
-    const initTable = () => {
-      const layui = window.layui;
-      if (!layui) {
-        setTimeout(initTable, 100);
-        return;
-      }
-
-      layui.use(['table', 'layer', 'form'], function(table: any, layer: any, form: any) {
+    useLayuiTable((layui: any) => {
+      const table = layui.table;
+      const layer = layui.layer;
+      const form = layui.form;
         const $ = layui.$; // 获取 jQuery 对象
         tableRef.current = table.render({
           elem: '#companyTable',
@@ -72,9 +70,8 @@ export default function AdminCompaniesPage() {
               title: '认证状态',
               width: 100,
               templet: function(d: any) {
-                return d.verified
-                  ? '<span class="layui-badge layui-bg-blue">已认证</span>'
-                  : '<span class="layui-badge layui-bg-orange">待审核</span>';
+                const status = companyStatusMap[d.verified ? 'verified' : 'pending'];
+                return `<span class="layui-badge ${status.class}">${status.text}</span>`;
               }
             },
             {
@@ -361,9 +358,7 @@ export default function AdminCompaniesPage() {
           }
         });
       });
-    };
-
-    initTable();
+    });
   }, []);
 
   return (

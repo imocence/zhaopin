@@ -37,7 +37,7 @@ export default function RootLayout({
       <body className="bg-gray-100">
       <Header/>
       {children}
-      <footer className="layui-bg-dark" style={{marginTop: '20px',paddingTop: '20px'}}>
+      <footer className="layui-bg-dark layui-footer-site">
           <div className="layui-container">
               <div className="layui-row layui-col-space30">
                   <div className="layui-col-md4 layui-col-sm6">

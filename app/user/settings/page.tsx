@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sidebar from '@/components/layout/Sidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 
 type TabKey = 'account' | 'password' | 'notifications' | 'privacy';
 
@@ -28,7 +28,7 @@ export default function UserSettingsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 侧边栏 */}
-          <Sidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="default" />
 
           {/* 主内容区 */}
           <div className="flex-1">

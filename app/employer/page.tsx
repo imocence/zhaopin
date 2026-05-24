@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import EmployerSidebar from '@/components/layout/EmployerSidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { companyService, jobService } from '@/lib/utils/data';
 
 export default function EmployerDashboardPage() {
@@ -107,7 +107,7 @@ export default function EmployerDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 侧边栏 */}
-          <EmployerSidebar items={sidebarItems} />
+          <UnifiedSidebar items={sidebarItems} variant="employer" />
 
           {/* 主内容区 */}
           <div className="flex-1">

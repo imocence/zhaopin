@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLayuiInit } from '@/lib/hooks/useLayuiInit';
 
 type UserType = 'jobseeker' | 'employer';
 
@@ -39,23 +40,15 @@ export default function RegisterPage() {
 
   // 初始化 layui tab 和 form
   useEffect(() => {
-    const initLayui = () => {
-      const layui = (window as any).layui;
-      if (!layui) {
-        setTimeout(initLayui, 100);
-        return;
-      }
-
-      layui.use(['element', 'form'], function() {
+    useLayuiInit({
+      modules: ['element', 'form'],
+      callback: (layui) => {
         const element = layui.element;
         const form = layui.form;
-
         element.render('tab', 'userTypeTab');
         form.render();
-      });
-    };
-
-    initLayui();
+      },
+    });
   }, [userType]);
 
   // 发送验证码倒计时
@@ -142,7 +135,7 @@ export default function RegisterPage() {
       {/* 页面头部 */}
       <div className="layui-card layui-page-header layui-mb20">
         <div className="layui-card-body layui-page-header-body layui-bg-gradient-cyan layui-flex layui-flex-center">
-          <div style={{position: 'relative', zIndex: 1}}>
+          <div className="layui-page-z1">
             <h1 className="layui-font-2xl layui-font-bold layui-font-white layui-mb0 layui-mt0">用户注册</h1>
             <p className="layui-font-sm layui-font-gray-light layui-mb0 layui-mt0">创建您的账号，开启职业新篇章</p>
           </div>
@@ -218,8 +211,7 @@ export default function RegisterPage() {
                       <div className="layui-col-md4 layui-col-xs3">
                         <button
                           type="button"
-                          className="layui-btn layui-btn-fluid layui-btn-primary layui-border"
-                          style={{marginLeft: '10px'}}
+                          className="layui-btn layui-btn-fluid layui-btn-primary layui-border layui-ml10"
                           disabled={countdown > 0}
                           onClick={() => {
                             startCountdown();
@@ -260,8 +252,8 @@ export default function RegisterPage() {
                         </div>
                       </div>
                       <div className="layui-col-md4 layui-col-xs3">
-                        <div style={{marginLeft: '10px'}}
-                            className="layui-codebox-img"
+                        <div
+                            className="layui-codebox-img layui-ml10"
                             onClick={generateEmailCode}
                             title="点击刷新验证码"
                           >
@@ -469,7 +461,7 @@ export default function RegisterPage() {
                         </div>
                       </div>
                       <div className="layui-col-md3 layui-col-xs3">
-                        <div style={{marginLeft: '10px'}}>
+                        <div className="layui-ml10">
                           <div
                             className="layui-codebox-img"
                             onClick={generateEmailCode}
@@ -482,10 +474,9 @@ export default function RegisterPage() {
                       <div className="layui-col-md3 layui-col-xs2">
                         <button
                           type="button"
-                          className="layui-btn layui-btn-sm layui-btn-fluid layui-btn-primary layui-border"
+                          className="layui-btn layui-btn-sm layui-btn-fluid layui-btn-primary layui-border layui-ml10"
                           onClick={generateEmailCode}
                           title="点击刷新验证码"
-                          style={{marginLeft: '10px'}}
                         >
                           <i className="layui-icon layui-icon-refresh layui-font-xs"></i>
                         </button>

@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Sidebar from '@/components/layout/Sidebar';
+import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { jobService, companyService } from '@/lib/utils/data';
 import { formatDate } from '@/lib/utils/format';
+import { getApplicationStatusBadge } from '@/lib/utils/status';
 
 type ApplicationStatus = 'all' | 'pending' | 'viewed' | 'interview' | 'offered' | 'rejected';
 
@@ -68,17 +69,7 @@ export default function UserApplicationsPage() {
     },
   ];
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: { [key: string]: { text: string; class: string } } = {
-      pending: { text: '待处理', class: 'layui-bg-orange' },
-      viewed: { text: '已查看', class: 'layui-bg-blue' },
-      interview: { text: '面试中', class: 'layui-bg-green' },
-      offered: { text: '已录用', class: 'layui-bg-primary' },
-      rejected: { text: '已拒绝', class: 'layui-bg-gray' },
-    };
-    const s = statusMap[status] || { text: status, class: '' };
-    return <span className={`layui-badge ${s.class}`}>{s.text}</span>;
-  };
+
 
   const filteredApplications = statusFilter === 'all'
     ? applications
@@ -162,7 +153,7 @@ export default function UserApplicationsPage() {
                             {app.jobTitle}
                           </Link>
                         </h3>
-                        {getStatusBadge(app.status)}
+                        {getApplicationStatusBadge(app.status)}
                       </div>
                       <p className="layui-font-gray layui-font-sm layui-mb5">{app.company?.name}</p>
                       <div className="layui-font-xs layui-font-gray-light">

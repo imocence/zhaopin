@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { jobService, companyService } from '@/lib/utils/data';
+import { jobStatusMap } from '@/lib/utils/status';
+import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 
 declare global {
   interface Window {
@@ -15,14 +17,10 @@ export default function AdminJobsPage() {
     const jobs = jobService.getAll();
     (window as any).jobs = jobs;
 
-    const initTable = () => {
-      const layui = window.layui;
-      if (!layui) {
-        setTimeout(initTable, 100);
-        return;
-      }
-
-      layui.use(['table', 'layer', 'form'], function(table: any, layer: any, form: any) {
+    useLayuiTable((layui: any) => {
+      const table = layui.table;
+      const layer = layui.layer;
+      const form = layui.form;
         const $ = layui.$; // 获取 jQuery 对象
         tableRef.current = table.render({
           elem: '#jobTable',
@@ -76,12 +74,9 @@ export default function AdminJobsPage() {
               title: '状态',
               width: 90,
               templet: function(d: any) {
-                const statusMap: { [key: string]: string } = {
-                  'active': '<span class="layui-badge layui-bg-green">招聘中</span>',
-                  'inactive': '<span class="layui-badge layui-bg-gray">已下架</span>',
-                  'draft': '<span class="layui-badge layui-bg-orange">草稿</span>'
-                };
-                return statusMap[d.status] || '<span class="layui-badge">未知</span>';
+                const status = jobStatusMap[d.status];
+                if (!status) return '<span class="layui-badge">未知</span>';
+                return `<span class="layui-badge ${status.class}">${status.text}</span>`;
               }
             },
             {
@@ -377,9 +372,7 @@ export default function AdminJobsPage() {
           }
         });
       });
-    };
-
-    initTable();
+    });
   }, []);
 
   return (
