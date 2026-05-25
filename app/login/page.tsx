@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
+import { fetchCaptcha, verifyCaptcha } from '@/lib/utils/captcha';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,21 +16,27 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(false);
   const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaId, setCaptchaId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [enableCaptcha, setEnableCaptcha] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const generateCaptcha = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 4; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
+  // 从接口获取验证码
+  const refreshCaptcha = useCallback(async () => {
+    try {
+      const data = await fetchCaptcha();
+      setCaptchaId(data.captchaId);
+      setCaptchaCode(data.captchaCode);
+    } catch (e) {
+      console.error('获取验证码失败', e);
     }
-    setCaptchaCode(code);
-  };
+  }, []);
+
+  // 初始化 layui 表单（必须在组件顶层调用 Hook）
+  useLayuiForm();
 
   useEffect(() => {
-    generateCaptcha();
+    refreshCaptcha();
 
     // 读取系统设置
     const adminSettings = localStorage.getItem('adminSettings');
@@ -41,11 +48,7 @@ export default function LoginPage() {
         console.error('读取系统设置失败', e);
       }
     }
-
-    if (formRef.current) {
-      useLayuiForm();
-    }
-  }, []);
+  }, [refreshCaptcha]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,7 +58,7 @@ export default function LoginPage() {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = async () => {
     const newErrors: {[key: string]: string} = {};
 
     if (!formData.username.trim()) {
@@ -71,8 +74,14 @@ export default function LoginPage() {
     if (enableCaptcha) {
       if (!formData.captcha) {
         newErrors.captcha = '请输入验证码';
-      } else if (formData.captcha.toUpperCase() !== captchaCode) {
-        newErrors.captcha = '验证码不正确';
+      } else {
+        // 通过接口验证验证码
+        const result = await verifyCaptcha(captchaId, formData.captcha);
+        if (!result.success) {
+          newErrors.captcha = result.message;
+          // 验证失败后刷新验证码
+          refreshCaptcha();
+        }
       }
     }
 
@@ -80,10 +89,10 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (await validateForm()) {
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
@@ -94,24 +103,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="layui-auth-shell">
+    <div className="layui-auth-shell layui-auth-shell--soft">
       <div className="layui-auth-shell-inner">
         {/* Logo 和标题 */}
         <div className="layui-text-center layui-mb30 layui-anim layui-anim-fadein">
-          <div className="layui-inline-block layui-mb20 layui-auth-logo-box">
-            <span className="layui-auth-logo-text">168</span>
+          <div className="layui-inline-block layui-mb20 layui-auth-logo-box-soft">
+            <span className="layui-auth-logo-text-soft">168</span>
           </div>
-          <h1 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-white">
+          <h1 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-dark" style={{textShadow: 'none'}}>
             美国华人168招聘网
           </h1>
-          <p className="layui-font-lg layui-font-gray-light layui-opacity-90">
+          <p className="layui-font-lg layui-font-gray" style={{opacity: 1}}>
             欢迎回来，请登录您的账号
           </p>
         </div>
 
         {/* 登录表单卡片 */}
         <div className="layui-card layui-anim layui-anim-scale layui-auth-card">
-          <div className="layui-card-body">
+          <div className="layui-card-body" style={{padding: '35px 30px'}}>
             <form ref={formRef} onSubmit={handleSubmit} className="layui-form">
               {/* 用户名/邮箱 */}
               <div className="layui-form-item">
@@ -169,8 +178,8 @@ export default function LoginPage() {
               {/* 验证码 */}
               {enableCaptcha && (
                 <div className="layui-form-item">
-                  <div className="layui-row">
-                    <div className="layui-col-xs7">
+                  <div className="layui-row layui-col-space10">
+                    <div className="layui-col-md8 layui-col-xs7">
                       <div className="layui-input-wrap">
                         <div className="layui-input-prefix">
                           <i className="layui-icon layui-icon-vercode"></i>
@@ -188,10 +197,11 @@ export default function LoginPage() {
                         />
                       </div>
                     </div>
-                    <div className="layui-col-xs5">
+                    <div className="layui-col-md4 layui-col-xs5">
                       <div
                         className="layui-captcha-box"
-                        onClick={generateCaptcha}
+                        style={{height: '42px', borderRadius: '8px'}}
+                        onClick={refreshCaptcha}
                         title="点击刷新"
                       >
                         {captchaCode}
@@ -208,7 +218,7 @@ export default function LoginPage() {
               )}
 
               {/* 记住我 & 忘记密码 */}
-              <div className="layui-flex layui-flex-between layui-mb20">
+              <div className="layui-flex layui-flex-between layui-mb20" style={{marginTop: '5px'}}>
                 <label className="layui-checkbox-row">
                   <input
                     type="checkbox"
@@ -221,7 +231,8 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="layui-font-sm layui-font-cyan layui-link-plain"
+                  className="layui-font-sm layui-link-plain"
+                  style={{color: '#009688'}}
                 >
                   忘记密码？
                 </Link>
@@ -258,21 +269,21 @@ export default function LoginPage() {
 
             {/* 社交登录按钮 */}
             <div className="layui-flex layui-flex-center layui-flex-gap-15">
-              <button type="button" className="layui-filter-tag layui-filter-tag-green layui-hover-lift layui-oauth-icon-btn">
+              <button type="button" className="layui-filter-tag layui-filter-tag-green layui-hover-lift layui-oauth-icon-btn" title="微信登录">
                 <i className="layui-icon layui-icon-login-wechat layui-icon-md"></i>
               </button>
-              <button type="button" className="layui-filter-tag layui-filter-tag-cyan layui-hover-lift layui-oauth-icon-btn">
+              <button type="button" className="layui-filter-tag layui-filter-tag-cyan layui-hover-lift layui-oauth-icon-btn" title="QQ登录">
                 <i className="layui-icon layui-icon-login-qq layui-icon-md"></i>
               </button>
-              <button type="button" className="layui-filter-tag layui-filter-tag-red layui-hover-lift layui-oauth-icon-btn">
+              <button type="button" className="layui-filter-tag layui-filter-tag-red layui-hover-lift layui-oauth-icon-btn" title="微博登录">
                 <i className="layui-icon layui-icon-login-weibo layui-icon-md"></i>
               </button>
             </div>
 
             {/* 注册链接 */}
-            <p className="layui-text-center layui-mt20 layui-font-sm layui-font-gray-66">
+            <p className="layui-text-center layui-mt20 layui-font-sm" style={{color: '#999'}}>
               还没有账号？
-              <Link href="/register" className="layui-font-cyan layui-font-bold layui-ml5 layui-link-plain">
+              <Link href="/register" className="layui-font-bold layui-ml5 layui-link-plain" style={{color: '#009688'}}>
                 立即注册
               </Link>
             </p>
@@ -281,7 +292,7 @@ export default function LoginPage() {
 
         {/* 返回首页 */}
         <p className="layui-text-center layui-mt20">
-          <Link href="/" className="layui-font-sm layui-font-gray-light layui-link-plain layui-opacity-90">
+          <Link href="/" className="layui-font-sm layui-link-plain layui-font-gray" style={{opacity: 0.8, transition: 'opacity 0.3s'}}>
             <i className="layui-icon layui-icon-return layui-mr5"></i>
             返回首页
           </Link>

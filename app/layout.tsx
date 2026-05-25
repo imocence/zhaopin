@@ -32,7 +32,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <link rel="stylesheet" href="/layui/css/layui.css" />
+        <link rel="stylesheet" href="/layui/css/layui-min.css" />
       </head>
       <body className="bg-gray-100">
       <Header/>

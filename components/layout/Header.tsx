@@ -37,7 +37,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <div className="layui-bg-dark">
+    <header className="layui-bg-dark">
       <ul className="layui-container layui-nav">
         <li className="layui-nav-item">
           <Link href="/" className="layui-logo">168招聘网</Link>
@@ -82,7 +82,7 @@ const Header: React.FC = () => {
           </li>
         )}
       </ul>
-    </div>
+    </header>
   );
 };
 

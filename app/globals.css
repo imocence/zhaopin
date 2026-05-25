@@ -194,7 +194,7 @@ body {
 
 /* 间距 */
 .layui-mt20 {
-    margin-top: 20px!important;
+    margin-top: 20px !important;
 }
 
 .layui-mb5 {
@@ -541,10 +541,6 @@ body {
 }
 
 /* 额外的间距类 */
-.layui-ml5 {
-    margin-left: 5px;
-}
-
 .layui-pl15 {
     padding-left: 15px;
 }
@@ -585,44 +581,12 @@ body {
     gap: 3px;
 }
 
-.layui-mt0 {
-    margin-top: 0;
-}
-
-/* Tab 相关样式 */
-.layui-tab-brief > .layui-tab-title .layui-this {
-    color: var(--layui-primary);
-    border-color: var(--layui-primary);
-}
-
-.layui-tab-brief > .layui-tab-title li {
-    padding: 12px 20px;
-    font-weight: 500;
-}
-
 /* 表单面板样式 */
 .layui-form-pane {
     padding: 20px;
     margin: 15px 0;
     border-radius: 8px;
     background: #fafafa;
-}
-
-/* 验证码样式 */
-.layui-codebox {
-    display: flex;
-    gap: 10px;
-}
-
-.layui-codebox-img {
-    min-width: 100px;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 20px;
-    letter-spacing: 8px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 /* 折叠面板样式 */
@@ -725,7 +689,7 @@ body {
 }
 
 .layui-input-wrap .layui-input {
-    padding-left: 36px;
+    padding-left: 55px !important;
     flex: 1;
 }
 
@@ -1051,12 +1015,53 @@ body {
 }
 
 .layui-auth-shell {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    background: linear-gradient(135deg, #009688 0%, #16baaa 40%, #1e9fff 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.layui-auth-shell::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 45%);
+    animation: layuiAuthBgFloat 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.layui-auth-shell::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 120%;
+    height: 40%;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+@keyframes layuiAuthBgFloat {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(2%, -1%) rotate(1deg);
+    }
+    66% {
+        transform: translate(-1%, 1%) rotate(-0.5deg);
+    }
 }
 
 .layui-auth-shell-inner {
@@ -1065,32 +1070,93 @@ body {
 }
 
 .layui-auth-logo-box {
-    width: 80px;
-    height: 80px;
+    width: 88px;
+    height: 88px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #009688 0%, #1e9fff 100%);
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 30px rgba(0, 150, 136, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.layui-auth-logo-box:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .layui-auth-logo-text {
-    font-size: 28px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.layui-auth-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition: box-shadow 0.3s ease;
+}
+
+.layui-auth-card:hover {
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.layui-auth-shell--soft {
+    height: 100vh;
+    background: linear-gradient(135deg, #e8f5f3 0%, #f0f9ff 50%, #e6f7ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.layui-auth-shell--soft::before {
+    display: none;
+}
+
+/* 浅色背景下的Logo样式 */
+.layui-auth-logo-box-soft {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #009688, #1e9fff);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0, 150, 136, 0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.layui-auth-logo-box-soft:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(0, 150, 136, 0.35);
+}
+
+.layui-auth-logo-text-soft {
+    font-size: 30px;
     font-weight: bold;
     color: #fff;
 }
 
-.layui-auth-card {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.layui-auth-shell--soft {
-    min-height: 100vh;
-    background: linear-gradient(to bottom right, #f6f8fa, #e9ecef);
+.layui-font-dark {
+    color: #333;
 }
 
 .layui-footer-site {
@@ -1495,11 +1561,10 @@ body {
 }
 
 .layui-captcha-box {
-    margin-left: 10px;
-    height: 38px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border: 1px solid #e8e8e8;
-    border-radius: 2px;
+    height: 36px;
+    width: 100%;
+    background: linear-gradient(135deg, #e8f5f3 0%, #f0f9ff 100%);
+    border: 1px solid #d4edea;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1509,10 +1574,20 @@ body {
     color: #009688;
     letter-spacing: 3px;
     user-select: none;
+    transition: all 0.3s ease;
+}
+
+.layui-captcha-box:hover {
+    background: linear-gradient(135deg, #d4edea 0%, #e0f0ff 100%);
+    border-color: #009688;
+    transform: scale(1.02);
 }
 
 .layui-login-divider {
     position: relative;
+    height: 20px;
+    display: flex;
+    align-items: center;
 }
 
 .layui-login-divider::before {
@@ -1528,32 +1603,158 @@ body {
     position: relative;
     display: flex;
     justify-content: center;
+    z-index: 1;
+    width: 100%;
 }
 
 .layui-login-divider-text {
     padding: 0 15px;
-    background: #fff;
     color: #999;
     font-size: 13px;
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.layui-login-divider-text::before,
+.layui-login-divider-text::after {
+    content: '\2022';
+    color: #009688;
+    font-size: 8px;
+    position: relative;
+    top: -1px;
+    margin: 0 4px;
+    opacity: 0.5;
 }
 
 .layui-oauth-icon-btn {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 50%;
-    font-size: 20px;
+    width: 50px;
+    height: 50px;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    font-size: 22px;
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    overflow: hidden;
+    line-height: 1;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-green {
+    background: #f6ffed !important;
+    color: #52c41a !important;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-green:hover {
+    background: #52c41a !important;
+    color: #fff !important;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-cyan {
+    background: #e6f7ff !important;
+    color: #1890ff !important;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-cyan:hover {
+    background: #1890ff !important;
+    color: #fff !important;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-red {
+    background: #fff1f0 !important;
+    color: #ff4d4f !important;
+}
+
+.layui-oauth-icon-btn.layui-filter-tag-red:hover {
+    background: #ff4d4f !important;
+    color: #fff !important;
+}
+
+.layui-oauth-icon-btn:hover {
+    transform: translateY(-3px) scale(1.1);
+    border-color: rgba(0, 150, 136, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.layui-btn.layui-btn-gradient-submit {
+    background: linear-gradient(135deg, #009688 0%, #16baaa 50%, #1e9fff 100%) !important;
+    height: 48px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 150, 136, 0.35);
+}
+
+.layui-btn.layui-btn-gradient-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 150, 136, 0.45);
+}
+
+.layui-btn.layui-btn-gradient-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(0, 150, 136, 0.3);
+}
+
+/* 登录卡片内输入框增强 */
+.layui-auth-card .layui-input-wrap .layui-input {
+    border-radius: 8px;
+    height: 44px;
+    transition: all 0.3s ease;
+    border-color: #e0e0e0;
+}
+
+.layui-auth-card .layui-input-wrap .layui-input:focus {
+    border-color: #009688;
+    box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1);
+}
+
+.layui-auth-card .layui-input-wrap .layui-input-prefix {
+    border-right: 1px solid #f0f0f0;
+    width: 44px;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.layui-btn.layui-btn-gradient-submit {
-    background: linear-gradient(135deg, #009688 0%, #1e9fff 100%) !important;
-    height: 46px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
+.layui-auth-card .layui-input-wrap .layui-input-prefix .layui-icon {
+    color: #009688;
+    font-size: 18px;
+}
+
+.layui-auth-card .layui-form-item {
+    margin-bottom: 20px;
+}
+
+.layui-auth-card .layui-form {
+    margin-bottom: 5px;
+}
+
+/* 登录卡片背景装饰 */
+.layui-auth-card .layui-card-body {
+    position: relative;
+}
+
+.layui-auth-card .layui-card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #009688, #16baaa, #1e9fff);
+    border-radius: 20px 20px 0 0;
+}
+
+/* 返回首页链接hover效果 */
+.layui-auth-shell .layui-link-plain:hover {
+    opacity: 1 !important;
+    text-decoration: underline;
 }
 
 .layui-checkbox-row {
@@ -1750,4 +1951,9 @@ body {
 /* 背景色 */
 .layui-bg-dark {
     background-color: #2f363c;
+}
+
+/* 注册页协议 checkbox 与链接对齐 */
+.layui-form-item .layui-form-checkbox[lay-skin='primary'] {
+    margin-top: 0;
 }
