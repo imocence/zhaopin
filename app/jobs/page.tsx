@@ -179,8 +179,8 @@ export default function JobsPage() {
                             <div className="layui-header-badge layui-font-white layui-font-lg">
                                 <i className="layui-icon layui-icon-ok-circle layui-font-white layui-icon-gap-md"></i>
                                 <span className="layui-font-white">
-                  <span className="layui-font-2xl layui-font-bold layui-font-white layui-mr5">{pagination.total}</span> 个职位
-                </span>
+                                    <span className="layui-font-2xl layui-font-bold layui-font-white layui-mr5">{pagination.total}</span> 个职位
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -192,41 +192,21 @@ export default function JobsPage() {
                 <div className="layui-card-body layui-p20">
                     <span className="layui-font-sm layui-font-gray-light layui-font-bold layui-mr20">热门搜索：</span>
                     <div className="layui-flex layui-flex-wrap layui-gap-10">
-            <span
-                className="layui-filter-tag layui-filter-tag-cyan"
-                onClick={() => handleQuickFilter({category: '软件工程师'})}
-            >
-              <i className="layui-icon layui-icon-engine layui-icon-gap-sm"></i>
-              软件工程师
-            </span>
-                        <span
-                            className="layui-filter-tag layui-filter-tag-green"
-                            onClick={() => handleQuickFilter({state: 'CA'})}
-                        >
-              <i className="layui-icon layui-icon-location layui-icon-gap-sm"></i>
-              加州
-            </span>
-                        <span
-                            className="layui-filter-tag layui-filter-tag-orange"
-                            onClick={() => handleQuickFilter({state: 'NY'})}
-                        >
-              <i className="layui-icon layui-icon-location layui-icon-gap-sm"></i>
-              纽约
-            </span>
-                        <span
-                            className="layui-filter-tag layui-filter-tag-red"
-                            onClick={() => handleQuickFilter({salaryMin: 80000})}
-                        >
-              <i className="layui-icon layui-icon-rmb layui-icon-gap-sm"></i>
-              高薪职位
-            </span>
-                        <span
-                            className="layui-filter-tag layui-filter-tag-purple"
-                            onClick={() => handleQuickFilter({experience: '3年以上'})}
-                        >
-              <i className="layui-icon layui-icon-date layui-icon-gap-sm"></i>
-              3年以上经验
-            </span>
+                    <span className="layui-filter-tag layui-filter-tag-cyan" onClick={() => handleQuickFilter({category: '软件工程师'})}>
+                      <i className="layui-icon layui-icon-engine layui-icon-gap-sm"></i> 软件工程师
+                    </span>
+                    <span className="layui-filter-tag layui-filter-tag-green" onClick={() => handleQuickFilter({state: 'CA'})}>
+                      <i className="layui-icon layui-icon-location layui-icon-gap-sm"></i> 加州
+                    </span>
+                    <span className="layui-filter-tag layui-filter-tag-orange" onClick={() => handleQuickFilter({state: 'NY'})}>
+                      <i className="layui-icon layui-icon-location layui-icon-gap-sm"></i> 纽约
+                    </span>
+                    <span className="layui-filter-tag layui-filter-tag-red" onClick={() => handleQuickFilter({salaryMin: 80000})}>
+                      <i className="layui-icon layui-icon-rmb layui-icon-gap-sm"></i> 高薪职位
+                    </span>
+                    <span className="layui-filter-tag layui-filter-tag-purple" onClick={() => handleQuickFilter({experience: '3年以上'})}>
+                      <i className="layui-icon layui-icon-date layui-icon-gap-sm"></i> 3年以上经验
+                    </span>
                     </div>
                 </div>
             </div>
@@ -242,45 +222,46 @@ export default function JobsPage() {
                 </div>
                 {/* 职位列表 */}
                 <div className="layui-col-md9">
-                {/* 排序选项 */}
-                <div className="layui-card layui-card-enhanced layui-mb15">
-                    <div className="layui-card-body layui-p20">
-                        <div className="layui-flex layui-flex-between layui-flex-wrap layui-m-5">
-                            <div className="layui-flex layui-flex-center layui-gap-10">
-                                <i className="layui-icon layui-icon-list layui-font-gray layui-mr5"></i>
-                                <span className="layui-font-sm layui-font-gray-light">
-                    显示 <span className="layui-font-lg layui-font-bold layui-font-blue">
-                      {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, pagination.total)}
-                    </span> 条，
-                    共 <span className="layui-font-lg layui-font-bold layui-font-blue">{pagination.total}</span> 条
-                  </span>
-                            </div>
-                            <div className="layui-flex layui-flex-center layui-gap-10">
-                                <i className="layui-icon layui-icon-template-1 layui-font-gray layui-mr5"></i>
-                                <span className="layui-font-sm layui-font-gray-light">排序：</span>
-                                <select
-                                    className="layui-input layui-inline-sort layui-mr5 layui-font-sm"
-                                    value={sortBy}
-                                    onChange={(e) => handleSortChange(e.target.value)}
-                                >
-                                    <option value="latest">最新发布</option>
-                                    <option value="salary-high">薪资从高到低</option>
-                                    <option value="salary-low">薪资从低到高</option>
-                                    <option value="views">浏览最多</option>
-                                </select>
+                    {/* 排序选项 */}
+                    <div className="layui-card layui-card-enhanced layui-mb15">
+                        <div className="layui-card-body layui-p20">
+                            <div className="layui-flex layui-flex-between layui-flex-wrap layui-m-5 layui-flex-items-center">
+                                <div className="layui-flex layui-flex-center layui-gap-10">
+                                    <i className="layui-icon layui-icon-list layui-font-gray layui-mr5"></i>
+                                    <span className="layui-font-sm layui-font-gray-light">
+                                    显示 <span className="layui-font-lg layui-font-bold layui-font-blue">
+                                      {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, pagination.total)}
+                                    </span> 条，
+                                    共 <span className="layui-font-lg layui-font-bold layui-font-blue">{pagination.total}</span> 条
+                                </span>
+                                </div>
+                                <div className="layui-flex layui-flex-center layui-gap-10 layui-flex-nowrap">
+                                    <i className="layui-icon layui-icon-template-1 layui-font-gray layui-mr5"></i>
+                                    <span className="layui-font-sm layui-font-gray-light layui-flex-shrink-0">排序：</span>
+                                    <select
+                                        className="layui-input layui-inline layui-inline-sort layui-mr5 layui-font-sm"
+                                        style={{width: "auto", minWidth: "120px"}}
+                                        value={sortBy}
+                                        onChange={(e) => handleSortChange(e.target.value)}
+                                    >
+                                        <option value="latest">最新发布</option>
+                                        <option value="salary-high">薪资从高到低</option>
+                                        <option value="salary-low">薪资从低到高</option>
+                                        <option value="views">浏览最多</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <JobList
-                    jobs={jobs}
-                    total={pagination.total}
-                    page={page}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                />
-            </div>
+                    <JobList
+                        jobs={jobs}
+                        total={pagination.total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
             </div>
         </div>
     );

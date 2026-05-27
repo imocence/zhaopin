@@ -95,7 +95,7 @@ export default function HomePage() {
           <div className="layui-card-body">
             <div className="layui-row">
               <div className="layui-col-xs3 layui-text-center">
-                <div className="layui-emoji-3xl">🏢</div>
+                <div className="layui-font-3xl">🏢</div>
               </div>
               <div className="layui-col-xs9">
                 <h3 className="layui-font-lg layui-mb10">
@@ -186,7 +186,7 @@ export default function HomePage() {
                       <Link href={`/companies/${company.id}`} className="layui-link-block">
                         <div className="layui-card">
                           <div className="layui-card-body layui-text-center">
-                            <div className="layui-emoji-2xl layui-mb10">🏢</div>
+                            <div className="layui-font-2xl layui-mb10">🏢</div>
                             <h3 className="layui-font-sm layui-mb10 layui-elip">{company.name}</h3>
                             {company.industry && (
                               <p className="layui-font-xs layui-font-gray layui-mb10">{company.industry}</p>

@@ -56,7 +56,7 @@ export default function UserCenterPage() {
         <div className="layui-card-body layui-hero-gradient">
           <div className="layui-flex layui-align-center layui-gap-15">
             <div className="layui-avatar-ring">
-              <span className="layui-emoji-3xl">👤</span>
+              <span className="layui-font-3xl">👤</span>
             </div>
             <div>
               <h1 className="layui-hero-headline">欢迎回来，{user.name}！</h1>
@@ -132,7 +132,7 @@ export default function UserCenterPage() {
                     <div className="layui-row layui-col-space10 layui-feed-row">
                       <div className="layui-col-xs2">
                         <div className="layui-feed-logo">
-                          <span className="layui-emoji-lg">🏢</span>
+                          <span className="layui-font-lg">🏢</span>
                         </div>
                       </div>
                       <div className="layui-col-xs7">
@@ -160,7 +160,7 @@ export default function UserCenterPage() {
                   <Link href="/jobs" className="layui-text-decoration-none">
                     <div className="layui-card layui-text-center layui-card-click">
                       <div className="layui-card-body">
-                        <div className="layui-emoji-2xl layui-mb10">🔍</div>
+                        <div className="layui-font-2xl layui-mb10">🔍</div>
                         <div className="layui-font-sm">搜索职位</div>
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export default function UserCenterPage() {
                   <Link href="/post" className="layui-text-decoration-none">
                     <div className="layui-card layui-text-center layui-card-click">
                       <div className="layui-card-body">
-                        <div className="layui-emoji-2xl layui-mb10">📝</div>
+                        <div className="layui-font-2xl layui-mb10">📝</div>
                         <div className="layui-font-sm">发布职位</div>
                       </div>
                     </div>
@@ -180,7 +180,7 @@ export default function UserCenterPage() {
                   <Link href="/user/profile" className="layui-text-decoration-none">
                     <div className="layui-card layui-text-center layui-card-click">
                       <div className="layui-card-body">
-                        <div className="layui-emoji-2xl layui-mb10">👤</div>
+                        <div className="layui-font-2xl layui-mb10">👤</div>
                         <div className="layui-font-sm">完善资料</div>
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export default function UserCenterPage() {
                   <Link href="/employer/company" className="layui-text-decoration-none">
                     <div className="layui-card layui-text-center layui-card-click">
                       <div className="layui-card-body">
-                        <div className="layui-emoji-2xl layui-mb10">✅</div>
+                        <div className="layui-font-2xl layui-mb10">✅</div>
                         <div className="layui-font-sm">企业认证</div>
                       </div>
                     </div>

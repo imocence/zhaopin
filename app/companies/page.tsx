@@ -234,7 +234,7 @@ export default function CompaniesPage() {
                     {/* 结果统计 */}
                     <div className="layui-card layui-card-enhanced layui-mb15">
                         <div className="layui-card-body layui-p20">
-                            <div className="layui-flex layui-flex-between layui-flex-wrap layui-m-5">
+                            <div className="layui-flex layui-flex-between layui-flex-wrap layui-m-5 layui-flex-items-center">
                                 <div className="layui-flex layui-flex-center layui-gap-10">
                                     <i className="layui-icon layui-icon-list layui-font-gray layui-mr5"></i>
                                     <span className="layui-font-sm layui-font-gray-light">
@@ -249,10 +249,10 @@ export default function CompaniesPage() {
                                         </button>
                                     )}
                                 </div>
-                                <div className="layui-flex layui-flex-center layui-gap-10">
+                                <div className="layui-flex layui-flex-center layui-gap-10 layui-flex-nowrap">
                                     <i className="layui-icon layui-icon-template-1 layui-font-gray layui-mr5"></i>
-                                    <span className="layui-font-sm layui-font-gray-light">排序：</span>
-                                    <select className="layui-input layui-inline-sort layui-mr5 layui-font-sm">
+                                    <span className="layui-font-sm layui-font-gray-light layui-flex-shrink-0">排序：</span>
+                                    <select className="layui-input layui-inline layui-inline-sort layui-mr5 layui-font-sm" style={{width: "auto", minWidth: "120px"}}>
                                         <option value="default">默认排序</option>
                                         <option value="jobs-desc">职位数从多到少</option>
                                         <option value="verified">已认证优先</option>

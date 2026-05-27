@@ -31,7 +31,7 @@ const JobList: React.FC<JobListProps> = ({
         <p className="layui-empty-card__desc">
           请尝试调整筛选条件或搜索关键词
         </p>
-        <div className="layui-flex layui-flex-center layui-flex-gap-10">
+        <div className="layui-flex layui-flex-center layui-gap-10">
           <span className="layui-filter-tag layui-bg-gray layui-font-gray-light">
             <i className="layui-icon layui-icon-refresh layui-icon-xs layui-mr5"></i>
             清除筛选

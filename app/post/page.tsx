@@ -490,7 +490,7 @@ export default function PostJobPage() {
           {/* 底部按钮 */}
           <div className="layui-card layui-mb30">
             <div className="layui-card-body layui-flex layui-flex-between layui-pt20 layui-border-top">
-              <div className="layui-flex-gap-15">
+              <div className="layui-gap-15">
                 {formStep > 1 && (
                   <button
                     type="button"
@@ -501,7 +501,7 @@ export default function PostJobPage() {
                   </button>
                 )}
               </div>
-              <div className="layui-flex-gap-15">
+              <div className="layui-gap-15">
                 {formStep < 3 ? (
                   <button
                     type="button"

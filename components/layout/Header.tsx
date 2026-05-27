@@ -37,7 +37,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="layui-bg-dark">
+    <header className="layui-bg-black" style={{marginBottom: '10px'}}>
       <ul className="layui-container layui-nav">
         <li className="layui-nav-item">
           <Link href="/" className="layui-logo">168招聘网</Link>
@@ -61,15 +61,15 @@ const Header: React.FC = () => {
 
         {!isLoggedIn ? (
           <>
-            <li className="layui-nav-item layui-nav-item-right">
+            <li className="layui-nav-item layui-nav-right">
               <Link href="/login">登录</Link>
             </li>
-            <li className="layui-nav-item layui-nav-item-right">
+            <li className="layui-nav-item layui-nav-right">
               <Link href="/register">注册</Link>
             </li>
           </>
         ) : (
-          <li className="layui-nav-item layui-nav-item-right">
+          <li className="layui-nav-item layui-nav-right">
             <Link href="/user">
               <i className="layui-icon layui-icon-username"></i> 用户中心
             </Link>

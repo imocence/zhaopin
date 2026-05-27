@@ -72,7 +72,7 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
   }
 
   // 雇主和管理员侧边栏样式
-  const bgClass = variant === 'employer' ? 'layui-bg-gray' : 'layui-bg-dark';
+  const bgClass = variant === 'employer' ? 'layui-bg-gray' : 'layui-bg-black';
 
   return (
     <div className="layui-card">

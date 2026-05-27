@@ -39,7 +39,6 @@ body {
 }
 
 .layui-flex-wrap {
-    display: flex;
     flex-wrap: wrap;
 }
 
@@ -53,13 +52,7 @@ body {
     gap: 15px;
 }
 
-.layui-flex-gap-10 {
-    display: flex;
-    gap: 10px;
-}
-
-.layui-flex-gap-15 {
-    display: flex;
+.layui-gap-15 {
     gap: 15px;
 }
 
@@ -100,88 +93,13 @@ body {
     width: 100%;
 }
 
-/* Layui容器 */
-.layui-container {
-    width: 1170px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* 文字颜色 */
-.layui-font-gray {
-    color: #999;
-}
-
-.layui-font-white {
-    color: #fff;
-}
-
+/* 文字颜色（仅保留layui未内置的） */
 .layui-font-gray-light {
     color: #666;
 }
 
 .layui-font-dark {
     color: #333;
-}
-
-/* 文字大小 */
-.layui-font-sm {
-    font-size: 14px;
-}
-
-.layui-font-xs {
-    font-size: 12px;
-}
-
-.layui-font-lg {
-    font-size: 16px;
-}
-
-.layui-font-xl {
-    font-size: 18px;
-}
-
-.layui-font-2xl {
-    font-size: 24px;
-}
-
-.layui-font-3xl {
-    font-size: 36px;
-}
-
-.layui-font-bold {
-    font-weight: bold;
-}
-
-/* 颜色 */
-.layui-font-cyan {
-    color: #009688;
-}
-
-.layui-font-blue {
-    color: #1e9fff;
-}
-
-.layui-font-orange {
-    color: #ffb800;
-}
-
-.layui-font-red {
-    color: #ff4d4f;
-}
-
-/* 文本对齐 */
-.layui-text-center {
-    text-align: center;
-}
-
-.layui-text-left {
-    text-align: left;
-}
-
-/* 边框 */
-.layui-border {
-    border: 1px solid #e8e8e8;
 }
 
 .layui-border-top {
@@ -192,33 +110,13 @@ body {
     border-bottom: 1px solid #f0f0f0;
 }
 
-/* 间距 */
-.layui-mt20 {
-    margin-top: 20px !important;
-}
-
-.layui-mb5 {
-    margin-bottom: 5px;
-}
-
-.layui-mb10 {
-    margin-bottom: 10px;
-}
-
+/* 间距（仅保留layui未覆盖的自定义值） */
 .layui-mb15 {
     margin-bottom: 15px;
 }
 
-.layui-mb20 {
-    margin-bottom: 20px;
-}
-
 .layui-mb25 {
     margin-bottom: 25px;
-}
-
-.layui-mb30 {
-    margin-bottom: 30px;
 }
 
 .layui-p20 {
@@ -244,10 +142,6 @@ body {
     background: #fafafa;
     border-bottom: 1px solid #f0f0f0;
     padding: 18px 20px;
-}
-
-.layui-card-body-p {
-    padding: 20px;
 }
 
 .layui-card-body-p25 {
@@ -482,11 +376,6 @@ body {
     background: #722ed1;
 }
 
-/* 搜索结果栏 */
-.layui-result-bar {
-    padding: 15px 20px;
-}
-
 /* 头部区域 */
 .layui-page-header {
     border-radius: 12px;
@@ -581,43 +470,6 @@ body {
     gap: 3px;
 }
 
-/* 表单面板样式 */
-.layui-form-pane {
-    padding: 20px;
-    margin: 15px 0;
-    border-radius: 8px;
-    background: #fafafa;
-}
-
-/* 折叠面板样式 */
-.layui-colla-title {
-    padding: 12px 15px;
-    font-weight: 500;
-    color: #333;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s;
-}
-
-.layui-colla-title:hover {
-    color: var(--layui-primary);
-    background: #f8f8f8;
-}
-
-.layui-colla-content {
-    padding: 15px;
-    color: #666;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.layui-show {
-    display: block;
-}
-
 /* 动画类 */
 .layui-anim-fadein {
     animation: layuiFadeIn 0.3s;
@@ -647,20 +499,6 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* 颜色相关 */
-.layui-border-red {
-    border-color: #ff4d4f !important;
-}
-
-/* 按钮变体 */
-.layui-btn-warm {
-    background: linear-gradient(135deg, #ffb800 0%, #ff9800 100%);
-}
-
-.layui-btn-warm:hover {
-    background: linear-gradient(135deg, #ff9800 0%, #ff7800 100%);
 }
 
 /* Tab 相关样式 */
@@ -722,28 +560,9 @@ body {
     color: var(--layui-primary);
 }
 
-/* 复选框样式 */
-.layui-checkbox input[type="checkbox"] + span {
-    cursor: pointer;
-}
-
-/* 登录页面专用样式 */
-.layui-btn-fluid {
-    width: 100%;
-}
-
-.layui-inline-block {
-    display: inline-block;
-}
-
 /* 边框颜色 */
 .layui-border-cyan {
     border-color: #009688 !important;
-}
-
-/* 背景颜色 */
-.layui-bg-cyan {
-    background-color: #009688 !important;
 }
 
 /* 颜色扩展 */
@@ -800,75 +619,6 @@ body {
 
 .layui-radius-xl {
     border-radius: 16px;
-}
-
-/* 输入框扩展 */
-.layui-input-block {
-    margin-left: 0;
-    width: 100%;
-}
-
-/* Tab 样式增强 */
-.layui-tab-item {
-    display: none;
-}
-
-.layui-tab-item.layui-show {
-    display: block;
-}
-
-.layui-tab-title li.layui-this {
-    color: #009688;
-}
-
-.layui-tab-brief > .layui-tab-more li.layui-this:after {
-    border-bottom: 2px solid #009688;
-}
-
-/* 表格样式增强 */
-.layui-table thead tr {
-    background-color: #fafafa;
-}
-
-.layui-table th {
-    font-weight: 600;
-    color: #333;
-}
-
-.layui-table tbody tr:hover {
-    background-color: #f8f8f8;
-}
-
-/* 分页样式增强 */
-.layui-laypage a {
-    color: #666;
-}
-
-.layui-laypage .layui-laypage-curr .layui-laypage-em {
-    background-color: #009688;
-}
-
-.layui-laypage a:hover {
-    color: #009688;
-}
-
-/* 图片上传预览 */
-.layui-upload-list {
-    margin-top: 10px;
-}
-
-.layui-upload-list li {
-    margin-bottom: 10px;
-}
-
-/* 消息提示样式增强 */
-.layui-layer-content {
-    padding: 20px;
-}
-
-.layui-layer-title {
-    background: linear-gradient(135deg, #009688 0%, #1e9fff 100%);
-    color: #fff;
 }
 
 /* 加载动画 */
@@ -1009,10 +759,6 @@ body {
 }
 
 /* ========== 前台：与 layui 栅格/配色一致的语义模块 ========== */
-
-.layui-nav-item.layui-nav-item-right {
-    float: right;
-}
 
 .layui-auth-shell {
     height: 100vh;
@@ -1155,18 +901,9 @@ body {
     color: #fff;
 }
 
-.layui-font-dark {
-    color: #333;
-}
-
 .layui-footer-site {
     margin-top: 20px;
     padding-top: 20px;
-}
-
-.layui-page-z1 {
-    position: relative;
-    z-index: 1;
 }
 
 .layui-link-block {
@@ -1179,18 +916,8 @@ body {
     text-decoration: none !important;
 }
 
-.layui-opacity-90 {
-    opacity: 0.9;
-}
-
 .layui-cursor-pointer {
     cursor: pointer;
-}
-
-.layui-select-inline-sort {
-    width: 140px;
-    display: inline-block;
-    vertical-align: middle;
 }
 
 .layui-carousel-slide {
@@ -1270,39 +997,6 @@ body {
     background: linear-gradient(135deg, #16baaa 0%, #5fb878 100%);
 }
 
-.layui-empty-card {
-    border-radius: 2px;
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.layui-empty-card__icon {
-    font-size: 80px;
-    line-height: 1;
-    margin-bottom: 20px;
-    opacity: 0.5;
-}
-
-.layui-empty-card__title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.layui-empty-card__desc {
-    font-size: 14px;
-    color: #999;
-    margin-bottom: 20px;
-}
-
-.layui-pagination-bar {
-    margin-top: 30px;
-    padding: 20px;
-    background: #fafafa;
-    border-radius: 2px;
-}
-
 .layui-hero-gradient {
     background: linear-gradient(135deg, #009688 0%, #1e9fff 100%);
     padding: 30px;
@@ -1320,45 +1014,7 @@ body {
     flex-shrink: 0;
 }
 
-.layui-avatar-square {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.layui-emoji-3xl {
-    font-size: 40px;
-    line-height: 1;
-}
-
-.layui-emoji-2xl {
-    font-size: 36px;
-    line-height: 1;
-}
-
-.layui-emoji-xl {
-    font-size: 28px;
-    line-height: 1;
-}
-
-.layui-emoji-lg {
-    font-size: 24px;
-    line-height: 1;
-}
-
-.layui-emoji-md {
-    font-size: 20px;
-    line-height: 1;
-}
-
-.layui-flex-gap-20 {
-    display: flex;
+.layui-gap-20 {
     gap: 20px;
 }
 
@@ -1372,10 +1028,6 @@ body {
 
 .layui-flex-2 {
     flex: 2;
-    min-width: 0;
-}
-
-.layui-minw-0 {
     min-width: 0;
 }
 
@@ -1468,27 +1120,6 @@ body {
     color: var(--layui-red);
 }
 
-.layui-post-wrap {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.layui-post-emoji-box {
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-}
-
-.layui-post-step-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 2px;
-}
-
 .layui-step-dot {
     width: 36px;
     height: 36px;
@@ -1536,11 +1167,6 @@ body {
     background: #f8f8f8;
     padding: 20px;
     border-radius: 2px;
-}
-
-.layui-form-panel-gray--lg {
-    padding: 25px;
-    margin-bottom: 20px;
 }
 
 .layui-input-prefix-dollar {
@@ -1777,14 +1403,6 @@ body {
     text-transform: uppercase;
 }
 
-.layui-line-height-relaxed {
-    line-height: 1.8;
-}
-
-.layui-whitespace-preline {
-    white-space: pre-line;
-}
-
 .layui-card-transition {
     transition: all 0.3s ease;
 }
@@ -1795,24 +1413,6 @@ body {
 
 .layui-textarea-h150 {
     min-height: 150px;
-}
-
-.layui-textarea-h120 {
-    min-height: 120px;
-}
-
-.layui-textarea-h100 {
-    min-height: 100px;
-}
-
-.layui-emoji-success {
-    font-size: 80px;
-    line-height: 1;
-    margin-bottom: 20px;
-}
-
-.layui-list-inset {
-    padding: 0 20px;
 }
 
 .layui-verify-check {
@@ -1841,18 +1441,6 @@ body {
     opacity: 0.5;
 }
 
-.layui-empty-icon-60 {
-    font-size: 60px;
-    line-height: 1;
-    margin-bottom: 20px;
-}
-
-.layui-empty-icon-50 {
-    font-size: 50px;
-    line-height: 1;
-    margin-bottom: 15px;
-}
-
 .layui-hero-headline {
     font-size: 28px;
     font-weight: 700;
@@ -1875,82 +1463,8 @@ body {
     color: rgba(255, 255, 255, 0.9);
 }
 
-.layui-dot-sep {
-    margin: 0 8px;
-}
-
-.layui-job-inline-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin: 0 0 8px;
-}
-
-.layui-job-inline-meta {
-    font-size: 13px;
-    color: #999;
-}
-
-.layui-job-inline-foot {
-    font-size: 12px;
-    color: #ccc;
-    margin-top: 8px;
-}
-
-.layui-feed-row {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.layui-feed-logo {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
-    background: #f8f8f8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.layui-feed-title {
-    font-size: 15px;
-    font-weight: bold;
-    color: #333;
-    margin: 0 0 8px;
-}
-
 .layui-card-click {
     cursor: pointer;
-}
-
-.layui-img-cover {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.layui-kv-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.layui-stat-num-md-cyan {
-    font-size: 24px;
-    font-weight: bold;
-    color: #009688;
-}
-
-.layui-stat-num-md-blue {
-    font-size: 24px;
-    font-weight: bold;
-    color: #1e9fff;
-}
-
-/* 背景色 */
-.layui-bg-dark {
-    background-color: #2f363c;
 }
 
 /* 注册页协议 checkbox 与链接对齐 */

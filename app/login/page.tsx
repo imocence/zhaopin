@@ -268,7 +268,7 @@ export default function LoginPage() {
             </div>
 
             {/* 社交登录按钮 */}
-            <div className="layui-flex layui-flex-center layui-flex-gap-15">
+            <div className="layui-flex layui-flex-center layui-gap-15">
               <button type="button" className="layui-filter-tag layui-filter-tag-green layui-hover-lift layui-oauth-icon-btn" title="微信登录">
                 <i className="layui-icon layui-icon-login-wechat layui-icon-md"></i>
               </button>
