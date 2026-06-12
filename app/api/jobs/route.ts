@@ -45,13 +45,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(successResponse(jobs, '获取公司职位成功'));
     }
 
-    if (Object.values(filters).some(v => v !== undefined)) {
+    const hasSearchFilters = Object.values(filters).some(v => v !== undefined);
+    const hasPagination = searchParams.has('page') || searchParams.has('pageSize');
+
+    if (hasSearchFilters || hasPagination) {
       const result = await jobService.search(filters, page, pageSize);
       return NextResponse.json(successResponse(result, '搜索职位成功'));
     }
 
-    const result = await jobService.search(filters, page, pageSize);
-    return NextResponse.json(successResponse(result, '获取职位列表成功'));
+    const jobs = await jobService.getAll();
+    return NextResponse.json(successResponse(jobs, '获取职位列表成功'));
   } catch (error) {
     console.error('Error fetching jobs:', error);
     return NextResponse.json(
