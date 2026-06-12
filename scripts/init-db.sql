@@ -90,6 +90,20 @@ CREATE TABLE IF NOT EXISTS messages (
   FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE SET NULL
 );
 
+-- 创建举报表
+CREATE TABLE IF NOT EXISTS reports (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('职位举报', '企业举报', '用户举报')),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  target_id TEXT,
+  target_name TEXT NOT NULL,
+  reporter_id TEXT,
+  reporter_name TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pending', 'processing', 'resolved')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- 创建分类表
 CREATE TABLE IF NOT EXISTS categories (
   id TEXT PRIMARY KEY,
@@ -119,3 +133,4 @@ CREATE INDEX IF NOT EXISTS idx_applications_job ON applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_applications_user ON applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_messages_from_user ON messages(from_user_id);
 CREATE INDEX IF NOT EXISTS idx_messages_to_user ON messages(to_user_id);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);

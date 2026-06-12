@@ -80,6 +80,9 @@ export interface Application {
   updatedAt: string;
   jobTitle?: string;
   companyName?: string;
+  applicantName?: string;
+  applicantEmail?: string;
+  applicantPhone?: string;
 }
 
 // 收藏类型
@@ -99,6 +102,19 @@ export interface Message {
   subject: string;
   content: string;
   read: boolean;
+  createdAt: string;
+}
+
+export interface Report {
+  id: string;
+  type: '职位举报' | '企业举报' | '用户举报';
+  title: string;
+  description: string;
+  targetId?: string;
+  targetName: string;
+  reporterId?: string;
+  reporterName: string;
+  status: 'pending' | 'processing' | 'resolved';
   createdAt: string;
 }
 

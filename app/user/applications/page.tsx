@@ -3,12 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { companyService } from '@/lib/services/data';
-import { Company } from '@/types';
+import { applicationService } from '@/lib/services/data';
+import { Application } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
-type ApplicationStatus = 'all' | 'pending' | 'viewed' | 'interview' | 'offered' | 'rejected';
+type ApplicationStatus = 'all' | 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';
 
 interface LayuiTableInstance {
   reload: (options: { data: unknown[]; page: { curr: number } }) => void;
@@ -32,7 +32,7 @@ interface Layui {
 export default function UserApplicationsPage() {
   const isAuth = useRequireAuth();
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus>('all');
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const tableRef = useRef<LayuiTableInstance | null>(null);
   const pageSize = 5;
 
@@ -45,66 +45,16 @@ export default function UserApplicationsPage() {
   ];
 
   useEffect(() => {
-    async function loadData() {
-      const comps = await companyService.getAll();
-      setCompanies(comps);
+    async function loadApplications() {
+      try {
+        const result = await applicationService.getMine();
+        setApplications(result);
+      } catch (error) {
+        console.error('加载申请数据失败', error);
+      }
     }
-    loadData();
+    loadApplications();
   }, []);
-
-  // 模拟申请数据
-  const applications = useMemo(
-    () => [
-      {
-        id: '1',
-        jobId: 'job1',
-        jobTitle: '高级软件工程师',
-        company: companies[0],
-        appliedAt: '2026-04-15',
-        status: 'pending' as const,
-        lastUpdate: '2026-04-15',
-      },
-      {
-        id: '2',
-        jobId: 'job2',
-        jobTitle: '前端开发工程师',
-        company: companies[1],
-        appliedAt: '2026-04-10',
-        status: 'viewed' as const,
-        lastUpdate: '2026-04-11',
-      },
-      {
-        id: '3',
-        jobId: 'job3',
-        jobTitle: '全栈工程师',
-        company: companies[2],
-        appliedAt: '2026-04-05',
-        status: 'interview' as const,
-        lastUpdate: '2026-04-12',
-      },
-      {
-        id: '4',
-        jobId: 'job4',
-        jobTitle: '产品经理',
-        company: companies[3],
-        appliedAt: '2026-03-28',
-        status: 'offered' as const,
-        lastUpdate: '2026-04-08',
-      },
-      {
-        id: '5',
-        jobId: 'job5',
-        jobTitle: 'UI设计师',
-        company: companies[4],
-        appliedAt: '2026-03-20',
-        status: 'rejected' as const,
-        lastUpdate: '2026-03-25',
-      },
-    ],
-    [companies]
-  );
-
-
 
   const filteredApplications = useMemo(
     () => (statusFilter === 'all' ? applications : applications.filter(app => app.status === statusFilter)),
@@ -114,8 +64,10 @@ export default function UserApplicationsPage() {
   const tableApplications = useMemo(
     () => filteredApplications.map(app => ({
       ...app,
-      companyName: app.company?.name || '-',
-      statusBadgeHtml: `<span class="layui-badge ${app.status === 'pending' ? 'layui-bg-orange' : app.status === 'viewed' ? 'layui-bg-blue' : app.status === 'interview' ? 'layui-bg-green' : app.status === 'offered' ? 'layui-bg-primary' : 'layui-bg-gray'}">${app.status === 'pending' ? '待处理' : app.status === 'viewed' ? '已查看' : app.status === 'interview' ? '面试中' : app.status === 'offered' ? '已录用' : '已拒绝'}</span>`,
+      companyName: app.companyName || '-',
+      appliedAt: app.createdAt,
+      lastUpdate: app.updatedAt,
+      statusBadgeHtml: `<span class="layui-badge ${app.status === 'pending' ? 'layui-bg-orange' : app.status === 'reviewed' ? 'layui-bg-blue' : app.status === 'interview' ? 'layui-bg-green' : app.status === 'accepted' ? 'layui-bg-primary' : 'layui-bg-gray'}>${app.status === 'pending' ? '待处理' : app.status === 'reviewed' ? '已查看' : app.status === 'interview' ? '面试中' : app.status === 'accepted' ? '已录用' : '已拒绝'}</span>`,
     })),
     [filteredApplications]
   );
@@ -183,7 +135,7 @@ export default function UserApplicationsPage() {
             templet: function (d: Record<string, unknown>) {
               const jobId = String(d.jobId ?? '');
               let buttons = `<a class="layui-btn layui-btn-sm layui-btn-primary" href="/jobs/${jobId}">查看职位</a>`;
-              if (d.status === 'offered') {
+              if (d.status === 'accepted') {
                 buttons += '<button class="layui-btn layui-btn-sm layui-btn-normal">接受offer</button>';
               }
               if (d.status === 'interview') {
@@ -205,9 +157,9 @@ export default function UserApplicationsPage() {
   const stats = {
     all: applications.length,
     pending: applications.filter(a => a.status === 'pending').length,
-    viewed: applications.filter(a => a.status === 'viewed').length,
+    reviewed: applications.filter(a => a.status === 'reviewed').length,
     interview: applications.filter(a => a.status === 'interview').length,
-    offered: applications.filter(a => a.status === 'offered').length,
+    accepted: applications.filter(a => a.status === 'accepted').length,
     rejected: applications.filter(a => a.status === 'rejected').length,
   };
 
@@ -231,9 +183,9 @@ export default function UserApplicationsPage() {
                   {[
                     { key: 'all', label: `全部 (${stats.all})` },
                     { key: 'pending', label: `待处理 (${stats.pending})` },
-                    { key: 'viewed', label: `已查看 (${stats.viewed})` },
+                    { key: 'reviewed', label: `已查看 (${stats.reviewed})` },
                     { key: 'interview', label: `面试中 (${stats.interview})` },
-                    { key: 'offered', label: `已录用 (${stats.offered})` },
+                    { key: 'accepted', label: `已录用 (${stats.accepted})` },
                     { key: 'rejected', label: `已拒绝 (${stats.rejected})` },
                   ].map((tab) => (
                     <li

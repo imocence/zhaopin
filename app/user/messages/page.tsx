@@ -1,20 +1,15 @@
 'use client';
 
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
+import { messageService } from '@/lib/services/data';
+import { Message } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 type MessageType = 'all' | 'system' | 'application' | 'interview' | 'company';
 
-interface Message {
-  id: string;
-  type: 'system' | 'application' | 'interview' | 'company';
-  title: string;
-  content: string;
-  createdAt: string;
-  isRead: boolean;
-}
+type LocalMessage = Message & { type: Exclude<MessageType, 'all'>; isRead: boolean; title: string; };
 
 interface LayuiTableInstance {
   reload: (options: { data: unknown[]; page: { curr: number } }) => void;
@@ -38,6 +33,7 @@ interface Layui {
 export default function UserMessagesPage() {
   const isAuth = useRequireAuth();
   const [typeFilter, setTypeFilter] = useState<MessageType>('all');
+  const [messages, setMessages] = useState<Message[]>([]);
   const tableRef = useRef<LayuiTableInstance | null>(null);
 
   const sidebarItems = [
@@ -48,63 +44,51 @@ export default function UserMessagesPage() {
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 
-  const messages: Message[] = useMemo(() => [
-    {
-      id: '1',
-      type: 'system',
-      title: '欢迎使用168招聘网',
-      content: '感谢您注册168招聘网，祝您求职顺利！',
-      createdAt: '2026-04-15 10:00',
-      isRead: false,
-    },
-    {
-      id: '2',
-      type: 'application',
-      title: '您的申请已被查看',
-      content: '腾讯美国已查看您对"高级软件工程师"职位的申请',
-      createdAt: '2026-04-14 15:30',
-      isRead: false,
-    },
-    {
-      id: '3',
-      type: 'interview',
-      title: '面试邀请',
-      content: '字节跳动邀请您参加"前端工程师"职位的面试，请确认时间',
-      createdAt: '2026-04-13 09:00',
-      isRead: false,
-    },
-    {
-      id: '4',
-      type: 'company',
-      title: '企业发布新职位',
-      content: '您关注的企业"阿里巴巴美国"发布了新职位',
-      createdAt: '2026-04-12 14:20',
-      isRead: true,
-    },
-    {
-      id: '5',
-      type: 'application',
-      title: '申请状态更新',
-      content: '您对"产品经理"职位的申请已进入面试阶段',
-      createdAt: '2026-04-11 11:00',
-      isRead: true,
-    },
-  ],
-    []
-  );
+  useEffect(() => {
+    async function loadMessages() {
+      try {
+        const result = await messageService.getMine();
+        setMessages(result);
+      } catch (error) {
+        console.error('加载消息数据失败', error);
+      }
+    }
+    loadMessages();
+  }, []);
+
+  const messagesWithType = useMemo<LocalMessage[]>(() => {
+    return messages.map(msg => {
+      const subject = msg.subject?.toLowerCase() ?? '';
+      let type: Exclude<MessageType, 'all'> = 'company';
+      if (msg.jobId) {
+        type = 'application';
+      } else if (subject.includes('面试')) {
+        type = 'interview';
+      } else if (subject.includes('系统') || subject.includes('欢迎')) {
+        type = 'system';
+      }
+
+      return {
+        ...msg,
+        type,
+        title: msg.subject,
+        isRead: msg.read,
+      };
+    });
+  }, [messages]);
 
   const filteredMessages = useMemo(
-    () => (typeFilter === 'all' ? messages : messages.filter(msg => msg.type === typeFilter)),
-    [typeFilter, messages]
+    () => (typeFilter === 'all' ? messagesWithType : messagesWithType.filter(msg => msg.type === typeFilter)),
+    [typeFilter, messagesWithType]
   );
 
   const stats = useMemo(() => ({
-    all: messages.length,
-    system: messages.filter(m => m.type === 'system').length,
-    application: messages.filter(m => m.type === 'application').length,
-    interview: messages.filter(m => m.type === 'interview').length,
-    company: messages.filter(m => m.type === 'company').length,
-  }), [messages]);
+    all: messagesWithType.length,
+    system: messagesWithType.filter(m => m.type === 'system').length,
+    application: messagesWithType.filter(m => m.type === 'application').length,
+    interview: messagesWithType.filter(m => m.type === 'interview').length,
+    company: messagesWithType.filter(m => m.type === 'company').length,
+  }), [messagesWithType]);
 
   const initTable = useCallback(
     (layui: Layui) => {

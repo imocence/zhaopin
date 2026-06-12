@@ -1,4 +1,4 @@
-import type { Job, Company, User, Category, Location, JobFilters, Pagination } from '@/types';
+import type { Job, Company, User, Category, Location, JobFilters, Pagination, Application, Message, Report } from '@/types';
 import * as apiServices from '@/lib/services/client-api';
 
 const isClient = typeof window !== 'undefined';
@@ -132,6 +132,55 @@ export const userService = {
     }
     const { userService: svc } = await getDbServices();
     return svc.getByEmail(email);
+  },
+};
+
+export const applicationService = {
+  getMine: async (): Promise<Application[]> => {
+    if (isClient) {
+      const { applicationService: svc } = apiServices;
+      return svc.getMine();
+    }
+    throw new Error('applicationService.getMine can only be used on the client');
+  },
+
+  getByCompanyId: async (companyId: string): Promise<Application[]> => {
+    if (isClient) {
+      const { applicationService: svc } = apiServices;
+      return svc.getByCompanyId(companyId);
+    }
+    throw new Error('applicationService.getByCompanyId can only be used on the client');
+  },
+};
+
+export const messageService = {
+  getMine: async (): Promise<Message[]> => {
+    if (isClient) {
+      const { messageService: svc } = apiServices;
+      return svc.getMine();
+    }
+    throw new Error('messageService.getMine can only be used on the client');
+  },
+};
+
+export const favoriteService = {
+  getMine: async (): Promise<Job[]> => {
+    if (isClient) {
+      const { favoriteService: svc } = apiServices;
+      return svc.getMine();
+    }
+    throw new Error('favoriteService.getMine can only be used on the client');
+  },
+};
+
+export const reportService = {
+  getAll: async (): Promise<Report[]> => {
+    if (isClient) {
+      const { reportService: svc } = apiServices;
+      return svc.getAll();
+    }
+    const { reportService: svc } = await getDbServices();
+    return svc.getAll();
   },
 };
 

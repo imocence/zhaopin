@@ -145,6 +145,7 @@ class LocalD1Database {
     this.tables.set('applications', []);
     this.tables.set('favorites', []);
     this.tables.set('messages', []);
+    this.tables.set('reports', []);
 
     db.close();
   }
@@ -254,6 +255,7 @@ class LocalD1Database {
     this.tables.set('applications', []);
     this.tables.set('favorites', []);
     this.tables.set('messages', []);
+    this.tables.set('reports', []);
   }
 }
 

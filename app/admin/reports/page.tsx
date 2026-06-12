@@ -1,62 +1,98 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+interface ReportItem {
+  id: string;
+  type: '职位举报' | '企业举报' | '用户举报';
+  title: string;
+  description: string;
+  targetId?: string;
+  targetName: string;
+  reporterId?: string;
+  reporterName: string;
+  status: 'pending' | 'processing' | 'resolved';
+  createdAt: string;
+}
 
 export default function AdminReportsPage() {
-  const [reports] = useState([
-    {
-      id: '1',
-      type: '职位举报',
-      title: '职位信息不实',
-      targetId: 'job1',
-      targetName: '高级软件工程师',
-      reporter: 'user1',
-      reporterName: '张三',
-      status: 'pending',
-      createdAt: '2026-04-15',
-      description: '该职位的薪资描述与实际不符',
-    },
-    {
-      id: '2',
-      type: '企业举报',
-      title: '企业存在欺诈行为',
-      targetId: 'company1',
-      targetName: '某科技公司',
-      reporter: 'user2',
-      reporterName: '李四',
-      status: 'processing',
-      createdAt: '2026-04-14',
-      description: '该企业要求先交钱再面试',
-    },
-    {
-      id: '3',
-      type: '用户举报',
-      title: '用户发布不当信息',
-      targetId: 'user3',
-      targetName: '王五',
-      reporter: 'user4',
-      reporterName: '赵六',
-      status: 'resolved',
-      createdAt: '2026-04-13',
-      description: '该用户在评论区发布广告信息',
-    },
-  ]);
+  const [reports, setReports] = useState<ReportItem[]>([]);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
-  const handleProcess = (reportId: string) => {
-    alert('开始处理举报');
-  };
+  useEffect(() => {
+    async function loadReports() {
+      try {
+        const response = await fetch('/api/reports');
+        const json = await response.json();
+        if (response.ok && json.status === 'success') {
+          setReports(json.data || []);
+        } else {
+          console.error('获取举报数据失败：', json.message || response.statusText);
+        }
+      } catch (error) {
+        console.error('获取举报数据异常：', error);
+      }
+    }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return '<span class="layui-badge layui-bg-orange">待处理</span>';
-      case 'processing':
-        return '<span class="layui-badge layui-bg-blue">处理中</span>';
-      case 'resolved':
-        return '<span class="layui-badge layui-bg-green">已解决</span>';
-      default:
-        return '<span class="layui-badge layui-bg-gray">未知</span>';
+    loadReports();
+  }, []);
+
+  const handleProcess = async (reportId: string) => {
+    const report = reports.find((item) => item.id === reportId);
+    if (!report) return;
+
+    let nextStatus: ReportItem['status'] | undefined;
+    if (report.status === 'pending') {
+      nextStatus = 'processing';
+    } else if (report.status === 'processing') {
+      nextStatus = 'resolved';
+    }
+
+    if (!nextStatus) {
+      alert('该举报已经处于已解决状态');
+      return;
+    }
+
+    setLoadingIds((prev) => [...prev, reportId]);
+    try {
+      const response = await fetch(`/api/reports/${reportId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const json = await response.json();
+      if (response.ok && json.status === 'success') {
+        const updatedReport = json.data as ReportItem;
+        setReports((prev) => prev.map((item) => (item.id === reportId ? updatedReport : item)));
+      } else {
+        console.error('更新举报状态失败：', json.message || response.statusText);
+        alert(json.message || '更新举报状态失败');
+      }
+    } catch (error) {
+      console.error('更新举报状态异常：', error);
+      alert('更新举报状态异常，请检查控制台');
+    } finally {
+      setLoadingIds((prev) => prev.filter((id) => id !== reportId));
     }
   };
+
+  const renderStatusBadge = (status: ReportItem['status']) => {
+    switch (status) {
+      case 'pending':
+        return <span className="layui-badge layui-bg-orange">待处理</span>;
+      case 'processing':
+        return <span className="layui-badge layui-bg-blue">处理中</span>;
+      case 'resolved':
+        return <span className="layui-badge layui-bg-green">已解决</span>;
+      default:
+        return <span className="layui-badge layui-bg-gray">未知</span>;
+    }
+  };
+
+  const pendingCount = reports.filter((report) => report.status === 'pending').length;
+  const processingCount = reports.filter((report) => report.status === 'processing').length;
+  const resolvedCount = reports.filter((report) => report.status === 'resolved').length;
 
   return (
     <div className="layui-fluid">
@@ -73,19 +109,19 @@ export default function AdminReportsPage() {
           <div className="layui-row layui-col-space15">
             <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
               <div className="layui-elem-quote layui-text-center">
-                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'pending').length}</h2>
+                <h2 className="layui-font-title layui-mt10">{pendingCount}</h2>
                 <p className="layui-text layui-word-aux">待处理举报</p>
               </div>
             </div>
             <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
               <div className="layui-elem-quote layui-text-center">
-                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'processing').length}</h2>
+                <h2 className="layui-font-title layui-mt10">{processingCount}</h2>
                 <p className="layui-text layui-word-aux">处理中举报</p>
               </div>
             </div>
             <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
               <div className="layui-elem-quote layui-text-center">
-                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'resolved').length}</h2>
+                <h2 className="layui-font-title layui-mt10">{resolvedCount}</h2>
                 <p className="layui-text layui-word-aux">已解决举报</p>
               </div>
             </div>
@@ -110,32 +146,42 @@ export default function AdminReportsPage() {
               </tr>
             </thead>
             <tbody>
-              {reports.map((report) => (
-                <tr key={report.id}>
-                  <td>{report.id}</td>
-                  <td>{report.type}</td>
-                  <td>
-                    <strong>{report.title}</strong>
-                    <div className="layui-text layui-word-aux layui-mt5">
-                      {report.description}
-                    </div>
-                  </td>
-                  <td>{report.targetName}</td>
-                  <td>{report.reporterName}</td>
-                  <td>{report.createdAt}</td>
-                  <td dangerouslySetInnerHTML={{ __html: getStatusBadge(report.status) }} />
-                  <td>
-                    <div className="layui-btn-group">
-                      <button
-                        className="layui-btn layui-btn-xs layui-btn-primary"
-                        onClick={() => handleProcess(report.id)}
-                      >
-                        <i className="layui-icon layui-icon-form"></i> 处理
-                      </button>
-                    </div>
+              {reports.length === 0 ? (
+                <tr>
+                  <td className="layui-elem-quote" colSpan={8}>
+                    暂无举报记录
                   </td>
                 </tr>
-              ))}
+              ) : (
+                reports.map((report) => (
+                  <tr key={report.id}>
+                    <td>{report.id}</td>
+                    <td>{report.type}</td>
+                    <td>
+                      <strong>{report.title}</strong>
+                      <div className="layui-text layui-word-aux layui-mt5">
+                        {report.description}
+                      </div>
+                    </td>
+                    <td>{report.targetName}</td>
+                    <td>{report.reporterName}</td>
+                    <td>{report.createdAt}</td>
+                    <td>{renderStatusBadge(report.status)}</td>
+                    <td>
+                      <div className="layui-btn-group">
+                        <button
+                          className="layui-btn layui-btn-xs layui-btn-primary"
+                          disabled={report.status === 'resolved' || loadingIds.includes(report.id)}
+                          onClick={() => handleProcess(report.id)}
+                        >
+                          <i className="layui-icon layui-icon-form"></i>
+                          {report.status === 'pending' ? ' 开始处理' : report.status === 'processing' ? ' 标记已解决' : ' 已解决'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

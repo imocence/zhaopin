@@ -3,16 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { companyService, jobService } from '@/lib/services/data';
-import { Company, Job } from '@/types';
+import { companyService, jobService, applicationService } from '@/lib/services/data';
+import { Company, Job, Application } from '@/types';
 
 export default function EmployerDashboardPage() {
   const [currentCompany, setCurrentCompany] = useState<Company | undefined>(undefined);
+  const [recentApplications, setRecentApplications] = useState<Application[]>([]);
   const [stats, setStats] = useState({
     activeJobs: 0,
-    totalApplications: 45,
-    pendingReview: 8,
-    totalViews: 1234,
+    totalApplications: 0,
+    pendingReview: 0,
+    totalViews: 0,
   });
 
   useEffect(() => {
@@ -21,13 +22,23 @@ export default function EmployerDashboardPage() {
       const company = verified[0];
       setCurrentCompany(company);
 
-      if (company) {
-        const jobs = await jobService.getByCompanyId(company.id);
-        setStats(prev => ({
-          ...prev,
-          activeJobs: jobs.filter(j => j.status === 'active').length,
-        }));
+      if (!company) return;
+
+      const jobs = await jobService.getByCompanyId(company.id);
+      let applications: Application[] = [];
+      try {
+        applications = await applicationService.getByCompanyId(company.id);
+      } catch (error) {
+        console.error('加载企业申请数据失败', error);
       }
+
+      setStats({
+        activeJobs: jobs.filter(j => j.status === 'active').length,
+        totalApplications: applications.length,
+        pendingReview: applications.filter(app => app.status === 'pending').length,
+        totalViews: jobs.reduce((sum, job) => sum + job.views, 0),
+      });
+      setRecentApplications(applications.slice(0, 3));
     }
     loadData();
   }, []);
@@ -74,43 +85,12 @@ export default function EmployerDashboardPage() {
     },
   ];
 
-  // 获取最新申请
-  const recentApplications = [
-    {
-      id: '1',
-      jobTitle: '高级软件工程师',
-      applicantName: '张三',
-      email: 'zhangsan@example.com',
-      phone: '123-456-7890',
-      appliedAt: '2026-04-15',
-      status: 'pending',
-    },
-    {
-      id: '2',
-      jobTitle: '市场专员',
-      applicantName: '李四',
-      email: 'lisi@example.com',
-      phone: '234-567-8901',
-      appliedAt: '2026-04-14',
-      status: 'reviewed',
-    },
-    {
-      id: '3',
-      jobTitle: 'UI设计师',
-      applicantName: '王五',
-      email: 'wangwu@example.com',
-      phone: '345-678-9012',
-      appliedAt: '2026-04-13',
-      status: 'interview',
-    },
-  ];
-
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { text: string; class: string } } = {
       pending: { text: '待处理', class: 'layui-bg-orange' },
       reviewed: { text: '已查看', class: 'layui-bg-blue' },
       interview: { text: '面试中', class: 'layui-bg-green' },
-      hired: { text: '已录用', class: 'layui-bg-primary' },
+      accepted: { text: '已录用', class: 'layui-bg-primary' },
       rejected: { text: '已拒绝', class: 'layui-bg-gray' },
     };
     const s = statusMap[status] || { text: status, class: '' };
@@ -217,14 +197,14 @@ export default function EmployerDashboardPage() {
                     <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <h4 className="font-medium text-gray-900">{app.applicantName}</h4>
+                          <h4 className="font-medium text-gray-900">{app.applicantName || '未知求职者'}</h4>
                           {getStatusBadge(app.status)}
                         </div>
                         <p className="text-sm text-gray-600">{app.jobTitle}</p>
                         <div className="flex gap-4 mt-1 text-xs text-gray-500">
-                          <span>📧 {app.email}</span>
-                          <span>📱 {app.phone}</span>
-                          <span>📅 {app.appliedAt}</span>
+                          <span>📧 {app.applicantEmail || '-'}</span>
+                          <span>📱 {app.applicantPhone || '-'}</span>
+                          <span>📅 {app.createdAt}</span>
                         </div>
                       </div>
                       <div className="flex gap-2">

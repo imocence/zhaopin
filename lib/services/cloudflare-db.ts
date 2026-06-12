@@ -59,6 +59,46 @@ function mapApplicationRow(row: Record<string, unknown>): Application {
     updatedAt: row.updated_at as string,
     jobTitle: row.job_title as string | undefined,
     companyName: row.company_name as string | undefined,
+    applicantName: row.applicant_name as string | undefined,
+    applicantEmail: row.applicant_email as string | undefined,
+    applicantPhone: row.applicant_phone as string | undefined,
+  };
+}
+
+function mapMessageRow(row: Record<string, unknown>): Message {
+  return {
+    id: row.id as string,
+    fromUserId: row.from_user_id as string,
+    toUserId: row.to_user_id as string,
+    jobId: row.job_id ? (row.job_id as string) : undefined,
+    subject: row.subject as string,
+    content: row.content as string,
+    read: Boolean(row.read),
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapFavoriteRow(row: Record<string, unknown>): Favorite {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    jobId: row.job_id as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapReportRow(row: Record<string, unknown>): Report {
+  return {
+    id: row.id as string,
+    type: row.type as Report['type'],
+    title: row.title as string,
+    description: row.description as string,
+    targetId: row.target_id as string | undefined,
+    targetName: row.target_name as string,
+    reporterId: row.reporter_id as string | undefined,
+    reporterName: row.reporter_name as string,
+    status: row.status as Report['status'],
+    createdAt: row.created_at as string,
   };
 }
 
@@ -637,6 +677,89 @@ export const userService = {
     }
 
     return mapUser(result);
+  },
+};
+
+export const applicationService = {
+  getByUserId: async (userId: string): Promise<Application[]> => {
+    const db = getDb();
+    const result = await db.prepare(
+      `SELECT a.*, j.title AS job_title, c.name AS company_name
+       FROM applications a
+       JOIN jobs j ON a.job_id = j.id
+       JOIN companies c ON j.company_id = c.id
+       WHERE a.user_id = ?
+       ORDER BY a.created_at DESC`
+    )
+      .bind(userId)
+      .all();
+    return result.results.map((row: any) => mapApplicationRow(row));
+  },
+
+  getByCompanyId: async (companyId: string): Promise<Application[]> => {
+    const db = getDb();
+    const result = await db.prepare(
+      `SELECT a.*, j.title AS job_title, c.name AS company_name, u.name AS applicant_name, u.email AS applicant_email, u.phone AS applicant_phone
+       FROM applications a
+       JOIN jobs j ON a.job_id = j.id
+       JOIN companies c ON j.company_id = c.id
+       JOIN users u ON a.user_id = u.id
+       WHERE j.company_id = ?
+       ORDER BY a.created_at DESC`
+    )
+      .bind(companyId)
+      .all();
+    return result.results.map((row: any) => mapApplicationRow(row));
+  },
+};
+
+export const messageService = {
+  getByUserId: async (userId: string): Promise<Message[]> => {
+    const db = getDb();
+    const result = await db.prepare('SELECT * FROM messages WHERE to_user_id = ? ORDER BY created_at DESC')
+      .bind(userId)
+      .all();
+    return result.results.map((row: any) => mapMessageRow(row));
+  },
+};
+
+export const favoriteService = {
+  getByUserId: async (userId: string): Promise<Favorite[]> => {
+    const db = getDb();
+    const result = await db.prepare('SELECT * FROM favorites WHERE user_id = ? ORDER BY created_at DESC')
+      .bind(userId)
+      .all();
+    return result.results.map((row: any) => mapFavoriteRow(row));
+  },
+
+  getJobsByUserId: async (userId: string): Promise<Job[]> => {
+    const db = getDb();
+    const result = await db.prepare(
+      `SELECT j.*
+       FROM favorites f
+       JOIN jobs j ON f.job_id = j.id
+       WHERE f.user_id = ?
+       ORDER BY f.created_at DESC`
+    )
+      .bind(userId)
+      .all();
+    return result.results.map((row: any) => mapJobRow(row));
+  },
+};
+
+export const reportService = {
+  getAll: async (): Promise<Report[]> => {
+    const db = getDb();
+    const result = await db.prepare('SELECT * FROM reports ORDER BY created_at DESC').all();
+    return result.results.map((row: any) => mapReportRow(row));
+  },
+
+  updateStatus: async (id: string, status: Report['status']): Promise<Report | undefined> => {
+    const db = getDb();
+    await db.prepare('UPDATE reports SET status = ? WHERE id = ?').bind(status, id).run();
+    const result = await db.prepare('SELECT * FROM reports WHERE id = ?').bind(id).first();
+    if (!result) return undefined;
+    return mapReportRow(result as Record<string, unknown>);
   },
 };
 

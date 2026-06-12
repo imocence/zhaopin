@@ -1,5 +1,5 @@
 
-import { Job, Company, User, Category, Location, JobFilters, Pagination } from '@/types';
+import { Job, Company, User, Category, Location, JobFilters, Pagination, Application, Message, Report } from '@/types';
 
 // API基础URL
 const API_BASE = '/api';
@@ -135,6 +135,36 @@ export const userService = {
     } catch {
       return undefined;
     }
+  },
+};
+
+// 应用相关操作 - 客户端API
+export const applicationService = {
+  getMine: async (): Promise<Application[]> => {
+    return fetchApi<Application[]>('/applications');
+  },
+
+  getByCompanyId: async (companyId: string): Promise<Application[]> => {
+    return fetchApi<Application[]>(`/applications`, { companyId });
+  },
+};
+
+// 消息相关操作 - 客户端API
+export const messageService = {
+  getMine: async (): Promise<Message[]> => {
+    return fetchApi<Message[]>('/messages');
+  },
+};
+
+export const favoriteService = {
+  getMine: async (): Promise<Job[]> => {
+    return fetchApi<Job[]>('/favorites');
+  },
+};
+
+export const reportService = {
+  getAll: async (): Promise<Report[]> => {
+    return fetchApi<Report[]>('/reports');
   },
 };
 

@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { jobService, companyService } from '@/lib/services/data';
+import { favoriteService, companyService } from '@/lib/services/data';
 import { Job, Company } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
@@ -44,14 +44,18 @@ export default function UserFavoritesPage() {
 
   useEffect(() => {
     async function loadData() {
-      const jobs = await jobService.getLatestJobs(12);
-      setFavoriteJobs(jobs);
-      // fetch companies for these jobs
-      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
-      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
-      const map: Record<string, Company | undefined> = {};
-      entries.forEach(([id, comp]) => { map[id] = comp; });
-      setCompanyMap(map);
+      try {
+        const jobs = await favoriteService.getMine();
+        setFavoriteJobs(jobs);
+
+        const ids = Array.from(new Set(jobs.map(j => j.companyId)));
+        const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
+        const map: Record<string, Company | undefined> = {};
+        entries.forEach(([id, comp]) => { map[id] = comp; });
+        setCompanyMap(map);
+      } catch (error) {
+        console.error('加载收藏职位失败', error);
+      }
     }
     loadData();
   }, []);

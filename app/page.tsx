@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { jobService, companyService, locationService } from '@/lib/services/data';
+import { jobService, companyService, locationService, categoryService } from '@/lib/services/data';
 import { Job, Company, Location } from '@/types';
 
 export default function HomePage() {
@@ -19,19 +19,7 @@ export default function HomePage() {
   const [companiesMap, setCompaniesMap] = useState<Record<string, Company>>({});
   const [jobsCountByState, setJobsCountByState] = useState<Record<string, number>>({});
   const [stats, setStats] = useState({ totalJobs: 0, totalCompanies: 0, totalLocations: 0 });
-
-  const categories = [
-    { id: 'tech', name: 'IT/互联网', icon: '💻', count: 1250 },
-    { id: 'finance', name: '金融/会计', icon: '💰', count: 856 },
-    { id: 'medical', name: '医疗/健康', icon: '🏥', count: 642 },
-    { id: 'education', name: '教育/培训', icon: '📚', count: 528 },
-    { id: 'design', name: '设计/创意', icon: '🎨', count: 435 },
-    { id: 'marketing', name: '市场/营销', icon: '📢', count: 389 },
-    { id: 'restaurant', name: '餐饮/服务', icon: '🍽️', count: 756 },
-    { id: 'construction', name: '建筑/工程', icon: '🏗️', count: 267 },
-    { id: 'logistics', name: '物流/运输', icon: '🚚', count: 324 },
-    { id: 'retail', name: '零售/销售', icon: '🛒', count: 445 },
-  ];
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; icon: string; count: number }>>([]);
 
   // 加载数据
   useEffect(() => {
@@ -62,6 +50,19 @@ export default function HomePage() {
           countMap[j.state] = (countMap[j.state] || 0) + 1;
         });
         setJobsCountByState(countMap);
+
+        const categoriesFromDb = await categoryService.getAll();
+        const categoryCounts = allJobs.reduce((acc, job) => {
+          acc[job.category] = (acc[job.category] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+
+        setCategories(categoriesFromDb.slice(0, 10).map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          icon: cat.icon,
+          count: categoryCounts[cat.slug] || 0,
+        })));
 
         // 设置统计数据
         setStats({
@@ -192,8 +193,11 @@ export default function HomePage() {
           <div className="layui-row layui-col-space20">
             <div className="layui-col-md9">
               <div className="layui-card">
-                <div className="layui-card-header">
-                  <i className="layui-icon layui-icon-list"></i> 推荐职位
+                <div className="layui-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>
+                    <i className="layui-icon layui-icon-list"></i> 推荐职位
+                  </span>
+                  <Link href="/jobs">更多职位.. </Link>
                 </div>
                 <div className="layui-card-body">
                   <div className="layui-tab layui-tab-card" lay-filter="jobTab">
@@ -206,16 +210,10 @@ export default function HomePage() {
                         <div className="layui-row layui-col-space15">
                           {hotJobs.map((job) => renderJobCard(job))}
                         </div>
-                        <div className="layui-text-center layui-mt20">
-                          <Link href="/jobs" className="layui-btn layui-btn-primary">查看更多职位</Link>
-                        </div>
                       </div>
                       <div className="layui-tab-item">
                         <div className="layui-row layui-col-space15">
                           {latestJobs.map((job) => renderJobCard(job))}
-                        </div>
-                        <div className="layui-text-center layui-mt20">
-                          <Link href="/jobs" className="layui-btn layui-btn-primary">查看更多职位</Link>
                         </div>
                       </div>
                     </div>
@@ -224,8 +222,9 @@ export default function HomePage() {
               </div>
 
               <div className="layui-card layui-mt20">
-                <div className="layui-card-header">
+                <div className="layui-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <i className="layui-icon layui-icon-component"></i> 热门企业
+                  <Link href="/companies">更多企业..</Link>
                 </div>
                 <div className="layui-card-body">
                   <div className="layui-row layui-col-space10">
@@ -248,9 +247,6 @@ export default function HomePage() {
                         </Link>
                       </div>
                     ))}
-                  </div>
-                  <div className="layui-text-center layui-mt20">
-                    <Link href="/companies" className="layui-btn layui-btn-primary">浏览更多企业</Link>
                   </div>
                 </div>
               </div>
