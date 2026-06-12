@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLayuiNav } from '@/lib/hooks/useLayuiInit';
+import { getAuthToken, clearAuth } from '@/lib/utils/auth-client';
 
 const Header: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
+
   // 初始化 Layui 导航
   useLayuiNav();
 
@@ -23,8 +24,14 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const checkAuth = () => setIsLoggedIn(!!getAuthToken());
+    checkAuth();
+    window.addEventListener('authChange', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('authChange', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
   }, []);
 
   if (!mounted) {
@@ -32,12 +39,12 @@ const Header: React.FC = () => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    clearAuth();
     window.location.href = '/';
   };
 
   return (
-    <header className="layui-bg-black" style={{marginBottom: pathname === '/' ? '0' : '10px'}}>
+    <header className="layui-bg-black" style={{ marginBottom: pathname === '/' ? '0' : '10px' }}>
       <ul className="layui-container layui-nav">
         <li className="layui-nav-item">
           <Link href="/" className="layui-logo">168招聘网</Link>
@@ -61,15 +68,15 @@ const Header: React.FC = () => {
 
         {!isLoggedIn ? (
           <>
-            <li className="layui-nav-item" style={{float: 'right'}}>
+            <li className="layui-nav-item" style={{ float: 'right' }}>
               <Link href="/login">登录</Link>
             </li>
-            <li className="layui-nav-item" style={{float: 'right'}}>
+            <li className="layui-nav-item" style={{ float: 'right' }}>
               <Link href="/register">注册</Link>
             </li>
           </>
         ) : (
-          <li className="layui-nav-item" style={{float: 'right'}}>
+          <li className="layui-nav-item" style={{ float: 'right' }}>
             <Link href="/user">
               <i className="layui-icon layui-icon-username"></i> 用户中心
             </Link>

@@ -2,15 +2,30 @@
 
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import Link from 'next/link';
-import { companyService, jobService } from '@/lib/utils/data';
+import { useRouter } from 'next/navigation';
+import { companyService, jobService } from '@/lib/services/data';
+import { Job, User } from '@/types';
+import { getStoredUser } from '@/lib/utils/auth-client';
+import React, { useEffect, useState } from 'react';
 
 export default function UserCenterPage() {
-  const user = {
-    id: 'user1',
-    name: '张三',
-    email: 'demo@example.com',
-    avatar: '/images/avatars/default.png',
-  };
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const currentUser = getStoredUser();
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+    setUser(currentUser);
+    setLoaded(true);
+  }, [router]);
+
+  if (!loaded) {
+    return null;
+  }
 
   const sidebarItems = [
     {
@@ -48,7 +63,21 @@ export default function UserCenterPage() {
     },
   ];
 
-  const latestJobs = jobService.getLatestJobs(4);
+  const [latestJobs, setLatestJobs] = useState<Job[]>([]);
+  const [companyMap, setCompanyMap] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    async function loadLatest() {
+      const jobs = await jobService.getLatestJobs(4);
+      setLatestJobs(jobs);
+      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
+      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
+      const map: Record<string, any> = {};
+      entries.forEach(([id, comp]) => { map[id] = comp; });
+      setCompanyMap(map);
+    }
+    loadLatest();
+  }, []);
 
   return (
     <div className="layui-container layui-mt20">
@@ -59,8 +88,8 @@ export default function UserCenterPage() {
               <span className="layui-font-3xl">👤</span>
             </div>
             <div>
-              <h1 className="layui-hero-headline">欢迎回来，{user.name}！</h1>
-              <p className="layui-hero-subline layui-font-sm">{user.email}</p>
+              <h1 className="layui-hero-headline">欢迎回来，{user?.name || '用户'}！</h1>
+              <p className="layui-hero-subline layui-font-sm">{user?.email || ''}</p>
             </div>
           </div>
         </div>
@@ -122,7 +151,7 @@ export default function UserCenterPage() {
             </div>
             <div className="layui-card-body">
               {latestJobs.map((job) => {
-                const company = companyService.getById(job.companyId);
+                const company = companyMap[job.companyId];
                 return (
                   <Link
                     key={job.id}

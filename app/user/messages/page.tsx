@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
+import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 
 type MessageType = 'all' | 'system' | 'application' | 'interview' | 'company';
 
@@ -14,8 +15,28 @@ interface Message {
   isRead: boolean;
 }
 
+interface LayuiTableInstance {
+  reload: (options: { data: unknown[]; page: { curr: number } }) => void;
+}
+
+interface Layui {
+  table: {
+    render: (options: {
+      elem: string;
+      data: unknown[];
+      page: boolean;
+      limit: number;
+      limits: number[];
+      skin: string;
+      even: boolean;
+      cols: unknown[][];
+    }) => LayuiTableInstance;
+  };
+}
+
 export default function UserMessagesPage() {
   const [typeFilter, setTypeFilter] = useState<MessageType>('all');
+  const tableRef = useRef<LayuiTableInstance | null>(null);
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
@@ -25,8 +46,7 @@ export default function UserMessagesPage() {
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 
-  // 模拟消息数据
-  const messages: Message[] = [
+  const messages: Message[] = useMemo(() => [
     {
       id: '1',
       type: 'system',
@@ -67,62 +87,144 @@ export default function UserMessagesPage() {
       createdAt: '2026-04-11 11:00',
       isRead: true,
     },
-  ];
+  ],
+    []
+  );
 
-  const filteredMessages = typeFilter === 'all'
-    ? messages
-    : messages.filter(msg => msg.type === typeFilter);
+  const filteredMessages = useMemo(
+    () => (typeFilter === 'all' ? messages : messages.filter(msg => msg.type === typeFilter)),
+    [typeFilter, messages]
+  );
 
-  const stats = {
+  const stats = useMemo(() => ({
     all: messages.length,
     system: messages.filter(m => m.type === 'system').length,
     application: messages.filter(m => m.type === 'application').length,
     interview: messages.filter(m => m.type === 'interview').length,
     company: messages.filter(m => m.type === 'company').length,
-  };
+  }), [messages]);
 
-  const getTypeIcon = (type: string) => {
-    const iconMap: { [key: string]: string } = {
-      system: '🔔',
-      application: '📝',
-      interview: '📅',
-      company: '🏢',
-    };
-    return iconMap[type] || '📬';
-  };
+  const initTable = useCallback(
+    (layui: Layui) => {
+      const table = layui.table;
+      if (tableRef.current) {
+        tableRef.current.reload({
+          data: filteredMessages,
+          page: { curr: 1 },
+        });
+        return;
+      }
 
-  const getTypeBadge = (type: string) => {
-    const typeMap: { [key: string]: { text: string; class: string } } = {
-      system: { text: '系统', class: 'layui-bg-blue' },
-      application: { text: '申请', class: 'layui-bg-orange' },
-      interview: { text: '面试', class: 'layui-bg-green' },
-      company: { text: '企业', class: 'layui-bg-purple' },
-    };
-    const t = typeMap[type] || { text: type, class: '' };
-    return <span className={`layui-badge ${t.class}`}>{t.text}</span>;
-  };
+      tableRef.current = table.render({
+        elem: '#userMessagesTable',
+        data: filteredMessages,
+        page: true,
+        limit: 5,
+        limits: [5, 10, 20],
+        skin: 'line',
+        even: true,
+        cols: [[
+          {
+            field: 'type',
+            title: '类型',
+            width: 140,
+            templet: function (d: Record<string, unknown>) {
+              const iconMap: Record<MessageType, string> = {
+                system: '🔔',
+                application: '📝',
+                interview: '📅',
+                company: '🏢',
+                all: '📬',
+              };
+              const typeMap: Record<MessageType, { text: string; cls: string }> = {
+                system: { text: '系统', cls: 'layui-bg-blue' },
+                application: { text: '申请', cls: 'layui-bg-orange' },
+                interview: { text: '面试', cls: 'layui-bg-green' },
+                company: { text: '企业', cls: 'layui-bg-purple' },
+                all: { text: '全部', cls: 'layui-bg-gray' },
+              };
+              const messageType = String(d.type) as MessageType;
+              const icon = iconMap[messageType] || '📬';
+              const type = typeMap[messageType] || { text: messageType, cls: '' };
+              return `<div><span style="display:inline-block;width:24px">${icon}</span><span class="layui-badge ${type.cls}">${type.text}</span></div>`;
+            },
+          },
+          {
+            field: 'title',
+            title: '消息内容',
+            minWidth: 300,
+            templet: function (d: Record<string, unknown>) {
+              return `<div class="layui-font-lg layui-font-bold">${d.title}</div><div class="layui-font-sm layui-font-gray">${d.content}</div>`;
+            },
+          },
+          { field: 'createdAt', title: '时间', width: 180 },
+          {
+            field: 'isRead',
+            title: '状态',
+            width: 80,
+            templet: function (d: Record<string, unknown>) {
+              return d.isRead
+                ? '<span class="layui-badge layui-bg-green">已读</span>'
+                : '<span class="layui-badge layui-bg-red">未读</span>';
+            },
+          },
+          {
+            field: 'action',
+            title: '操作',
+            width: 140,
+            align: 'center',
+            templet: function (d: Record<string, unknown>) {
+              return d.isRead
+                ? '<span class="layui-font-sm layui-font-gray">—</span>'
+                : '<span class="layui-btn layui-btn-sm layui-btn-outline">标为已读</span>';
+            },
+          },
+        ]],
+      });
+    },
+    [filteredMessages]
+  );
 
-  const markAsRead = (messageId: string) => {
-    console.log('标记为已读:', messageId);
-  };
+  useLayuiTable(initTable);
 
   const markAllAsRead = () => {
     console.log('全部标记为已读');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* 侧边栏 */}
-          <UnifiedSidebar items={sidebarItems} variant="default" />
+    <div className="layui-container layui-mt20">
+      <div className="layui-row layui-col-space20">
+        <div className="layui-col-md3">
+          <UnifiedSidebar items={sidebarItems} title="用户中心" variant="default" />
+        </div>
 
-          {/* 主内容区 */}
-          <div className="flex-1">
-            <div className="layui-card mb-6">
-              <div className="layui-card-body">
-                <div className="flex items-center justify-between mb-4">
-                  <h1 className="text-2xl font-bold text-gray-900">消息通知</h1>
+        <div className="layui-col-md9">
+          <div className="layui-card layui-mb20">
+            <div className="layui-card-body">
+              <div className="layui-row layui-col-space10 layui-mb20">
+                <div className="layui-col-xs8 layui-col-md10">
+                  <h1 className="layui-font-lg layui-font-bold">消息通知</h1>
+                  <div className="layui-tab layui-tab-brief layui-mt10">
+                    <ul className="layui-tab-title">
+                      {[
+                        { key: 'all', label: `全部 (${stats.all})` },
+                        { key: 'system', label: `系统消息 (${stats.system})` },
+                        { key: 'application', label: `申请状态 (${stats.application})` },
+                        { key: 'interview', label: `面试邀请 (${stats.interview})` },
+                        { key: 'company', label: `企业动态 (${stats.company})` },
+                      ].map((item) => (
+                        <li
+                          key={item.key}
+                          className={typeFilter === item.key ? 'layui-this' : ''}
+                          onClick={() => setTypeFilter(item.key as MessageType)}
+                        >
+                          {item.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="layui-col-xs4 layui-col-md2 layui-text-right">
                   <button
                     className="layui-btn layui-btn-sm layui-btn-outline"
                     onClick={markAllAsRead}
@@ -130,86 +232,14 @@ export default function UserMessagesPage() {
                     全部标为已读
                   </button>
                 </div>
+              </div>
 
-                {/* 类型筛选 */}
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    className={`layui-btn layui-btn-sm ${typeFilter === 'all' ? 'layui-btn-primary' : 'layui-btn-outline'}`}
-                    onClick={() => setTypeFilter('all')}
-                  >
-                    全部 ({stats.all})
-                  </button>
-                  <button
-                    className={`layui-btn layui-btn-sm ${typeFilter === 'system' ? 'layui-btn-primary' : 'layui-btn-outline'}`}
-                    onClick={() => setTypeFilter('system')}
-                  >
-                    系统消息 ({stats.system})
-                  </button>
-                  <button
-                    className={`layui-btn layui-btn-sm ${typeFilter === 'application' ? 'layui-btn-primary' : 'layui-btn-outline'}`}
-                    onClick={() => setTypeFilter('application')}
-                  >
-                    申请状态 ({stats.application})
-                  </button>
-                  <button
-                    className={`layui-btn layui-btn-sm ${typeFilter === 'interview' ? 'layui-btn-primary' : 'layui-btn-outline'}`}
-                    onClick={() => setTypeFilter('interview')}
-                  >
-                    面试邀请 ({stats.interview})
-                  </button>
-                  <button
-                    className={`layui-btn layui-btn-sm ${typeFilter === 'company' ? 'layui-btn-primary' : 'layui-btn-outline'}`}
-                    onClick={() => setTypeFilter('company')}
-                  >
-                    企业动态 ({stats.company})
-                  </button>
+              <div className="layui-card layui-mb20">
+                <div className="layui-card-body">
+                  <div id="userMessagesTable"></div>
                 </div>
               </div>
             </div>
-
-            {/* 消息列表 */}
-            {filteredMessages.length > 0 ? (
-              <div className="space-y-3">
-                {filteredMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`layui-card ${!msg.isRead ? 'border-l-4 border-l-[var(--layui-primary)]' : ''}`}
-                  >
-                    <div className="layui-card-body">
-                      <div className="flex items-start gap-4">
-                        <div className="text-3xl">{getTypeIcon(msg.type)}</div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <h3 className={`font-semibold ${!msg.isRead ? 'text-gray-900' : 'text-gray-600'}`}>
-                              {msg.title}
-                            </h3>
-                            {!msg.isRead && <span className="layui-badge layui-bg-red">新</span>}
-                            {getTypeBadge(msg.type)}
-                          </div>
-                          <p className="text-gray-700 mb-2">{msg.content}</p>
-                          <p className="text-xs text-gray-500">{msg.createdAt}</p>
-                        </div>
-                        {!msg.isRead && (
-                          <button
-                            className="layui-btn layui-btn-sm layui-btn-outline"
-                            onClick={() => markAsRead(msg.id)}
-                          >
-                            标为已读
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="layui-card">
-                <div className="layui-card-body text-center py-12">
-                  <div className="text-6xl mb-4">💬</div>
-                  <p className="text-gray-600">暂无消息</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

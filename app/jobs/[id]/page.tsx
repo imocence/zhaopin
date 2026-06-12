@@ -1,15 +1,16 @@
 import { notFound } from 'next/navigation';
-import { jobService, companyService } from '@/lib/utils/data';
+import { jobService, companyService } from '@/lib/services/data';
 import JobDetail from '@/components/job/JobDetail';
 
-export default function JobDetailPage({ params }: { params: { id: string } }) {
-  const job = jobService.getById(params.id);
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const job = await jobService.getById(id);
 
   if (!job) {
     notFound();
   }
 
-  const company = companyService.getById(job.companyId);
+  const company = await companyService.getById(job.companyId);
 
   return (
     <div className="layui-container layui-mt20">
@@ -27,7 +28,7 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
 
 // 生成静态参数
 export async function generateStaticParams() {
-  const jobs = jobService.getAll();
+  const jobs = await jobService.getAll();
   return jobs.slice(0, 10).map((job) => ({
     id: job.id,
   }));

@@ -1,16 +1,46 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { companyService, jobService } from '@/lib/utils/data';
+import { companyService, jobService } from '@/lib/services/data';
+import { Company, Job } from '@/types';
 import { formatDate } from '@/lib/utils/format';
 
 const DEFAULT_LOGO = '/images/logos/default.svg';
 
-export default function CompanyDetailPage({ params }: { params: { id: string } }) {
+export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [logoError, setLogoError] = useState(false);
-  const company = companyService.getById(params.id);
+  const [company, setCompany] = useState<Company | undefined>(undefined);
+  const [companyJobs, setCompanyJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      const { id } = await params;
+      const [comp, jobs] = await Promise.all([
+        companyService.getById(id),
+        jobService.getByCompanyId(id),
+      ]);
+      setCompany(comp);
+      setCompanyJobs(jobs);
+      setLoading(false);
+    }
+    loadData();
+  }, [params]);
+
+  if (loading) {
+    return (
+      <div className="layui-container layui-mt20">
+        <div className="layui-card">
+          <div className="layui-card-body layui-text-center layui-p60-20">
+            <div className="layui-empty-icon-60">⏳</div>
+            <h1 className="layui-font-title layui-font-bold layui-mb15">加载中...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!company) {
     return (
@@ -28,10 +58,6 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
       </div>
     );
   }
-
-  const companyJobs = useMemo(() => {
-    return jobService.getByCompanyId(params.id);
-  }, [params.id]);
 
   const logoSrc = logoError || !company.logo ? DEFAULT_LOGO : company.logo;
 

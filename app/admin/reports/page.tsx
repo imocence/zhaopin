@@ -71,28 +71,22 @@ export default function AdminReportsPage() {
         <div className="layui-card-header">举报统计</div>
         <div className="layui-card-body">
           <div className="layui-row layui-col-space15">
-            <div className="layui-col-md4">
-              <div className="layui-bg-gray" style={{padding: 15, borderRadius: 4, textAlign: 'center'}}>
-                <h2 style={{fontSize: 32, color: '#FFB800', margin: 0}}>
-                  {reports.filter(r => r.status === 'pending').length}
-                </h2>
-                <p style={{color: '#999', marginTop: 10}}>待处理举报</p>
+            <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
+              <div className="layui-elem-quote layui-text-center">
+                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'pending').length}</h2>
+                <p className="layui-text layui-word-aux">待处理举报</p>
               </div>
             </div>
-            <div className="layui-col-md4">
-              <div className="layui-bg-gray" style={{padding: 15, borderRadius: 4, textAlign: 'center'}}>
-                <h2 style={{fontSize: 32, color: '#1E9FFF', margin: 0}}>
-                  {reports.filter(r => r.status === 'processing').length}
-                </h2>
-                <p style={{color: '#999', marginTop: 10}}>处理中举报</p>
+            <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
+              <div className="layui-elem-quote layui-text-center">
+                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'processing').length}</h2>
+                <p className="layui-text layui-word-aux">处理中举报</p>
               </div>
             </div>
-            <div className="layui-col-md4">
-              <div className="layui-bg-gray" style={{padding: 15, borderRadius: 4, textAlign: 'center'}}>
-                <h2 style={{fontSize: 32, color: '#5FB878', margin: 0}}>
-                  {reports.filter(r => r.status === 'resolved').length}
-                </h2>
-                <p style={{color: '#999', marginTop: 10}}>已解决举报</p>
+            <div className="layui-col-md4 layui-col-sm4 layui-col-xs12">
+              <div className="layui-elem-quote layui-text-center">
+                <h2 className="layui-font-title layui-mt10">{reports.filter(r => r.status === 'resolved').length}</h2>
+                <p className="layui-text layui-word-aux">已解决举报</p>
               </div>
             </div>
           </div>
@@ -122,14 +116,14 @@ export default function AdminReportsPage() {
                   <td>{report.type}</td>
                   <td>
                     <strong>{report.title}</strong>
-                    <div style={{fontSize: 12, color: '#999', marginTop: 5}}>
+                    <div className="layui-text layui-word-aux layui-mt5">
                       {report.description}
                     </div>
                   </td>
                   <td>{report.targetName}</td>
                   <td>{report.reporterName}</td>
                   <td>{report.createdAt}</td>
-                  <td dangerouslySetInnerHTML={{__html: getStatusBadge(report.status)}} />
+                  <td dangerouslySetInnerHTML={{ __html: getStatusBadge(report.status) }} />
                   <td>
                     <div className="layui-btn-group">
                       <button

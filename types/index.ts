@@ -14,7 +14,7 @@ export interface Job {
   description: string;
   requirements: string[];
   benefits: string[];
-  status: 'active' | 'closed' | 'draft';
+  status: 'active' | 'inactive' | 'closed' | 'draft';
   views: number;
   applications: number;
   createdAt: string;
@@ -35,15 +35,21 @@ export interface Company {
   website?: string;
   email: string;
   phone?: string;
+  contact?: {
+    name?: string;
+    phone?: string;
+  };
   verified: boolean;
   verifiedAt?: string;
   jobCount?: number;
+  rejectReason?: string;
   createdAt: string;
 }
 
 // 用户类型
 export interface User {
   id: string;
+  username?: string;
   email: string;
   name: string;
   avatar?: string;
@@ -53,7 +59,13 @@ export interface User {
   state?: string;
   resume?: string;
   bio?: string;
+  status?: 'active' | 'inactive';
+  companyId?: string;
   createdAt: string;
+}
+
+export interface UserWithPassword extends User {
+  passwordHash?: string;
 }
 
 // 职位申请类型
@@ -66,6 +78,16 @@ export interface Application {
   resume?: string;
   createdAt: string;
   updatedAt: string;
+  jobTitle?: string;
+  companyName?: string;
+}
+
+// 收藏类型
+export interface Favorite {
+  id: string;
+  userId: string;
+  jobId: string;
+  createdAt: string;
 }
 
 // 消息类型

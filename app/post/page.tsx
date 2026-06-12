@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { EXPERIENCE_OPTIONS, EDUCATION_OPTIONS, SALARY_TYPE_OPTIONS } from '@/lib/constants';
-import { categoryService, locationService } from '@/lib/utils/data';
+import { categoryService, locationService } from '@/lib/services/data';
+import { authHeaders } from '@/lib/utils/auth-client';
 
 interface FormData {
   title: string;
@@ -49,8 +50,20 @@ export default function PostJobPage() {
   const [errors, setErrors] = useState<FormErrors>({}); // 仅用于记录当前步骤验证状态
   const formRef = useRef<HTMLFormElement>(null);
 
-  const categories = categoryService.getAllSubcategories();
-  const locations = locationService.getAll();
+  const [categories, setCategories] = useState<string[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadFilterData() {
+      const [cats, locs] = await Promise.all([
+        categoryService.getAllSubcategories(),
+        locationService.getAll(),
+      ]);
+      setCategories(cats);
+      setLocations(locs);
+    }
+    loadFilterData();
+  }, []);
 
   useEffect(() => {
     const initLayui = () => {
@@ -60,7 +73,7 @@ export default function PostJobPage() {
         setTimeout(initLayui, 100);
         return;
       }
-      layui.use(['form', 'element'], function() {
+      layui.use(['form', 'element'], function () {
         const form = layui.form;
         const element = layui.element;
         if (formRef.current) {
@@ -70,18 +83,18 @@ export default function PostJobPage() {
 
         // 注册自定义 lay-verify 验证规则
         form.verify({
-          required: function(value: string, elem: HTMLElement) {
+          required: function (value: string, elem: HTMLElement) {
             if (!value || !value.trim()) {
               const label = elem.closest('.layui-form-item')?.querySelector('.layui-form-label-enhanced')?.textContent?.replace(' *', '').trim() || '此字段';
               return label + '不能为空';
             }
           },
-          number: function(value: string) {
+          number: function (value: string) {
             if (value && isNaN(Number(value))) {
               return '请输入有效的数字';
             }
           },
-          salaryCheck: function(value: string) {
+          salaryCheck: function (value: string) {
             const formEl = formRef.current;
             if (!formEl) return;
             const salaryMinInput = formEl.querySelector('[name="salaryMin"]') as HTMLInputElement;
@@ -97,7 +110,7 @@ export default function PostJobPage() {
         });
 
         // 监听 layui select 变化
-        form.on('select(*)', function(data: { elem: HTMLElement; value: string }) {
+        form.on('select(*)', function (data: { elem: HTMLElement; value: string }) {
           const name = data.elem.getAttribute('name');
           if (name) {
             setFormData(prev => {
@@ -112,7 +125,7 @@ export default function PostJobPage() {
         });
 
         // 使用 layui form.on('submit') 监听"下一步"按钮提交
-        form.on('submit(nextStep)', function(data: { field: Record<string, string> }) {
+        form.on('submit(nextStep)', function (data: { field: Record<string, string> }) {
           // 同步 layui 表单数据到 React state（确保 select 值正确）
           setFormData(prev => ({ ...prev, ...data.field }));
           setFormStep(formStep + 1);
@@ -120,16 +133,52 @@ export default function PostJobPage() {
         });
 
         // 使用 layui form.on('submit') 监听最终提交
-        form.on('submit(postJobSubmit)', function(data: { field: Record<string, string> }) {
+        form.on('submit(postJobSubmit)', async function (data: { field: Record<string, string> }) {
           setFormData(prev => ({ ...prev, ...data.field }));
           setErrors({});
           setLoading(true);
 
-          setTimeout(() => {
-            setLoading(false);
+          try {
+            const response = await fetch('/api/jobs', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...authHeaders(),
+              },
+              body: JSON.stringify({
+                title: data.field.title,
+                category: data.field.category,
+                state: data.field.state,
+                city: data.field.city,
+                description: data.field.description,
+                salaryType: data.field.salaryType,
+                salaryMin: Number(data.field.salaryMin),
+                salaryMax: Number(data.field.salaryMax),
+                experience: data.field.experience,
+                education: data.field.education,
+                requirements: data.field.requirements
+                  ? data.field.requirements.split('\n').map(item => item.trim()).filter(Boolean)
+                  : [],
+                benefits: data.field.benefits
+                  ? data.field.benefits.split('\n').map(item => item.trim()).filter(Boolean)
+                  : [],
+              }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => null) as any;
+              setErrors(prev => ({ ...prev, submit: errorData?.error || '职位发布失败，请重试' }));
+              return false;
+            }
+
             alert('职位发布成功！');
             router.push('/jobs');
-          }, 1000);
+          } catch (error) {
+            console.error('职位发布请求失败:', error);
+            setErrors(prev => ({ ...prev, submit: '职位发布请求失败，请检查网络后重试' }));
+          } finally {
+            setLoading(false);
+          }
 
           return false;
         });

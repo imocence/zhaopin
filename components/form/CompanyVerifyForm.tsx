@@ -1,17 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Location } from '@/types';
 import { useRouter } from 'next/navigation';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { locationService } from '@/lib/utils/data';
+import { locationService } from '@/lib/services/data';
 
 const CompanyVerifyForm: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
 
-  const locations = locationService.getAll();
+  const [locations, setLocations] = useState<Location[]>([]);
+
+  useEffect(() => {
+    async function loadLocations() {
+      const locs = await locationService.getAll();
+      setLocations(locs);
+    }
+    loadLocations();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,11 +48,10 @@ const CompanyVerifyForm: React.FC = () => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step >= i
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= i
                       ? 'bg-[var(--layui-primary)] text-white'
                       : 'bg-gray-200 text-gray-600'
-                  }`}
+                    }`}
                 >
                   {i}
                 </div>
@@ -271,7 +279,7 @@ const CompanyVerifyForm: React.FC = () => {
 
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm text-yellow-800">
-                  ⚠️ 请确保上传的营业执照清晰可见，信息完整。审核通过后，企业将获得"已认证"标识。
+                  ⚠️ 请确保上传的营业执照清晰可见，信息完整。审核通过后，企业将获得&quot;已认证&quot;标识。
                 </p>
               </div>
             </div>

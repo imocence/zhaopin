@@ -1,23 +1,31 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { jobService, companyService } from '@/lib/utils/data';
+import { jobService, companyService } from '@/lib/services/data';
+import { Company, Job } from '@/types';
 import { formatDate } from '@/lib/utils/format';
 import { getJobStatusBadge } from '@/lib/utils/status';
 
 export default function EmployerJobsPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive' | 'draft'>('all');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [currentCompany, setCurrentCompany] = useState<Company | undefined>(undefined);
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
 
-  // 模拟当前企业
-  const currentCompany = companyService.getVerified()[0];
-
-  // 获取企业职位
-  const allJobs = useMemo(() => {
-    return jobService.getByCompanyId(currentCompany?.id || '');
-  }, [currentCompany]);
+  useEffect(() => {
+    async function loadData() {
+      const verified = await companyService.getVerified();
+      const company = verified[0];
+      setCurrentCompany(company);
+      if (company) {
+        const jobs = await jobService.getByCompanyId(company.id);
+        setAllJobs(jobs);
+      }
+    }
+    loadData();
+  }, []);
 
   // 筛选职位
   const filteredJobs = useMemo(() => {

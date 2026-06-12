@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { jobService, companyService } from '@/lib/utils/data';
+import { jobService, companyService } from '@/lib/services/data';
 import { jobStatusMap } from '@/lib/utils/status';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 
@@ -14,103 +14,111 @@ export default function AdminJobsPage() {
   const tableRef = useRef<any>(null);
 
   useEffect(() => {
-    const jobs = jobService.getAll();
-    (window as any).jobs = jobs;
+    async function loadData() {
+      const jobs = await jobService.getAll();
+      (window as any).jobs = jobs;
 
-    useLayuiTable((layui: any) => {
-      const table = layui.table;
-      const layer = layui.layer;
-      const form = layui.form;
-        const $ = layui.$; // 获取 jQuery 对象
-        tableRef.current = table.render({
-          elem: '#jobTable',
-          data: jobs,
-          page: true,
-          limits: [10, 20, 30, 50],
-          limit: 10,
-          cols: [[
-            {field: 'id', title: 'ID', width: 80, sort: true},
-            {field: 'title', title: '职位名称', minWidth: 180},
-            {
-              field: 'companyId',
-              title: '公司',
-              width: 140,
-              templet: function(d: any) {
-                const company = companyService.getById(d.companyId);
-                return company?.name || '<span style="color: #999;">未知</span>';
-              }
-            },
-            {
-              field: 'category',
-              title: '分类',
-              width: 100
-            },
-            {
-              field: 'location',
-              title: '位置',
-              width: 140,
-              templet: function(d: any) {
-                return `${d.location}, ${d.state}`;
-              }
-            },
-            {
-              field: 'salary',
-              title: '薪资',
-              width: 140,
-              templet: function(d: any) {
-                const typeMap: { [key: string]: string } = {
-                  'hourly': '时薪',
-                  'monthly': '月薪',
-                  'yearly': '年薪'
-                };
-                return `$${d.salaryMin} - $${d.salaryMax}
+      const initTable = () => {
+        const layui = (window as any).layui;
+        if (!layui) {
+          setTimeout(initTable, 100);
+          return;
+        }
+        layui.use(['table', 'layer', 'form'], function () {
+          const table = layui.table;
+          const layer = layui.layer;
+          const form = layui.form;
+          const $ = layui.$;
+          tableRef.current = table.render({
+            elem: '#jobTable',
+            data: jobs,
+            page: true,
+            limits: [10, 20, 30, 50],
+            limit: 10,
+            cols: [[
+              { field: 'id', title: 'ID', width: 80, sort: true },
+              { field: 'title', title: '职位名称', minWidth: 180 },
+              {
+                field: 'companyId',
+                title: '公司',
+                width: 140,
+                templet: function (d: any) {
+                  const companies = (window as any).companies || [];
+                  const company = companies.find((c: any) => c.id === d.companyId);
+                  return company?.name || '<span style="color: #999;">未知</span>';
+                }
+              },
+              {
+                field: 'category',
+                title: '分类',
+                width: 100
+              },
+              {
+                field: 'location',
+                title: '位置',
+                width: 140,
+                templet: function (d: any) {
+                  return `${d.location}, ${d.state}`;
+                }
+              },
+              {
+                field: 'salary',
+                title: '薪资',
+                width: 140,
+                templet: function (d: any) {
+                  const typeMap: { [key: string]: string } = {
+                    'hourly': '时薪',
+                    'monthly': '月薪',
+                    'yearly': '年薪'
+                  };
+                  return `$${d.salaryMin} - $${d.salaryMax}
                   <span class="layui-badge layui-bg-gray" style="margin-left: 5px;">
                     ${typeMap[d.salaryType] || '年薪'}
                   </span>`;
-              }
-            },
-            {
-              field: 'status',
-              title: '状态',
-              width: 90,
-              templet: function(d: any) {
-                const status = jobStatusMap[d.status];
-                if (!status) return '<span class="layui-badge">未知</span>';
-                return `<span class="layui-badge ${status.class}">${status.text}</span>`;
-              }
-            },
-            {
-              field: 'views',
-              title: '浏览',
-              width: 70,
-              templet: function(d: any) {
-                return `<span class="layui-badge-dot layui-bg-green"></span> ${d.views || 0}`;
-              }
-            },
-            {
-              field: 'applications',
-              title: '申请',
-              width: 70,
-              templet: function(d: any) {
-                return `<span class="layui-badge-dot layui-bg-blue"></span> ${d.applications || 0}`;
-              }
-            },
-            {
-              field: 'createdAt',
-              title: '发布时间',
-              width: 110,
-              sort: true,
-              templet: function(d: any) {
-                return new Date(d.createdAt).toLocaleDateString('zh-CN');
-              }
-            },
-            {
-              fixed: 'right',
-              title: '操作',
-              width: 250,
-              align: 'center',
-              templet: function(d: any) {
-                return `
+                }
+              },
+              {
+                field: 'status',
+                title: '状态',
+                width: 90,
+                templet: function (d: any) {
+                  const status = jobStatusMap[d.status];
+                  if (!status) return '<span class="layui-badge">未知</span>';
+                  return `<span class="layui-badge ${status.class}">${status.text}</span>`;
+                }
+              },
+              {
+                field: 'views',
+                title: '浏览',
+                width: 70,
+                templet: function (d: any) {
+                  return `<span class="layui-badge-dot layui-bg-green"></span> ${d.views || 0}`;
+                }
+              },
+              {
+                field: 'applications',
+                title: '申请',
+                width: 70,
+                templet: function (d: any) {
+                  return `<span class="layui-badge-dot layui-bg-blue"></span> ${d.applications || 0}`;
+                }
+              },
+              {
+                field: 'createdAt',
+                title: '发布时间',
+                width: 110,
+                sort: true,
+                templet: function (d: any) {
+                  return new Date(d.createdAt).toLocaleDateString('zh-CN');
+                }
+              },
+              {
+                fixed: 'right',
+                title: '操作',
+                width: 250,
+                align: 'center',
+                templet: function (d: any) {
+                  return `
                   <a class="layui-btn layui-btn-xs" lay-event="edit">
                     <i class="layui-icon layui-icon-edit"></i>
                   </a>
@@ -121,72 +129,74 @@ export default function AdminJobsPage() {
                     <i class="layui-icon layui-icon-delete"></i>
                   </a>
                 `;
+                }
               }
-            }
-          ]]
-        });
+            ]]
+          });
 
-        // 监听工具条事件
-        table.on('tool(jobTable)', function(obj: any) {
-          const data = obj.data;
+          // 监听工具条事件
+          table.on('tool(jobTable)', function (obj: any) {
+            const data = obj.data;
 
-          if (obj.event === 'del') {
-            layer.confirm('确定要删除该职位吗？', {icon: 3, title: '提示'}, function(index: any) {
-              const jobs = jobService.getAll().filter(j => j.id !== data.id);
-              (window as any).jobs = jobs;
+            if (obj.event === 'del') {
+              layer.confirm('确定要删除该职位吗？', { icon: 3, title: '提示' }, function (index: any) {
+                jobService.getAll().then((jobs) => {
+                  const newJobs = jobs.filter(j => j.id !== data.id);
+                  (window as any).jobs = newJobs;
 
-              tableRef.current?.reload({
-                data: jobs
+                  tableRef.current?.reload({
+                    data: newJobs
+                  });
+
+                  layer.msg('删除成功', { icon: 1 });
+                  layer.close(index);
+                });
               });
+            } else if (obj.event === 'edit') {
+              // 获取所有公司选项
+              const companies = (window as any).companies || [];
+              const companyOptions = companies.map((c: any) =>
+                `<option value="${c.id}" ${data.companyId === c.id ? 'selected' : ''}>${c.name}</option>`
+              ).join('');
 
-              layer.msg('删除成功', {icon: 1});
-              layer.close(index);
-            });
-          } else if (obj.event === 'edit') {
-            // 获取所有公司选项
-            const companies = companyService.getAll();
-            const companyOptions = companies.map(c =>
-              `<option value="${c.id}" ${data.companyId === c.id ? 'selected' : ''}>${c.name}</option>`
-            ).join('');
+              // 薪资类型选项
+              const salaryTypes = [
+                { value: 'hourly', label: '时薪' },
+                { value: 'monthly', label: '月薪' },
+                { value: 'yearly', label: '年薪' }
+              ];
+              const salaryTypeOptions = salaryTypes.map(st =>
+                `<option value="${st.value}" ${data.salaryType === st.value ? 'selected' : ''}>${st.label}</option>`
+              ).join('');
 
-            // 薪资类型选项
-            const salaryTypes = [
-              {value: 'hourly', label: '时薪'},
-              {value: 'monthly', label: '月薪'},
-              {value: 'yearly', label: '年薪'}
-            ];
-            const salaryTypeOptions = salaryTypes.map(st =>
-              `<option value="${st.value}" ${data.salaryType === st.value ? 'selected' : ''}>${st.label}</option>`
-            ).join('');
+              // 状态选项
+              const statuses = [
+                { value: 'active', label: '招聘中' },
+                { value: 'inactive', label: '已下架' },
+                { value: 'draft', label: '草稿' }
+              ];
+              const statusOptions = statuses.map(s =>
+                `<option value="${s.value}" ${data.status === s.value ? 'selected' : ''}>${s.label}</option>`
+              ).join('');
 
-            // 状态选项
-            const statuses = [
-              {value: 'active', label: '招聘中'},
-              {value: 'inactive', label: '已下架'},
-              {value: 'draft', label: '草稿'}
-            ];
-            const statusOptions = statuses.map(s =>
-              `<option value="${s.value}" ${data.status === s.value ? 'selected' : ''}>${s.label}</option>`
-            ).join('');
+              // 经验选项
+              const experiences = ['不限', '1-3年', '3-5年', '5-10年', '10年以上'];
+              const experienceOptions = experiences.map(e =>
+                `<option value="${e}" ${data.experience === e ? 'selected' : ''}>${e}</option>`
+              ).join('');
 
-            // 经验选项
-            const experiences = ['不限', '1-3年', '3-5年', '5-10年', '10年以上'];
-            const experienceOptions = experiences.map(e =>
-              `<option value="${e}" ${data.experience === e ? 'selected' : ''}>${e}</option>`
-            ).join('');
+              // 学历选项
+              const educations = ['不限', '高中', '大专', '本科', '硕士', '博士'];
+              const educationOptions = educations.map(e =>
+                `<option value="${e}" ${data.education === e ? 'selected' : ''}>${e}</option>`
+              ).join('');
 
-            // 学历选项
-            const educations = ['不限', '高中', '大专', '本科', '硕士', '博士'];
-            const educationOptions = educations.map(e =>
-              `<option value="${e}" ${data.education === e ? 'selected' : ''}>${e}</option>`
-            ).join('');
-
-            // 职位编辑表单
-            layer.open({
-              type: 1,
-              title: '编辑职位信息',
-              area: ['700px', '650px'],
-              content: `
+              // 职位编辑表单
+              layer.open({
+                type: 1,
+                title: '编辑职位信息',
+                area: ['700px', '650px'],
+                content: `
                 <div style="padding: 20px; max-height: 550px; overflow-y: auto;">
                   <form class="layui-form" lay-filter="editJobForm" id="editJobForm">
                     <div class="layui-form-item">
@@ -293,86 +303,91 @@ export default function AdminJobsPage() {
                   </form>
                 </div>
               `,
-              btn: ['保存', '取消'],
-              success: function(layero: any, index: any) {
-                // 等待 DOM 完全插入后再渲染
-                setTimeout(() => {
-                  form.render(null, 'editJobForm');
-                }, 10);
-              },
-              yes: function(index: any) {
-                const title = $('#editJobForm [name="title"]').val();
-                const companyId = $('#editJobForm [name="companyId"]').val();
-                const category = $('#editJobForm [name="category"]').val();
-                const salaryMin = $('#editJobForm [name="salaryMin"]').val();
-                const salaryMax = $('#editJobForm [name="salaryMax"]').val();
-                const salaryType = $('#editJobForm [name="salaryType"]').val();
-                const state = $('#editJobForm [name="state"]').val();
-                const location = $('#editJobForm [name="location"]').val();
-                const experience = $('#editJobForm [name="experience"]').val();
-                const education = $('#editJobForm [name="education"]').val();
-                const status = $('#editJobForm [name="status"]').val();
-                const description = $('#editJobForm [name="description"]').val();
-                const requirements = $('#editJobForm [name="requirements"]').val();
+                btn: ['保存', '取消'],
+                success: function (layero: any, index: any) {
+                  // 等待 DOM 完全插入后再渲染
+                  setTimeout(() => {
+                    form.render(null, 'editJobForm');
+                  }, 10);
+                },
+                yes: function (index: any) {
+                  const title = $('#editJobForm [name="title"]').val();
+                  const companyId = $('#editJobForm [name="companyId"]').val();
+                  const category = $('#editJobForm [name="category"]').val();
+                  const salaryMin = $('#editJobForm [name="salaryMin"]').val();
+                  const salaryMax = $('#editJobForm [name="salaryMax"]').val();
+                  const salaryType = $('#editJobForm [name="salaryType"]').val();
+                  const state = $('#editJobForm [name="state"]').val();
+                  const location = $('#editJobForm [name="location"]').val();
+                  const experience = $('#editJobForm [name="experience"]').val();
+                  const education = $('#editJobForm [name="education"]').val();
+                  const status = $('#editJobForm [name="status"]').val();
+                  const description = $('#editJobForm [name="description"]').val();
+                  const requirements = $('#editJobForm [name="requirements"]').val();
 
-                if (!title || !companyId || !category || !salaryMin || !salaryMax || !description) {
-                  layer.msg('请填写所有必填项', {icon: 2});
-                  return false;
-                }
+                  if (!title || !companyId || !category || !salaryMin || !salaryMax || !description) {
+                    layer.msg('请填写所有必填项', { icon: 2 });
+                    return false;
+                  }
 
-                // 更新职位信息
-                const jobs = jobService.getAll();
-                const job = jobs.find(j => j.id === data.id);
-                if (job) {
-                  job.title = title;
-                  job.companyId = companyId;
-                  job.category = category;
-                  job.salaryMin = parseInt(salaryMin);
-                  job.salaryMax = parseInt(salaryMax);
-                  job.salaryType = salaryType;
-                  job.state = state;
-                  job.location = location;
-                  job.experience = experience;
-                  job.education = education;
-                  job.status = status;
-                  job.description = description;
-                  job.requirements = requirements.split('\n').filter(r => r.trim());
+                  // 更新职位信息
+                  jobService.getAll().then((jobs) => {
+                    const job = jobs.find(j => j.id === data.id);
+                    if (job) {
+                      job.title = title;
+                      job.companyId = companyId;
+                      job.category = category;
+                      job.salaryMin = parseInt(salaryMin);
+                      job.salaryMax = parseInt(salaryMax);
+                      job.salaryType = salaryType;
+                      job.state = state;
+                      job.location = location;
+                      job.experience = experience;
+                      job.education = education;
+                      job.status = status;
+                      job.description = description;
+                      job.requirements = requirements.split('\n').filter((r: string) => r.trim());
 
-                  // 更新 window 对象
-                  (window as any).jobs = jobs;
+                      // 更新 window 对象
+                      (window as any).jobs = jobs;
 
-                  // 重新加载表格
-                  tableRef.current?.reload({
-                    data: jobs
+                      // 重新加载表格
+                      tableRef.current?.reload({
+                        data: jobs
+                      });
+
+                      layer.close(index);
+                      layer.msg('保存成功', { icon: 1 });
+                    } else {
+                      layer.msg('职位不存在', { icon: 2 });
+                    }
                   });
-
-                  layer.close(index);
-                  layer.msg('保存成功', {icon: 1});
-                } else {
-                  layer.msg('职位不存在', {icon: 2});
                 }
-              }
-            });
-          } else if (obj.event === 'toggle') {
-            const isActive = data.status === 'active';
-            const action = isActive ? '下架' : '上架';
+              });
+            } else if (obj.event === 'toggle') {
+              const isActive = data.status === 'active';
+              const action = isActive ? '下架' : '上架';
 
-            layer.confirm(`确定要${action}该职位吗？`, {icon: 3, title: '提示'}, function(index: any) {
-              const jobs = jobService.getAll();
-              const job = jobs.find(j => j.id === data.id);
-              if (job) {
-                job.status = isActive ? 'inactive' : 'active';
-              }
+              layer.confirm(`确定要${action}该职位吗？`, { icon: 3, title: '提示' }, function (index: any) {
+                jobService.getAll().then((jobs) => {
+                  const job = jobs.find(j => j.id === data.id);
+                  if (job) {
+                    job.status = isActive ? 'inactive' : 'active';
+                  }
 
-              tableRef.current?.reload();
+                  tableRef.current?.reload();
 
-              layer.msg(`职位已${action}`, {icon: 1});
-              layer.close(index);
-            });
-          }
+                  layer.msg(`职位已${action}`, { icon: 1 });
+                  layer.close(index);
+                });
+              });
+            }
+          });
         });
-      });
-    });
+      };
+      initTable();
+    }
+    loadData();
   }, []);
 
   return (
@@ -390,25 +405,27 @@ export default function AdminJobsPage() {
           <div className="layui-btn-group">
             <button
               className="layui-btn layui-btn-primary"
-              onClick={() => tableRef.current?.reload({
-                data: jobService.getAll()
+              onClick={async () => tableRef.current?.reload({
+                data: await jobService.getAll()
               })}
             >
               全部
             </button>
             <button
               className="layui-btn layui-btn-normal"
-              onClick={() => tableRef.current?.reload({
-                data: jobService.getAll().filter(j => j.status === 'active')
-              })}
+              onClick={async () => {
+                const all = await jobService.getAll();
+                tableRef.current?.reload({ data: all.filter(j => j.status === 'active') });
+              }}
             >
               招聘中
             </button>
             <button
               className="layui-btn layui-btn-warm"
-              onClick={() => tableRef.current?.reload({
-                data: jobService.getAll().filter(j => j.status === 'inactive')
-              })}
+              onClick={async () => {
+                const all = await jobService.getAll();
+                tableRef.current?.reload({ data: all.filter(j => j.status === 'inactive') });
+              }}
             >
               已下架
             </button>

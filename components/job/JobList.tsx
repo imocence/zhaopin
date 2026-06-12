@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Job } from '@/types';
 import JobCard from './JobCard';
 import Pagination from '@/components/ui/Pagination';
-import { companyService } from '@/lib/utils/data';
+import { companyService } from '@/lib/services/data';
 
 export interface JobListProps {
   jobs: Job[];
@@ -21,6 +21,18 @@ const JobList: React.FC<JobListProps> = ({
   pageSize,
   onPageChange,
 }) => {
+  const [companyMap, setCompanyMap] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    async function loadCompanies() {
+      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
+      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
+      const map: Record<string, any> = {};
+      entries.forEach(([id, comp]) => { map[id] = comp; });
+      setCompanyMap(map);
+    }
+    loadCompanies();
+  }, [jobs]);
   if (jobs.length === 0) {
     return (
       <div className="layui-card layui-empty-card">
@@ -45,7 +57,7 @@ const JobList: React.FC<JobListProps> = ({
     <div>
       <div className="layui-mb20">
         {jobs.map((job) => {
-          const company = companyService.getById(job.companyId);
+          const company = companyMap[job.companyId];
           return (
             <JobCard
               key={job.id}

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 import { fetchCaptcha, verifyCaptcha } from '@/lib/utils/captcha';
+import { saveAuth } from '@/lib/utils/auth-client';
+import { User } from '@/types';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,8 +15,9 @@ export default function LoginPage() {
     password: '',
     captcha: '',
   });
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const [captchaCode, setCaptchaCode] = useState('');
   const [captchaId, setCaptchaId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -59,7 +62,7 @@ export default function LoginPage() {
   };
 
   const validateForm = async () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.username.trim()) {
       newErrors.username = '请输入用户名';
@@ -91,14 +94,31 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (await validateForm()) {
-      setLoading(true);
-      setTimeout(() => {
+    if (!(await validateForm())) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: formData.username.trim(), password: formData.password }),
+      });
+      type LoginApiResponse = { user?: User; token?: string; error?: string; expiresAt?: number };
+      const data = (await res.json().catch(() => null)) as LoginApiResponse | null;
+      if (!res.ok) {
+        setLoginError(data?.error || '登录失败，请稍后重试');
+        refreshCaptcha();
         setLoading(false);
-        localStorage.setItem('token', 'demo-token-' + Date.now());
-        router.push('/');
-      }, 1000);
+        return;
+      }
+
+      // 后端返回 { user, token }
+      saveAuth(data?.token ?? '', data!.user as User);
+      router.push('/user');
+    } catch (error) {
+      console.error('登录请求失败', error);
+      setLoginError('登录请求失败，请检查网络后重试');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,17 +130,17 @@ export default function LoginPage() {
           <div className="layui-inline-block layui-mb20 layui-auth-logo-box-soft">
             <span className="layui-auth-logo-text-soft">168</span>
           </div>
-          <h1 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-dark" style={{textShadow: 'none'}}>
+          <h1 className="layui-font-2xl layui-font-bold layui-mb10 layui-font-dark" style={{ textShadow: 'none' }}>
             美国华人168招聘网
           </h1>
-          <p className="layui-font-lg layui-font-gray" style={{opacity: 1}}>
+          <p className="layui-font-lg layui-font-gray" style={{ opacity: 1 }}>
             欢迎回来，请登录您的账号
           </p>
         </div>
 
         {/* 登录表单卡片 */}
         <div className="layui-card layui-anim layui-anim-scale layui-auth-card">
-          <div className="layui-card-body" style={{padding: '35px 30px'}}>
+          <div className="layui-card-body" style={{ padding: '35px 30px' }}>
             <form ref={formRef} onSubmit={handleSubmit} className="layui-form">
               {/* 用户名/邮箱 */}
               <div className="layui-form-item">
@@ -200,7 +220,7 @@ export default function LoginPage() {
                     <div className="layui-col-md4 layui-col-xs5">
                       <div
                         className="layui-captcha-box"
-                        style={{height: '42px', borderRadius: '8px'}}
+                        style={{ height: '42px', borderRadius: '8px' }}
                         onClick={refreshCaptcha}
                         title="点击刷新"
                       >
@@ -218,13 +238,12 @@ export default function LoginPage() {
               )}
 
               {/* 记住我 & 忘记密码 */}
-              <div className="layui-flex layui-flex-between layui-mb20" style={{marginTop: '5px'}}>
+              <div className="layui-flex layui-flex-between layui-mb20" style={{ marginTop: '5px' }}>
                 <label className="layui-checkbox-row">
                   <input
                     type="checkbox"
                     id="rememberMe"
                     name="remember"
-                    title="记住我"
                     lay-skin="primary"
                   />
                   <span className="layui-ml5">记住我</span>
@@ -232,7 +251,7 @@ export default function LoginPage() {
                 <Link
                   href="/forgot-password"
                   className="layui-font-sm layui-link-plain"
-                  style={{color: '#009688'}}
+                  style={{ color: '#009688' }}
                 >
                   忘记密码？
                 </Link>
@@ -281,9 +300,9 @@ export default function LoginPage() {
             </div>
 
             {/* 注册链接 */}
-            <p className="layui-text-center layui-mt20 layui-font-sm" style={{color: '#999'}}>
+            <p className="layui-text-center layui-mt20 layui-font-sm" style={{ color: '#999' }}>
               还没有账号？
-              <Link href="/register" className="layui-font-bold layui-ml5 layui-link-plain" style={{color: '#009688'}}>
+              <Link href="/register" className="layui-font-bold layui-ml5 layui-link-plain" style={{ color: '#009688' }}>
                 立即注册
               </Link>
             </p>
@@ -292,7 +311,7 @@ export default function LoginPage() {
 
         {/* 返回首页 */}
         <p className="layui-text-center layui-mt20">
-          <Link href="/" className="layui-font-sm layui-link-plain layui-font-gray" style={{opacity: 0.8, transition: 'opacity 0.3s'}}>
+          <Link href="/" className="layui-font-sm layui-link-plain layui-font-gray" style={{ opacity: 0.8, transition: 'opacity 0.3s' }}>
             <i className="layui-icon layui-icon-return layui-mr5"></i>
             返回首页
           </Link>

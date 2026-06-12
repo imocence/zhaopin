@@ -1,12 +1,23 @@
 /* ==================== 全局样式 ==================== */
 html {
     height: 100%;
+    min-height: 100%;
 }
 
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+footer.layui-footer-site {
+    margin-top: auto;
 }
 
 /* Layui 主色（与 layui 默认绿 / 组件引用一致，供 var(--layui-primary) 等使用） */
@@ -1396,7 +1407,7 @@ body {
 }
 
 .layui-icon-md {
-    font-size: 20px;
+    font-size: 44px!important;
 }
 
 .layui-captcha-uppercase {

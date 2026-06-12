@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
+import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 
 type TabKey = 'account' | 'password' | 'notifications' | 'privacy';
 
@@ -23,42 +24,45 @@ export default function UserSettingsPage() {
     { key: 'privacy' as TabKey, label: '隐私设置', icon: '🔐' },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* 侧边栏 */}
-          <UnifiedSidebar items={sidebarItems} variant="default" />
+  useLayuiForm();
 
-          {/* 主内容区 */}
-          <div className="flex-1">
-            <div className="layui-card">
-              {/* 选项卡导航 */}
-              <div className="layui-card-body border-b">
-                <div className="flex gap-2 overflow-x-auto">
+  return (
+    <div className="layui-container layui-mt20">
+      <div className="layui-row layui-col-space20">
+        <div className="layui-col-md3">
+          <UnifiedSidebar items={sidebarItems} variant="default" />
+        </div>
+
+        <div className="layui-col-md9">
+          <div className="layui-card">
+            <div className="layui-card-body">
+              <div className="layui-tab layui-tab-brief layui-mb20">
+                <ul className="layui-tab-title">
                   {tabs.map((tab) => (
-                    <button
+                    <li
                       key={tab.key}
+                      className={activeTab === tab.key ? 'layui-this' : ''}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded whitespace-nowrap transition-colors ${
-                        activeTab === tab.key
-                          ? 'bg-[var(--layui-primary)] text-white'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
                     >
-                      <span>{tab.icon}</span>
-                      <span>{tab.label}</span>
-                    </button>
+                      <span>{tab.icon}</span> {tab.label}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
-              {/* 选项卡内容 */}
-              <div className="layui-card-body">
-                {activeTab === 'account' && <AccountSettings />}
-                {activeTab === 'password' && <PasswordSettings />}
-                {activeTab === 'notifications' && <NotificationSettings />}
-                {activeTab === 'privacy' && <PrivacySettings />}
+              <div className="layui-tab-content">
+                <div className={`layui-tab-item${activeTab === 'account' ? ' layui-show' : ''}`}>
+                  <AccountSettings />
+                </div>
+                <div className={`layui-tab-item${activeTab === 'password' ? ' layui-show' : ''}`}>
+                  <PasswordSettings />
+                </div>
+                <div className={`layui-tab-item${activeTab === 'notifications' ? ' layui-show' : ''}`}>
+                  <NotificationSettings />
+                </div>
+                <div className={`layui-tab-item${activeTab === 'privacy' ? ' layui-show' : ''}`}>
+                  <PrivacySettings />
+                </div>
               </div>
             </div>
           </div>
@@ -71,31 +75,28 @@ export default function UserSettingsPage() {
 // 账号设置
 function AccountSettings() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">账号设置</h2>
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            用户名
-          </label>
+    <form className="layui-form">
+      <div className="layui-form-item">
+        <label className="layui-form-label">用户名</label>
+        <div className="layui-input-block">
           <input type="text" className="layui-input" defaultValue="zhangsan" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            邮箱
-          </label>
+      </div>
+      <div className="layui-form-item">
+        <label className="layui-form-label">邮箱</label>
+        <div className="layui-input-block">
           <input type="email" className="layui-input" defaultValue="zhangsan@example.com" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            手机号
-          </label>
+      </div>
+      <div className="layui-form-item">
+        <label className="layui-form-label">手机号</label>
+        <div className="layui-input-block">
           <input type="tel" className="layui-input" defaultValue="123-456-7890" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            所在时区
-          </label>
+      </div>
+      <div className="layui-form-item">
+        <label className="layui-form-label">时区</label>
+        <div className="layui-input-block">
           <select className="layui-select">
             <option>Pacific Time (PT)</option>
             <option>Mountain Time (MT)</option>
@@ -103,43 +104,48 @@ function AccountSettings() {
             <option>Eastern Time (ET)</option>
           </select>
         </div>
-        <button type="submit" className="layui-btn layui-btn-primary">
-          保存更改
-        </button>
-      </form>
-    </div>
+      </div>
+      <div className="layui-form-item">
+        <div className="layui-input-block">
+          <button className="layui-btn layui-btn-primary" type="submit">
+            保存更改
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 
 // 修改密码
 function PasswordSettings() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">修改密码</h2>
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            当前密码 *
-          </label>
+    <form className="layui-form">
+      <div className="layui-form-item">
+        <label className="layui-form-label">当前密码</label>
+        <div className="layui-input-block">
           <input type="password" className="layui-input" placeholder="请输入当前密码" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            新密码 *
-          </label>
+      </div>
+      <div className="layui-form-item">
+        <label className="layui-form-label">新密码</label>
+        <div className="layui-input-block">
           <input type="password" className="layui-input" placeholder="6-20位字符" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            确认新密码 *
-          </label>
+      </div>
+      <div className="layui-form-item">
+        <label className="layui-form-label">确认密码</label>
+        <div className="layui-input-block">
           <input type="password" className="layui-input" placeholder="再次输入新密码" />
         </div>
-        <button type="submit" className="layui-btn layui-btn-primary">
-          修改密码
-        </button>
-      </form>
-    </div>
+      </div>
+      <div className="layui-form-item">
+        <div className="layui-input-block">
+          <button className="layui-btn layui-btn-primary" type="submit">
+            修改密码
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 
@@ -153,89 +159,83 @@ function NotificationSettings() {
     smsNotification: false,
   });
 
-  const handleToggle = (key: string) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+  const handleToggle = (key: keyof typeof settings) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">通知设置</h2>
-
-      <div className="space-y-4">
-        <h3 className="font-medium text-gray-900">邮件通知</h3>
-        <div className="space-y-3">
-          <label className="layui-checkbox">
-            <input
-              type="checkbox"
-              checked={settings.emailApplication}
-              onChange={() => handleToggle('emailApplication')}
-            />
-            <span></span>
-            <span className="ml-7 text-sm text-gray-700">申请状态更新通知</span>
-          </label>
-          <label className="layui-checkbox">
-            <input
-              type="checkbox"
-              checked={settings.emailInterview}
-              onChange={() => handleToggle('emailInterview')}
-            />
-            <span></span>
-            <span className="ml-7 text-sm text-gray-700">面试邀请通知</span>
-          </label>
-          <label className="layui-checkbox">
-            <input
-              type="checkbox"
-              checked={settings.emailCompany}
-              onChange={() => handleToggle('emailCompany')}
-            />
-            <span></span>
-            <span className="ml-7 text-sm text-gray-700">关注企业新职位通知</span>
-          </label>
+    <form className="layui-form">
+      <div className="layui-form-item layui-form-text">
+        <label className="layui-form-label">邮件通知</label>
+        <div className="layui-input-block">
+          <input
+            type="checkbox"
+            name="emailApplication"
+            title="申请状态更新通知"
+            checked={settings.emailApplication}
+            onChange={() => handleToggle('emailApplication')}
+          />
+          <input
+            type="checkbox"
+            name="emailInterview"
+            title="面试邀请通知"
+            checked={settings.emailInterview}
+            onChange={() => handleToggle('emailInterview')}
+          />
+          <input
+            type="checkbox"
+            name="emailCompany"
+            title="关注企业新职位通知"
+            checked={settings.emailCompany}
+            onChange={() => handleToggle('emailCompany')}
+          />
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="font-medium text-gray-900">浏览器通知</h3>
-        <label className="layui-checkbox">
+      <div className="layui-form-item layui-form-text">
+        <label className="layui-form-label">浏览器通知</label>
+        <div className="layui-input-block">
           <input
             type="checkbox"
+            name="browserNotification"
+            title="启用浏览器推送通知"
             checked={settings.browserNotification}
             onChange={() => handleToggle('browserNotification')}
           />
-          <span></span>
-          <span className="ml-7 text-sm text-gray-700">启用浏览器推送通知</span>
-        </label>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="font-medium text-gray-900">短信通知</h3>
-        <label className="layui-checkbox">
+      <div className="layui-form-item layui-form-text">
+        <label className="layui-form-label">短信通知</label>
+        <div className="layui-input-block">
           <input
             type="checkbox"
+            name="smsNotification"
+            title="启用短信通知（面试邀请等）"
             checked={settings.smsNotification}
             onChange={() => handleToggle('smsNotification')}
           />
-          <span></span>
-          <span className="ml-7 text-sm text-gray-700">启用短信通知（面试邀请等）</span>
-        </label>
+        </div>
       </div>
 
-      <button className="layui-btn layui-btn-primary">保存设置</button>
-    </div>
+      <div className="layui-form-item">
+        <div className="layui-input-block">
+          <button className="layui-btn layui-btn-primary" type="submit">
+            保存设置
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 
 // 隐私设置
 function PrivacySettings() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">隐私设置</h2>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            谁可以查看我的简历
-          </label>
+    <form className="layui-form">
+      <div className="layui-form-item">
+        <label className="layui-form-label">谁可以查看我的简历</label>
+        <div className="layui-input-block">
           <select className="layui-select">
             <option>所有企业</option>
             <option>我申请过的企业</option>
@@ -243,57 +243,49 @@ function PrivacySettings() {
             <option>完全隐藏</option>
           </select>
         </div>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            谁可以查看我的求职状态
-          </label>
+      <div className="layui-form-item">
+        <label className="layui-form-label">谁可以查看我的求职状态</label>
+        <div className="layui-input-block">
           <select className="layui-select">
             <option>所有人</option>
             <option>仅企业用户</option>
             <option>完全隐藏</option>
           </select>
         </div>
+      </div>
 
-        <div>
-          <label className="layui-checkbox">
-            <input type="checkbox" defaultChecked />
-            <span></span>
-            <span className="ml-7 text-sm text-gray-700">
-              允许企业通过搜索找到我的简历
-            </span>
-          </label>
-        </div>
-
-        <div>
-          <label className="layui-checkbox">
-            <input type="checkbox" />
-            <span></span>
-            <span className="ml-7 text-sm text-gray-700">
-              在"正在看这个职位的用户"中匿名显示
-            </span>
-          </label>
+      <div className="layui-form-item layui-form-text">
+        <label className="layui-form-label">隐私选项</label>
+        <div className="layui-input-block">
+          <input type="checkbox" name="resumeVisible" title="允许企业通过搜索找到我的简历" defaultChecked />
+          <input type="checkbox" name="anonymousView" title="在'正在看这个职位的用户'中匿名显示" />
         </div>
       </div>
 
-      <div className="layui-card layui-bg-gray bg-opacity-10">
+      <div className="layui-card layui-bg-gray">
         <div className="layui-card-body">
-          <h3 className="font-medium text-gray-900 mb-2">数据控制</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            您可以下载或删除您的个人数据
-          </p>
-          <div className="flex gap-3">
-            <button className="layui-btn layui-btn-sm layui-btn-outline">
+          <h3 className="layui-card-title">数据控制</h3>
+          <p className="layui-font-sm layui-font-gray">您可以下载或删除您的个人数据</p>
+          <div className="layui-btn-group">
+            <button className="layui-btn layui-btn-sm layui-btn-outline" type="button">
               下载我的数据
             </button>
-            <button className="layui-btn layui-btn-sm layui-btn-danger">
+            <button className="layui-btn layui-btn-sm layui-btn-danger" type="button">
               删除账号
             </button>
           </div>
         </div>
       </div>
 
-      <button className="layui-btn layui-btn-primary">保存设置</button>
-    </div>
+      <div className="layui-form-item">
+        <div className="layui-input-block">
+          <button className="layui-btn layui-btn-primary" type="submit">
+            保存设置
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }

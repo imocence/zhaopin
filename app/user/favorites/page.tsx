@@ -1,12 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { jobService, companyService } from '@/lib/utils/data';
-import JobCard from '@/components/job/JobCard';
+import { jobService, companyService } from '@/lib/services/data';
+import { Job, Company } from '@/types';
+import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
+
+interface LayuiTableInstance {
+  reload: (options: { data: unknown[]; page: { curr: number } }) => void;
+}
+
+interface Layui {
+  table: {
+    render: (options: {
+      elem: string;
+      data: unknown[];
+      page: boolean;
+      limit: number;
+      limits: number[];
+      skin: string;
+      even: boolean;
+      cols: unknown[][];
+    }) => LayuiTableInstance;
+  };
+}
 
 export default function UserFavoritesPage() {
+  const [favoriteJobs, setFavoriteJobs] = useState<Job[]>([]);
+  const [companyMap, setCompanyMap] = useState<Record<string, Company | undefined>>({});
+  const pageSize = 5;
+  const tableRef = useRef<LayuiTableInstance | null>(null);
+
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
     { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: 3 },
@@ -15,58 +40,110 @@ export default function UserFavoritesPage() {
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 
-  // 获取收藏的职位（模拟数据，取前8个职位）
-  const favoriteJobs = jobService.getLatestJobs(12);
+  useEffect(() => {
+    async function loadData() {
+      const jobs = await jobService.getLatestJobs(12);
+      setFavoriteJobs(jobs);
+      // fetch companies for these jobs
+      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
+      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
+      const map: Record<string, Company | undefined> = {};
+      entries.forEach(([id, comp]) => { map[id] = comp; });
+      setCompanyMap(map);
+    }
+    loadData();
+  }, []);
+
+  const tableJobs = useMemo(
+    () => favoriteJobs.map(job => ({
+      ...job,
+      companyName: companyMap[job.companyId]?.name || '-',
+      salaryText: job.salaryMin ? `$${job.salaryMin}-${job.salaryMax}` : '面议',
+    })),
+    [favoriteJobs, companyMap]
+  );
+
+  const initTable = useCallback(
+    (layui: Layui) => {
+      const table = layui.table;
+      if (tableRef.current) {
+        tableRef.current.reload({
+          data: tableJobs,
+          page: { curr: 1 }
+        });
+        return;
+      }
+
+      tableRef.current = table.render({
+        elem: '#userFavoritesTable',
+        data: tableJobs,
+        page: true,
+        limit: pageSize,
+        limits: [5, 10, 20],
+        skin: 'line',
+        even: true,
+        cols: [[
+          {
+            field: 'title',
+            title: '职位名称',
+            minWidth: 260,
+            templet: function (d: Record<string, unknown>) {
+              return `<a class="layui-font-cyan layui-text-decoration-none" href="/jobs/${d.id}">${d.title}</a>`;
+            }
+          },
+          { field: 'companyName', title: '公司', width: 220 },
+          { field: 'location', title: '城市', width: 140 },
+          { field: 'salaryText', title: '薪资', width: 140 },
+          {
+            field: 'actions',
+            title: '操作',
+            width: 180,
+            align: 'center',
+            templet: function (d: Record<string, unknown>) {
+              return `
+                <div class="layui-btn-group">
+                  <a class="layui-btn layui-btn-sm layui-btn-primary" href="/jobs/${d.id}">查看</a>
+                  <button class="layui-btn layui-btn-sm layui-btn-danger">取消收藏</button>
+                </div>`;
+            }
+          }
+        ]]
+      });
+    },
+    [tableJobs]
+  );
+
+  useLayuiTable(initTable);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* 侧边栏 */}
+    <div className="layui-container layui-mt20">
+      <div className="layui-row layui-col-space20">
+        <div className="layui-col-md3">
           <UnifiedSidebar items={sidebarItems} variant="default" />
-
-          {/* 主内容区 */}
-          <div className="flex-1">
-            {/* 页面标题 */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">收藏职位</h1>
-              <p className="text-gray-600">共收藏 {favoriteJobs.length} 个职位</p>
-            </div>
-
-            {/* 收藏职位列表 */}
-            {favoriteJobs.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {favoriteJobs.map((job) => {
-                  const company = companyService.getById(job.companyId);
-                  return (
-                    <div key={job.id} className="relative">
-                      <button
-                        className="absolute top-4 right-4 z-10 text-yellow-500 hover:text-yellow-600 text-2xl"
-                        title="取消收藏"
-                      >
-                        ⭐
-                      </button>
-                      <JobCard
-                        job={job}
-                        companyName={company?.name}
-                        companyLogo={company?.logo}
-                        companyVerified={company?.verified}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="layui-card">
-                <div className="layui-card-body text-center py-12">
-                  <div className="text-6xl mb-4">⭐</div>
-                  <p className="text-gray-600 mb-4">还没有收藏任何职位</p>
-                  <Link href="/jobs" className="layui-btn">
-                    去找职位
-                  </Link>
+        </div>
+        <div className="layui-col-md9">
+          <div className="layui-card layui-mb20">
+            <div className="layui-card-body">
+              <div className="layui-row layui-col-space10 layui-mb20">
+                <div className="layui-col-xs12">
+                  <h1 className="layui-font-2xl layui-font-bold">收藏职位</h1>
+                  <p className="layui-font-gray layui-mt5">共收藏 {favoriteJobs.length} 个职位</p>
                 </div>
               </div>
-            )}
+              {favoriteJobs.length > 0 ? (
+                <div id="userFavoritesTable"></div>
+              ) : (
+                <div className="layui-card">
+                  <div className="layui-card-body layui-text-center layui-mt20">
+                    <div className="layui-font-title layui-mb15">⭐</div>
+                    <p className="layui-font-gray layui-mb20">还没有收藏任何职位</p>
+                    <Link href="/jobs" className="layui-btn">
+                      去找职位
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

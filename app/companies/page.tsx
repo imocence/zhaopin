@@ -1,9 +1,10 @@
 'use client';
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {companyService, locationService} from '@/lib/utils/data';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { companyService, locationService } from '@/lib/services/data';
+import { Company, Location } from '@/types';
 import CompanyCard from '@/components/company/CompanyCard';
-import {FilterSection, FilterSidebar} from '@/components/filter';
+import { FilterSection, FilterSidebar } from '@/components/filter';
 
 export default function CompaniesPage() {
     const [filters, setFilters] = useState({
@@ -18,8 +19,21 @@ export default function CompaniesPage() {
     const laypageRef = useRef<HTMLDivElement>(null);
     const laypageInitialized = useRef(false);
 
-    const allCompanies = useMemo(() => companyService.getAll(), []);
-    const locations = locationService.getAll();
+    const [allCompanies, setAllCompanies] = useState<Company[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
+
+    // 加载数据
+    useEffect(() => {
+        async function loadData() {
+            const [companies, locs] = await Promise.all([
+                companyService.getAll(),
+                locationService.getAll(),
+            ]);
+            setAllCompanies(companies);
+            setLocations(locs);
+        }
+        loadData();
+    }, []);
 
     const filteredCompanies = useMemo(() => {
         let result = allCompanies;
@@ -89,7 +103,7 @@ export default function CompaniesPage() {
                         jump: function (obj: any, first: boolean) {
                             if (!first) {
                                 setPage(obj.curr);
-                                window.scrollTo({top: 0, behavior: 'smooth'});
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
                             }
                         }
                     });
@@ -107,13 +121,13 @@ export default function CompaniesPage() {
         laypageInitialized.current = false;
     }, [totalPages]);
 
-    const handleFilterChange = (key: string, value: string) => {
-        setFilters(prev => ({...prev, [key]: value}));
+    const handleFilterChange = (key: string, value: any) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
         setPage(1);
     };
 
     const handleResetFilters = () => {
-        setFilters({keyword: '', state: '', industry: '', verified: false});
+        setFilters({ keyword: '', state: '', industry: '', verified: false });
         setPage(1);
     };
 
@@ -128,25 +142,25 @@ export default function CompaniesPage() {
             type: 'text',
             placeholder: '搜索企业名称...',
             value: filters.keyword,
-            onChange: (value) => handleFilterChange('keyword', value)
+            onChange: (value: any) => handleFilterChange('keyword', value)
         },
         {
             key: 'state',
             label: '所在州',
             icon: 'layui-icon-location',
             type: 'select',
-            options: locations.map(loc => ({value: loc.stateCode, label: loc.name})),
+            options: locations.map(loc => ({ value: loc.stateCode, label: loc.name })),
             value: filters.state,
-            onChange: (value) => handleFilterChange('state', value)
+            onChange: (value: any) => handleFilterChange('state', value)
         },
         ...(industries.length > 0 ? [{
             key: 'industry' as const,
             label: '行业',
             icon: 'layui-icon-file',
             type: 'select' as const,
-            options: industries.map(ind => ({value: ind, label: ind})),
+            options: industries.map(ind => ({ value: ind, label: ind })),
             value: filters.industry,
-            onChange: (value: string) => handleFilterChange('industry', value)
+            onChange: (value: any) => handleFilterChange('industry', value)
         }] : []),
         {
             key: 'verified',
@@ -154,7 +168,7 @@ export default function CompaniesPage() {
             icon: 'layui-icon-ok-circle',
             type: 'checkbox',
             value: filters.verified,
-            onChange: (value) => handleFilterChange('verified', value)
+            onChange: (value: any) => handleFilterChange('verified', value)
         }
     ];
 
@@ -183,8 +197,8 @@ export default function CompaniesPage() {
                             <div className="layui-header-badge layui-font-white layui-font-lg">
                                 <i className="layui-icon layui-icon-ok-circle layui-font-white layui-icon-gap-md"></i>
                                 <span className="layui-font-white">
-                  <span className="layui-font-2xl layui-font-bold layui-font-white layui-mr5">{filteredCompanies.length}</span> 家企业
-                </span>
+                                    <span className="layui-font-2xl layui-font-bold layui-font-white layui-mr5">{filteredCompanies.length}</span> 家企业
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -238,8 +252,8 @@ export default function CompaniesPage() {
                                 <div className="layui-flex layui-flex-center layui-gap-10">
                                     <i className="layui-icon layui-icon-list layui-font-gray layui-mr5"></i>
                                     <span className="layui-font-sm layui-font-gray-light">
-                    找到 <span className="layui-font-lg layui-font-bold layui-font-blue">{filteredCompanies.length}</span> 家企业
-                  </span>
+                                        找到 <span className="layui-font-lg layui-font-bold layui-font-blue">{filteredCompanies.length}</span> 家企业
+                                    </span>
                                     {hasActiveFilters && (
                                         <button
                                             className="layui-btn layui-btn-xxs layui-btn-primary layui-mr20"
@@ -252,7 +266,7 @@ export default function CompaniesPage() {
                                 <div className="layui-flex layui-flex-center layui-gap-10 layui-flex-nowrap">
                                     <i className="layui-icon layui-icon-template-1 layui-font-gray layui-mr5"></i>
                                     <span className="layui-font-sm layui-font-gray-light layui-flex-shrink-0">排序：</span>
-                                    <select className="layui-input layui-inline layui-inline-sort layui-mr5 layui-font-sm" style={{width: "auto", minWidth: "120px"}}>
+                                    <select className="layui-input layui-inline layui-inline-sort layui-mr5 layui-font-sm" style={{ width: "auto", minWidth: "120px" }}>
                                         <option value="default">默认排序</option>
                                         <option value="jobs-desc">职位数从多到少</option>
                                         <option value="verified">已认证优先</option>
@@ -268,7 +282,7 @@ export default function CompaniesPage() {
                         <div className="layui-row layui-col-space20">
                             {paginatedCompanies.map((company) => (
                                 <div className="layui-col-md4 layui-col-xs6" key={company.id}>
-                                    <CompanyCard company={company}/>
+                                    <CompanyCard company={company} />
                                 </div>
                             ))}
                         </div>

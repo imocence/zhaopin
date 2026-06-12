@@ -1,33 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
+import { getStoredUser } from '@/lib/utils/auth-client';
+import { User } from '@/types';
 
 export default function UserProfilePage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [formData, setFormData] = useState({
-    name: '张三',
-    email: 'zhangsan@example.com',
-    phone: '123-456-7890',
-    location: 'California',
-    bio: '经验丰富的软件工程师，专注于前端开发。',
-    skills: 'React, Next.js, TypeScript, Node.js',
-    experience: '5年',
-    education: '本科',
-    expectedSalary: '80000-120000',
+    username: '',
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+    skills: '',
+    experience: '',
+    education: '',
+    expectedSalary: '',
     expectedSalaryType: 'yearly',
   });
+
+  useEffect(() => {
+    const currentUser = getStoredUser();
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      username: (currentUser as any).username ?? prev.username,
+      name: currentUser.name,
+      email: currentUser.email,
+      phone: (currentUser as any).phone ?? prev.phone,
+      location: (currentUser as any).location ?? prev.location,
+      bio: (currentUser as any).bio ?? prev.bio,
+      skills: (currentUser as any).skills ?? prev.skills,
+      experience: (currentUser as any).experience ?? prev.experience,
+      education: (currentUser as any).education ?? prev.education,
+      expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
+      expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+    }));
+    setLoaded(true);
+  }, [router]);
+
+  if (!loaded) {
+    return null;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 保存用户信息
-    console.log('保存用户信息:', formData);
-    setIsEditing(false);
+    const currentUser = getStoredUser();
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/users/${currentUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          location: formData.location,
+          bio: formData.bio,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error('Failed to save user info', await res.text());
+        return;
+      }
+
+      const data = await res.json().catch(() => null) as any;
+      const updatedUser = data?.data as User;
+      if (updatedUser) {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving user info:', error);
+    }
   };
 
   const sidebarItems = [
@@ -68,6 +133,18 @@ export default function UserProfilePage() {
                     <legend>基本信息</legend>
                     <div className="layui-field-box">
                       <div className="layui-form-item">
+                        <div className="layui-inline">
+                          <label className="layui-form-label">账号</label>
+                          <div className="layui-input-inline">
+                            <input
+                              type="text"
+                              name="username"
+                              value={formData.username}
+                              disabled
+                              className="layui-input"
+                            />
+                          </div>
+                        </div>
                         <div className="layui-inline">
                           <label className="layui-form-label">姓名</label>
                           <div className="layui-input-inline">
@@ -167,7 +244,7 @@ export default function UserProfilePage() {
                       </div>
                       <div className="layui-form-item">
                         <label className="layui-form-label">期望薪资</label>
-                        <div className="layui-input-inline" style={{width: '200px'}}>
+                        <div className="layui-input-inline" style={{ width: '200px' }}>
                           <input
                             type="text"
                             name="expectedSalary"
@@ -177,7 +254,7 @@ export default function UserProfilePage() {
                             placeholder="例如: 80000-120000"
                           />
                         </div>
-                        <div className="layui-input-inline" style={{width: '100px'}}>
+                        <div className="layui-input-inline" style={{ width: '100px' }}>
                           <select
                             name="expectedSalaryType"
                             value={formData.expectedSalaryType}
@@ -244,12 +321,12 @@ export default function UserProfilePage() {
               ) : (
                 <>
                   {/* 头像和基本信息 */}
-                  <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px'}}>
-                    <div style={{width: '100px', height: '100px', borderRadius: '50%', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                      <span style={{fontSize: '48px'}}>👤</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
+                    <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '48px' }}>👤</span>
                     </div>
                     <div>
-                      <h2 style={{fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '8px'}}>{formData.name}</h2>
+                      <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>{formData.name}</h2>
                       <p className="layui-font-gray">{formData.email}</p>
                       <p className="layui-font-sm layui-font-gray-light layui-mt5">{formData.location}</p>
                     </div>
@@ -310,7 +387,7 @@ export default function UserProfilePage() {
 
                   {/* 资料完整度 */}
                   <div>
-                    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                       <span className="layui-font-sm layui-font-gray-light">资料完整度</span>
                       <span className="layui-font-sm layui-font-cyan">85%</span>
                     </div>

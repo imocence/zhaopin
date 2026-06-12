@@ -1,21 +1,36 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { companyService, jobService } from '@/lib/utils/data';
+import { companyService, jobService } from '@/lib/services/data';
+import { Company, Job } from '@/types';
 
 export default function EmployerDashboardPage() {
-  // 模拟当前登录企业
-  const currentCompany = companyService.getVerified()[0];
-
-  // 获取企业统计数据
-  const stats = {
-    activeJobs: jobService.getByCompanyId(currentCompany?.id || '').filter(j => j.status === 'active').length,
+  const [currentCompany, setCurrentCompany] = useState<Company | undefined>(undefined);
+  const [stats, setStats] = useState({
+    activeJobs: 0,
     totalApplications: 45,
     pendingReview: 8,
     totalViews: 1234,
-  };
+  });
+
+  useEffect(() => {
+    async function loadData() {
+      const verified = await companyService.getVerified();
+      const company = verified[0];
+      setCurrentCompany(company);
+
+      if (company) {
+        const jobs = await jobService.getByCompanyId(company.id);
+        setStats(prev => ({
+          ...prev,
+          activeJobs: jobs.filter(j => j.status === 'active').length,
+        }));
+      }
+    }
+    loadData();
+  }, []);
 
   // 侧边栏菜单项
   const sidebarItems = [
