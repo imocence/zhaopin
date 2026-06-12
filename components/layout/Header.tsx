@@ -22,6 +22,8 @@ const Header: React.FC = () => {
     return pathname.startsWith(href);
   };
 
+  const loginHref = `/login?next=${encodeURIComponent(pathname || '/')}`;
+
   useEffect(() => {
     setMounted(true);
     const checkAuth = () => setIsLoggedIn(!!getAuthToken());
@@ -69,7 +71,7 @@ const Header: React.FC = () => {
         {!isLoggedIn ? (
           <>
             <li className="layui-nav-item" style={{ float: 'right' }}>
-              <Link href="/login">登录</Link>
+              <Link href={loginHref}>登录</Link>
             </li>
             <li className="layui-nav-item" style={{ float: 'right' }}>
               <Link href="/register">注册</Link>

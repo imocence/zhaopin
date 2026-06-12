@@ -3,6 +3,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 type MessageType = 'all' | 'system' | 'application' | 'interview' | 'company';
 
@@ -35,6 +36,7 @@ interface Layui {
 }
 
 export default function UserMessagesPage() {
+  const isAuth = useRequireAuth();
   const [typeFilter, setTypeFilter] = useState<MessageType>('all');
   const tableRef = useRef<LayuiTableInstance | null>(null);
 
@@ -106,6 +108,10 @@ export default function UserMessagesPage() {
 
   const initTable = useCallback(
     (layui: Layui) => {
+      const container = document.getElementById('userMessagesTable');
+      if (!container) {
+        return;
+      }
       const table = layui.table;
       if (tableRef.current) {
         tableRef.current.reload({
@@ -190,6 +196,8 @@ export default function UserMessagesPage() {
   const markAllAsRead = () => {
     console.log('全部标记为已读');
   };
+
+  if (!isAuth) return null;
 
   return (
     <div className="layui-container layui-mt20">

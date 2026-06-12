@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { getStoredUser } from '@/lib/utils/auth-client';
 import { User } from '@/types';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 export default function UserProfilePage() {
+  const isAuth = useRequireAuth();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -47,7 +49,7 @@ export default function UserProfilePage() {
     setLoaded(true);
   }, [router]);
 
-  if (!loaded) {
+  if (!loaded || !isAuth) {
     return null;
   }
 

@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
-import { fetchCaptcha, verifyCaptcha } from '@/lib/utils/captcha';
+import { fetchCaptcha, isCaptchaEnabled, verifyCaptcha } from '@/lib/utils/captcha';
 import { saveAuth } from '@/lib/utils/auth-client';
 import { User } from '@/types';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -21,7 +22,7 @@ export default function LoginPage() {
   const [captchaCode, setCaptchaCode] = useState('');
   const [captchaId, setCaptchaId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [enableCaptcha, setEnableCaptcha] = useState(true);
+  const [enableCaptcha, setEnableCaptcha] = useState(isCaptchaEnabled());
   const formRef = useRef<HTMLFormElement>(null);
 
   // 从接口获取验证码
@@ -39,14 +40,17 @@ export default function LoginPage() {
   useLayuiForm();
 
   useEffect(() => {
-    refreshCaptcha();
+    if (isCaptchaEnabled()) {
+      // 在微任务中调用以避免同步 setState 导致的渲染警告
+      Promise.resolve().then(() => refreshCaptcha());
+    }
 
     // 读取系统设置
     const adminSettings = localStorage.getItem('adminSettings');
     if (adminSettings) {
       try {
         const settings = JSON.parse(adminSettings);
-        setEnableCaptcha(settings.enableCaptcha ?? true);
+        Promise.resolve().then(() => setEnableCaptcha(isCaptchaEnabled() ? settings.enableCaptcha ?? true : false));
       } catch (e) {
         console.error('读取系统设置失败', e);
       }
@@ -102,18 +106,59 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: formData.username.trim(), password: formData.password }),
       });
-      type LoginApiResponse = { user?: User; token?: string; error?: string; expiresAt?: number };
+      type LoginApiResponse = { status?: 'success' | 'error'; message?: string; data?: { user: User; token: string; expiresAt?: number } };
       const data = (await res.json().catch(() => null)) as LoginApiResponse | null;
-      if (!res.ok) {
-        setLoginError(data?.error || '登录失败，请稍后重试');
-        refreshCaptcha();
+      if (!res.ok || data?.status === 'error') {
+        setLoginError(data?.message || '登录失败，请稍后重试');
+        if (enableCaptcha) {
+          refreshCaptcha();
+        }
         setLoading(false);
         return;
       }
 
-      // 后端返回 { user, token }
-      saveAuth(data?.token ?? '', data!.user as User);
-      router.push('/user');
+      // 后端返回 { status, message, data: { user, token } }
+      saveAuth(data?.data?.token ?? '', data?.data?.user as User);
+
+      // 优先使用 URL 参数 next/redirect，其次尝试同源的 document.referrer，最后回到 /user
+      try {
+        const nextParam = searchParams?.get('next') || searchParams?.get('redirect');
+        if (nextParam) {
+          const decodedNext = decodeURIComponent(nextParam);
+          if (decodedNext.startsWith('/')) {
+            router.push(decodedNext);
+          } else {
+            // if decodedNext is full URL but same-origin, push its pathname
+            try {
+              const u = new URL(decodedNext, window.location.href);
+              if (u.origin === window.location.origin) {
+                router.push(u.pathname + u.search + u.hash);
+              } else {
+                router.push('/user');
+              }
+            } catch {
+              router.push('/user');
+            }
+          }
+        } else if (typeof document !== 'undefined' && document.referrer) {
+          try {
+            const ref = new URL(document.referrer);
+            const currentPath = window.location.pathname;
+            if (ref.origin === window.location.origin && ref.pathname !== currentPath) {
+              // 保留 ref 的 pathname + search + hash
+              router.push(ref.pathname + ref.search + ref.hash);
+            } else {
+              router.push('/user');
+            }
+          } catch {
+            router.push('/user');
+          }
+        } else {
+          router.push('/user');
+        }
+      } catch {
+        router.push('/user');
+      }
     } catch (error) {
       console.error('登录请求失败', error);
       setLoginError('登录请求失败，请检查网络后重试');
@@ -142,6 +187,9 @@ export default function LoginPage() {
         <div className="layui-card layui-anim layui-anim-scale layui-auth-card">
           <div className="layui-card-body" style={{ padding: '35px 30px' }}>
             <form ref={formRef} onSubmit={handleSubmit} className="layui-form">
+              {loginError && (
+                <p className="layui-font-sm layui-font-red layui-mb10">{loginError}</p>
+              )}
               {/* 用户名/邮箱 */}
               <div className="layui-form-item">
                 <div className="layui-input-wrap">
@@ -183,9 +231,16 @@ export default function LoginPage() {
                     lay-reqtext="请填写密码"
                     className={`layui-input ${errors.password ? 'layui-border-red' : ''}`}
                   />
-                  <div className="layui-input-suffix layui-cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                  <button
+                    type="button"
+                    className="layui-btn layui-btn-xs layui-btn-primary layui-input-suffix layui-cursor-pointer"
+                    style={{ pointerEvents: 'auto' }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                  >
                     <i className={`layui-icon ${showPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'}`}></i>
-                  </div>
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="layui-font-xs layui-font-red layui-mt5">

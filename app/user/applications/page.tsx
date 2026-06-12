@@ -6,6 +6,7 @@ import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { companyService } from '@/lib/services/data';
 import { Company } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 type ApplicationStatus = 'all' | 'pending' | 'viewed' | 'interview' | 'offered' | 'rejected';
 
@@ -29,6 +30,7 @@ interface Layui {
 }
 
 export default function UserApplicationsPage() {
+  const isAuth = useRequireAuth();
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus>('all');
   const [companies, setCompanies] = useState<Company[]>([]);
   const tableRef = useRef<LayuiTableInstance | null>(null);
@@ -120,6 +122,10 @@ export default function UserApplicationsPage() {
 
   const initTable = useCallback(
     (layui: Layui) => {
+      const container = document.getElementById('userApplicationsTable');
+      if (!container) {
+        return;
+      }
       const table = layui.table;
       if (tableRef.current) {
         tableRef.current.reload({
@@ -193,6 +199,8 @@ export default function UserApplicationsPage() {
   );
 
   useLayuiTable(initTable);
+
+  if (!isAuth) return null;
 
   const stats = {
     all: applications.length,

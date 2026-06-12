@@ -6,6 +6,7 @@ import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { jobService, companyService } from '@/lib/services/data';
 import { Job, Company } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 interface LayuiTableInstance {
   reload: (options: { data: unknown[]; page: { curr: number } }) => void;
@@ -27,6 +28,7 @@ interface Layui {
 }
 
 export default function UserFavoritesPage() {
+  const isAuth = useRequireAuth();
   const [favoriteJobs, setFavoriteJobs] = useState<Job[]>([]);
   const [companyMap, setCompanyMap] = useState<Record<string, Company | undefined>>({});
   const pageSize = 5;
@@ -65,6 +67,10 @@ export default function UserFavoritesPage() {
 
   const initTable = useCallback(
     (layui: Layui) => {
+      const container = document.getElementById('userFavoritesTable');
+      if (!container) {
+        return;
+      }
       const table = layui.table;
       if (tableRef.current) {
         tableRef.current.reload({
@@ -115,6 +121,8 @@ export default function UserFavoritesPage() {
 
   useLayuiTable(initTable);
 
+  if (!isAuth) return null;
+
   return (
     <div className="layui-container layui-mt20">
       <div className="layui-row layui-col-space20">
@@ -130,11 +138,10 @@ export default function UserFavoritesPage() {
                   <p className="layui-font-gray layui-mt5">共收藏 {favoriteJobs.length} 个职位</p>
                 </div>
               </div>
-              {favoriteJobs.length > 0 ? (
-                <div id="userFavoritesTable"></div>
-              ) : (
-                <div className="layui-card">
-                  <div className="layui-card-body layui-text-center layui-mt20">
+              <div id="userFavoritesTable"></div>
+              {favoriteJobs.length === 0 && (
+                <div className="layui-card layui-mt20">
+                  <div className="layui-card-body layui-text-center">
                     <div className="layui-font-title layui-mb15">⭐</div>
                     <p className="layui-font-gray layui-mb20">还没有收藏任何职位</p>
                     <Link href="/jobs" className="layui-btn">

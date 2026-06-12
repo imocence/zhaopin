@@ -5,7 +5,9 @@ import { Job, Company, User, Category, Location, JobFilters, Pagination } from '
 const API_BASE = '/api';
 
 type ApiResponse<T> = {
-  data: T;
+  status: 'success' | 'error';
+  message: string;
+  data?: T;
 };
 
 // 通用fetch函数
@@ -20,12 +22,12 @@ async function fetchApi<T>(endpoint: string, params?: Record<string, string>): P
   }
 
   const response = await fetch(url.toString());
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  const json = (await response.json()) as ApiResponse<T>;
+  if (!response.ok || json.status === 'error') {
+    throw new Error(json.message || `API error: ${response.status} ${response.statusText}`);
   }
 
-  const json = (await response.json()) as ApiResponse<T>;
-  return json.data;
+  return json.data as T;
 }
 
 // 职位相关操作 - 客户端API
@@ -71,11 +73,12 @@ export const jobService = {
     });
 
     const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    const json = (await response.json()) as ApiResponse<{ data: Job[]; pagination: Pagination }>;
+    if (!response.ok || json.status === 'error') {
+      throw new Error(json.message || `API error: ${response.status} ${response.statusText}`);
     }
 
-    return (await response.json()) as { data: Job[]; pagination: Pagination };
+    return json.data as { data: Job[]; pagination: Pagination };
   },
 
   // 获取热门职位

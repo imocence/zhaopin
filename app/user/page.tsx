@@ -4,14 +4,18 @@ import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { companyService, jobService } from '@/lib/services/data';
-import { Job, User } from '@/types';
+import { Job, User, Company } from '@/types';
 import { getStoredUser } from '@/lib/utils/auth-client';
 import React, { useEffect, useState } from 'react';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 export default function UserCenterPage() {
+  const isAuth = useRequireAuth();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [latestJobs, setLatestJobs] = useState<Job[]>([]);
+  const [companyMap, setCompanyMap] = useState<Record<string, Company | undefined>>({});
 
   useEffect(() => {
     const currentUser = getStoredUser();
@@ -19,11 +23,26 @@ export default function UserCenterPage() {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
-    setLoaded(true);
+    setTimeout(() => {
+      setUser(currentUser);
+      setLoaded(true);
+    }, 0);
   }, [router]);
 
-  if (!loaded) {
+  useEffect(() => {
+    async function loadLatest() {
+      const jobs = await jobService.getLatestJobs(4);
+      setLatestJobs(jobs);
+      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
+      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
+      const map: Record<string, Company | undefined> = {};
+      entries.forEach(([id, comp]) => { map[id] = comp; });
+      setCompanyMap(map);
+    }
+    loadLatest();
+  }, []);
+
+  if (!loaded || !isAuth) {
     return null;
   }
 
@@ -62,22 +81,6 @@ export default function UserCenterPage() {
       href: '/user/settings',
     },
   ];
-
-  const [latestJobs, setLatestJobs] = useState<Job[]>([]);
-  const [companyMap, setCompanyMap] = useState<Record<string, any>>({});
-
-  useEffect(() => {
-    async function loadLatest() {
-      const jobs = await jobService.getLatestJobs(4);
-      setLatestJobs(jobs);
-      const ids = Array.from(new Set(jobs.map(j => j.companyId)));
-      const entries = await Promise.all(ids.map(async (id) => [id, await companyService.getById(id)] as const));
-      const map: Record<string, any> = {};
-      entries.forEach(([id, comp]) => { map[id] = comp; });
-      setCompanyMap(map);
-    }
-    loadLatest();
-  }, []);
 
   return (
     <div className="layui-container layui-mt20">

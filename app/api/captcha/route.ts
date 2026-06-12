@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // 简单的内存缓存（生产环境应使用 Redis 等）
 const captchaStore = new Map<string, { code: string; expires: number }>();
@@ -42,10 +43,10 @@ export async function GET(request: NextRequest) {
     expires: Date.now() + 5 * 60 * 1000,
   });
 
-  return NextResponse.json({
+  return NextResponse.json(successResponse({
     captchaId,
     captchaCode: code,
-  });
+  }, '获取验证码成功'));
 }
 
 /**
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     if (!captchaId || !captchaCode) {
       return NextResponse.json(
-        { success: false, message: '缺少验证码参数' },
+        errorResponse('缺少验证码参数'),
         { status: 400 }
       );
     }
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     if (!stored) {
       return NextResponse.json(
-        { success: false, message: '验证码已过期，请重新获取' },
+        errorResponse('验证码已过期，请重新获取'),
         { status: 400 }
       );
     }
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (stored.expires < Date.now()) {
       captchaStore.delete(captchaId);
       return NextResponse.json(
-        { success: false, message: '验证码已过期，请重新获取' },
+        errorResponse('验证码已过期，请重新获取'),
         { status: 400 }
       );
     }
@@ -92,15 +93,15 @@ export async function POST(request: NextRequest) {
 
     if (stored.code !== captchaCode.toUpperCase()) {
       return NextResponse.json(
-        { success: false, message: '验证码不正确' },
+        errorResponse('验证码不正确'),
         { status: 400 }
       );
     }
 
-    return NextResponse.json({ success: true, message: '验证码正确' });
+    return NextResponse.json(successResponse({ success: true }, '验证码正确'));
   } catch {
     return NextResponse.json(
-      { success: false, message: '请求参数错误' },
+      errorResponse('请求参数错误'),
       { status: 400 }
     );
   }

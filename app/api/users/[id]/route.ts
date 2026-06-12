@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/users/[id] - 获取单个用户详情
 export async function GET(
@@ -16,16 +17,16 @@ export async function GET(
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        errorResponse('User not found'),
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ data: user });
+    return NextResponse.json(successResponse(user, '获取用户成功'));
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch user' },
+      errorResponse('Failed to fetch user'),
       { status: 500 }
     );
   }
@@ -43,16 +44,16 @@ export async function PUT(
 
     if (!updated) {
       return NextResponse.json(
-        { error: 'User not found or update failed' },
+        errorResponse('User not found or update failed'),
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ data: updated });
+    return NextResponse.json(successResponse(updated, '更新用户成功'));
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json(
-      { error: 'Failed to update user' },
+      errorResponse('Failed to update user'),
       { status: 500 }
     );
   }

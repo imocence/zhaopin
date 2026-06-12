@@ -167,7 +167,7 @@ export default function PostJobPage() {
 
             if (!response.ok) {
               const errorData = await response.json().catch(() => null) as any;
-              setErrors(prev => ({ ...prev, submit: errorData?.error || '职位发布失败，请重试' }));
+              setErrors(prev => ({ ...prev, submit: errorData?.message || '职位发布失败，请重试' }));
               return false;
             }
 

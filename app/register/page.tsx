@@ -1,10 +1,10 @@
 'use client';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
-import {useLayuiInit} from '@/lib/hooks/useLayuiInit';
-import {fetchCaptcha, verifyCaptcha} from '@/lib/utils/captcha';
+import { useRouter } from 'next/navigation';
+import { useLayuiInit } from '@/lib/hooks/useLayuiInit';
+import { fetchCaptcha, isCaptchaEnabled, verifyCaptcha } from '@/lib/utils/captcha';
 
 type UserType = 'jobseeker' | 'employer';
 
@@ -26,6 +26,7 @@ export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [showPassword, setShowPassword] = useState(false);
+    const isLocalDev = !isCaptchaEnabled();
 
     // 从接口获取验证码
     const refreshCaptcha = useCallback(async () => {
@@ -39,8 +40,10 @@ export default function RegisterPage() {
     }, []);
 
     useEffect(() => {
-        refreshCaptcha();
-    }, [refreshCaptcha]);
+        if (!isLocalDev) {
+            refreshCaptcha();
+        }
+    }, [refreshCaptcha, isLocalDev]);
 
     // 初始化 layui form（必须在组件顶层调用 Hook）
     useLayuiInit({
@@ -66,10 +69,10 @@ export default function RegisterPage() {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData(prev => ({...prev, [name]: value}));
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) {
-            setErrors(prev => ({...prev, [name]: ''}));
+            setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
@@ -90,15 +93,17 @@ export default function RegisterPage() {
             newErrors.email = '请输入有效的邮箱地址';
         }
 
-        if (!formData.emailCode.trim()) {
-            newErrors.emailCode = '请输入验证码';
-        } else {
-            // 通过接口验证验证码
-            const result = await verifyCaptcha(captchaId, formData.emailCode);
-            if (!result.success) {
-                newErrors.emailCode = result.message;
-                // 验证失败后刷新验证码
-                refreshCaptcha();
+        if (!isLocalDev) {
+            if (!formData.emailCode.trim()) {
+                newErrors.emailCode = '请输入验证码';
+            } else {
+                // 通过接口验证验证码
+                const result = await verifyCaptcha(captchaId, formData.emailCode);
+                if (!result.success) {
+                    newErrors.emailCode = result.message;
+                    // 验证失败后刷新验证码
+                    refreshCaptcha();
+                }
             }
         }
 
@@ -159,7 +164,7 @@ export default function RegisterPage() {
                                 <li
                                     className={userType === 'jobseeker' ? 'layui-this' : ''}
                                     onClick={() => setUserType('jobseeker')}
-                                    style={{cursor: 'pointer'}}
+                                    style={{ cursor: 'pointer' }}
                                 >
                                     <i className="layui-icon layui-icon-user layui-icon-gap"></i>
                                     求职者注册
@@ -167,7 +172,7 @@ export default function RegisterPage() {
                                 <li
                                     className={userType === 'employer' ? 'layui-this' : ''}
                                     onClick={() => setUserType('employer')}
-                                    style={{cursor: 'pointer'}}
+                                    style={{ cursor: 'pointer' }}
                                 >
                                     <i className="layui-icon layui-icon-component layui-icon-gap"></i>
                                     企业注册
@@ -176,7 +181,7 @@ export default function RegisterPage() {
                             {/* 注册表单 - 根据 userType 动态切换 */}
                             <div className="layui-tab-item layui-show">
                                 <form onSubmit={handleSubmit} className="layui-form layui-p25">
-                                    <input type="hidden" name="userType" value={userType}/>
+                                    <input type="hidden" name="userType" value={userType} />
                                     {/* 用户名/企业名称 */}
                                     <div className="layui-form-item layui-mb20">
                                         <div className="layui-input-wrap">
@@ -244,44 +249,45 @@ export default function RegisterPage() {
                                         )}
                                     </div>
 
-                                    {/* 验证码 */}
-                                    <div className="layui-form-item layui-mb20">
-                                        <div className="layui-row layui-col-space10">
-                                            <div className="layui-col-md8 layui-col-xs7">
-                                                <div className="layui-input-wrap">
-                                                    <div className="layui-input-prefix">
-                                                        <i className="layui-icon layui-icon-vercode"></i>
+                                    {!isLocalDev && (
+                                        <div className="layui-form-item layui-mb20">
+                                            <div className="layui-row layui-col-space10">
+                                                <div className="layui-col-md8 layui-col-xs7">
+                                                    <div className="layui-input-wrap">
+                                                        <div className="layui-input-prefix">
+                                                            <i className="layui-icon layui-icon-vercode"></i>
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            name="emailCode"
+                                                            value={formData.emailCode}
+                                                            onChange={handleInputChange}
+                                                            placeholder="请输入验证码"
+                                                            lay-verify="required"
+                                                            lay-reqtext="请填写验证码"
+                                                            className={`layui-input layui-captcha-uppercase ${errors.emailCode ? 'layui-border-red' : ''}`}
+                                                            maxLength={4}
+                                                        />
                                                     </div>
-                                                    <input
-                                                        type="text"
-                                                        name="emailCode"
-                                                        value={formData.emailCode}
-                                                        onChange={handleInputChange}
-                                                        placeholder="请输入验证码"
-                                                        lay-verify="required"
-                                                        lay-reqtext="请填写验证码"
-                                                        className={`layui-input layui-captcha-uppercase ${errors.emailCode ? 'layui-border-red' : ''}`}
-                                                        maxLength={4}
-                                                    />
+                                                </div>
+                                                <div className="layui-col-md4 layui-col-xs5">
+                                                    <div
+                                                        className="layui-captcha-box"
+                                                        onClick={refreshCaptcha}
+                                                        title="点击刷新验证码"
+                                                    >
+                                                        {captchaCode}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="layui-col-md4 layui-col-xs5">
-                                                <div
-                                                    className="layui-captcha-box"
-                                                    onClick={refreshCaptcha}
-                                                    title="点击刷新验证码"
-                                                >
-                                                    {captchaCode}
-                                                </div>
-                                            </div>
+                                            {errors.emailCode && (
+                                                <p className="layui-font-xs layui-font-red layui-mt5">
+                                                    <i className="layui-icon layui-icon-close layui-mr5"></i>
+                                                    {errors.emailCode}
+                                                </p>
+                                            )}
                                         </div>
-                                        {errors.emailCode && (
-                                            <p className="layui-font-xs layui-font-red layui-mt5">
-                                                <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                {errors.emailCode}
-                                            </p>
-                                        )}
-                                    </div>
+                                    )}
 
                                     {/* 密码 */}
                                     <div className="layui-form-item layui-mb20">
@@ -301,7 +307,7 @@ export default function RegisterPage() {
                                                 maxLength={20}
                                             />
                                             <div className="layui-input-suffix layui-cursor-pointer"
-                                                 onClick={() => setShowPassword(!showPassword)}>
+                                                onClick={() => setShowPassword(!showPassword)}>
                                                 <i className={`layui-icon ${showPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'}`}></i>
                                             </div>
                                         </div>
@@ -350,14 +356,14 @@ export default function RegisterPage() {
                                                 onChange={(e) => {
                                                     setAgreed(e.target.checked);
                                                     if (errors.agreed) {
-                                                        setErrors(prev => ({...prev, agreed: ''}));
+                                                        setErrors(prev => ({ ...prev, agreed: '' }));
                                                     }
                                                 }}
                                             />
-                                            <span style={{display: 'inline-block', verticalAlign: '-webkit-baseline-middle'}}>
+                                            <span style={{ display: 'inline-block', verticalAlign: '-webkit-baseline-middle' }}>
                                                 我已阅读并同意
-                                              <Link href="/terms" className="layui-font-blue layui-ml5">《用户协议》</Link>和
-                                              <Link href="/privacy" className="layui-font-blue">《隐私政策》</Link>
+                                                <Link href="/terms" className="layui-font-blue layui-ml5">《用户协议》</Link>和
+                                                <Link href="/privacy" className="layui-font-blue">《隐私政策》</Link>
                                             </span>
                                             {errors.agreed && (
                                                 <p className="layui-font-xs layui-font-red layui-mt5">
@@ -376,14 +382,14 @@ export default function RegisterPage() {
                                     >
                                         {loading ? (
                                             <span className="layui-flex layui-flex-center">
-                        <i className="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop layui-mr10"></i>
-                        注册中...
-                      </span>
+                                                <i className="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop layui-mr10"></i>
+                                                注册中...
+                                            </span>
                                         ) : (
                                             <span className="layui-flex layui-flex-center">
-                        <i className="layui-icon layui-icon-ok layui-mr10"></i>
-                        立即注册
-                      </span>
+                                                <i className="layui-icon layui-icon-ok layui-mr10"></i>
+                                                立即注册
+                                            </span>
                                         )}
                                     </button>
                                 </form>
@@ -398,35 +404,35 @@ export default function RegisterPage() {
                             <i className="layui-icon layui-icon-about layui-font-cyan layui-font-xl"></i>
                             注册优势
                         </div>
-                        <div className="layui-card-body" style={{padding: '10px 15px'}}>
+                        <div className="layui-card-body" style={{ padding: '10px 15px' }}>
                             <div className="layui-row layui-col-space10">
                                 <div className="layui-col-md4 layui-col-xs6">
-                                    <div className="layui-text-center" style={{padding: '8px 5px'}}>
-                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{fontSize: '20px'}}></i>
+                                    <div className="layui-text-center" style={{ padding: '8px 5px' }}>
+                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{ fontSize: '20px' }}></i>
                                         <p className="layui-font-xs layui-font-gray-light layui-mt5">海量优质职位，精准匹配</p>
                                     </div>
                                 </div>
                                 <div className="layui-col-md4 layui-col-xs6">
-                                    <div className="layui-text-center" style={{padding: '8px 5px'}}>
-                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{fontSize: '20px'}}></i>
+                                    <div className="layui-text-center" style={{ padding: '8px 5px' }}>
+                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{ fontSize: '20px' }}></i>
                                         <p className="layui-font-xs layui-font-gray-light layui-mt5">企业实名认证，安全可靠</p>
                                     </div>
                                 </div>
                                 <div className="layui-col-md4 layui-col-xs6">
-                                    <div className="layui-text-center" style={{padding: '8px 5px'}}>
-                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{fontSize: '20px'}}></i>
+                                    <div className="layui-text-center" style={{ padding: '8px 5px' }}>
+                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{ fontSize: '20px' }}></i>
                                         <p className="layui-font-xs layui-font-gray-light layui-mt5">一键投递简历，快速入职</p>
                                     </div>
                                 </div>
                                 <div className="layui-col-md4 layui-col-xs6">
-                                    <div className="layui-text-center" style={{padding: '8px 5px'}}>
-                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{fontSize: '20px'}}></i>
+                                    <div className="layui-text-center" style={{ padding: '8px 5px' }}>
+                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{ fontSize: '20px' }}></i>
                                         <p className="layui-font-xs layui-font-gray-light layui-mt5">隐私保护，信息加密</p>
                                     </div>
                                 </div>
                                 <div className="layui-col-md4 layui-col-xs6">
-                                    <div className="layui-text-center" style={{padding: '8px 5px'}}>
-                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{fontSize: '20px'}}></i>
+                                    <div className="layui-text-center" style={{ padding: '8px 5px' }}>
+                                        <i className="layui-icon layui-icon-ok layui-font-cyan" style={{ fontSize: '20px' }}></i>
                                         <p className="layui-font-xs layui-font-gray-light layui-mt5">专业服务，全程协助</p>
                                     </div>
                                 </div>

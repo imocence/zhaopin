@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { companyService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/companies/[id] - 获取单个公司详情
 export async function GET(
@@ -16,16 +17,16 @@ export async function GET(
 
     if (!company) {
       return NextResponse.json(
-        { error: 'Company not found' },
+        errorResponse('Company not found'),
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ data: company });
+    return NextResponse.json(successResponse(company, '获取公司详情成功'));
   } catch (error) {
     console.error('Error fetching company:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch company' },
+      errorResponse('Failed to fetch company'),
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jobService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/jobs/[id] - 获取单个职位详情
 export async function GET(
@@ -16,16 +17,16 @@ export async function GET(
 
     if (!job) {
       return NextResponse.json(
-        { error: 'Job not found' },
+        errorResponse('Job not found'),
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ data: job });
+    return NextResponse.json(successResponse(job, '获取职位详情成功'));
   } catch (error) {
     console.error('Error fetching job:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch job' },
+      errorResponse('Failed to fetch job'),
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/users - 获取用户列表
 export async function GET(request: NextRequest) {
@@ -13,15 +14,15 @@ export async function GET(request: NextRequest) {
 
     if (email) {
       const user = await userService.getByEmail(email);
-      return NextResponse.json({ data: user });
+      return NextResponse.json(successResponse(user, '获取用户成功'));
     }
 
     const users = await userService.getAll();
-    return NextResponse.json({ data: users });
+    return NextResponse.json(successResponse(users, '获取用户列表成功'));
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
+      errorResponse('Failed to fetch users'),
       { status: 500 }
     );
   }
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (!username || !email || !password || !name || !userType) {
       return NextResponse.json(
-        { error: '缺少必要注册字段' },
+        errorResponse('缺少必要注册字段'),
         { status: 400 }
       );
     }
@@ -55,11 +56,11 @@ export async function POST(request: NextRequest) {
       companyId: userType === 'employer' ? 'company1' : undefined,
     });
 
-    return NextResponse.json({ data: user });
+    return NextResponse.json(successResponse(user, '注册成功'));
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json(
-      { error: '注册失败，请稍后重试' },
+      errorResponse('注册失败，请稍后重试'),
       { status: 500 }
     );
   }

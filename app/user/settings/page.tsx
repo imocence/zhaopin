@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
+import useRequireAuth from '@/lib/hooks/useRequireAuth';
 
 type TabKey = 'account' | 'password' | 'notifications' | 'privacy';
 
 export default function UserSettingsPage() {
+  const isAuth = useRequireAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('account');
 
   const sidebarItems = [
@@ -25,6 +27,8 @@ export default function UserSettingsPage() {
   ];
 
   useLayuiForm();
+
+  if (!isAuth) return null;
 
   return (
     <div className="layui-container layui-mt20">

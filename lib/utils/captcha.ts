@@ -3,6 +3,14 @@
  * 统一通过 /api/captcha 接口获取和验证验证码
  */
 
+function isLocalDevelopment(): boolean {
+  return typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+}
+
+export function isCaptchaEnabled(): boolean {
+  return !isLocalDevelopment();
+}
+
 interface CaptchaResponse {
   captchaId: string;
   captchaCode: string;
@@ -13,16 +21,35 @@ interface VerifyResponse {
   message: string;
 }
 
+interface ApiResponse<T> {
+  status: 'success' | 'error';
+  message: string;
+  data?: T;
+}
+
 /**
  * 从接口获取验证码
  * @returns 验证码ID和验证码文本
  */
 export async function fetchCaptcha(): Promise<CaptchaResponse> {
+  if (!isCaptchaEnabled()) {
+    return {
+      captchaId: 'LOCAL_DEBUG',
+      captchaCode: '0000',
+    };
+  }
+
   const res = await fetch('/api/captcha');
   if (!res.ok) {
     throw new Error('获取验证码失败');
   }
-  return res.json();
+
+  const json = (await res.json()) as ApiResponse<CaptchaResponse>;
+  if (json.status === 'error') {
+    throw new Error(json.message);
+  }
+
+  return json.data as CaptchaResponse;
 }
 
 /**
@@ -35,10 +62,20 @@ export async function verifyCaptcha(
   captchaId: string,
   captchaCode: string
 ): Promise<VerifyResponse> {
+  if (!isCaptchaEnabled()) {
+    return { success: true, message: '本地开发模式跳过验证码' };
+  }
+
   const res = await fetch('/api/captcha', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ captchaId, captchaCode }),
   });
-  return res.json();
+
+  const json = (await res.json()) as ApiResponse<VerifyResponse>;
+  if (json.status === 'error') {
+    return { success: false, message: json.message };
+  }
+
+  return json.data as VerifyResponse;
 }

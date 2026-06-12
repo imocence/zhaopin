@@ -25,9 +25,15 @@ function parseAuthTokenPayload(token: string): AuthTokenPayload | null {
   try {
     // Expect a JWT like header.payload.signature - we need the payload part
     const parts = token.split('.');
-    if (parts.length < 2) return null;
-    const payloadPart = parts[1];
-    const decoded = base64UrlDecode(payloadPart);
+    // Support either full JWT (header.payload.signature) or a payload-only token
+    let decoded = '';
+    if (parts.length >= 2) {
+      const payloadPart = parts[1];
+      decoded = base64UrlDecode(payloadPart);
+    } else {
+      // token may already be a base64-url encoded JSON payload
+      decoded = base64UrlDecode(token);
+    }
     const payload = JSON.parse(decoded) as AuthTokenPayload;
     if (!payload.userId || typeof payload.exp !== 'number') {
       return null;
@@ -63,11 +69,18 @@ export function clearAuth(): void {
   dispatchAuthChange();
 }
 
+// 静默清除，不触发 `authChange` 事件（用于内部检测避免循环触发）
+function clearAuthSilent(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
 export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
   const token = localStorage.getItem(TOKEN_KEY);
   if (!isAuthTokenValid(token)) {
-    clearAuth();
+    // 使用静默清除以避免触发事件监听器中的循环调用
+    clearAuthSilent();
     return null;
   }
   return token;
@@ -81,7 +94,8 @@ export function getStoredUser(): User | null {
   try {
     return JSON.parse(raw) as User;
   } catch {
-    clearAuth();
+    // 解析异常时静默清除，避免导致事件循环
+    clearAuthSilent();
     return null;
   }
 }

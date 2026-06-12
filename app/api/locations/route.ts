@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { locationService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/locations - 获取地区列表
 export async function GET(request: NextRequest) {
@@ -15,23 +16,23 @@ export async function GET(request: NextRequest) {
     if (type === 'cities') {
       if (stateCode) {
         const cities = await locationService.getCitiesByState(stateCode);
-        return NextResponse.json({ data: cities });
+        return NextResponse.json(successResponse(cities, '获取城市列表成功'));
       }
       const cities = await locationService.getAllCities();
-      return NextResponse.json({ data: cities });
+      return NextResponse.json(successResponse(cities, '获取城市列表成功'));
     }
 
     if (stateCode) {
       const location = await locationService.getByState(stateCode);
-      return NextResponse.json({ data: location });
+      return NextResponse.json(successResponse(location, '获取地区信息成功'));
     }
 
     const locations = await locationService.getAll();
-    return NextResponse.json({ data: locations });
+    return NextResponse.json(successResponse(locations, '获取地区列表成功'));
   } catch (error) {
     console.error('Error fetching locations:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch locations' },
+      errorResponse('Failed to fetch locations'),
       { status: 500 }
     );
   }

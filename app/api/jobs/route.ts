@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jobService } from '@/lib/services/cloudflare-db';
 import { ensureDb } from '@/lib/db/ensure-db';
 import { getCurrentUser } from '@/lib/utils/auth-server';
+import { successResponse, errorResponse } from '@/lib/utils/api-response';
 
 // GET /api/jobs - 获取职位列表
 export async function GET(request: NextRequest) {
@@ -30,31 +31,31 @@ export async function GET(request: NextRequest) {
     if (type === 'hot') {
       const limit = Number(searchParams.get('limit')) || 10;
       const jobs = await jobService.getHotJobs(limit);
-      return NextResponse.json({ data: jobs });
+      return NextResponse.json(successResponse(jobs, '获取热门职位成功'));
     }
 
     if (type === 'latest') {
       const limit = Number(searchParams.get('limit')) || 10;
       const jobs = await jobService.getLatestJobs(limit);
-      return NextResponse.json({ data: jobs });
+      return NextResponse.json(successResponse(jobs, '获取最新职位成功'));
     }
 
     if (companyId) {
       const jobs = await jobService.getByCompanyId(companyId);
-      return NextResponse.json({ data: jobs });
+      return NextResponse.json(successResponse(jobs, '获取公司职位成功'));
     }
 
     if (Object.values(filters).some(v => v !== undefined)) {
       const result = await jobService.search(filters, page, pageSize);
-      return NextResponse.json(result);
+      return NextResponse.json(successResponse(result, '搜索职位成功'));
     }
 
     const result = await jobService.search(filters, page, pageSize);
-    return NextResponse.json(result);
+    return NextResponse.json(successResponse(result, '获取职位列表成功'));
   } catch (error) {
     console.error('Error fetching jobs:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch jobs' },
+      errorResponse('Failed to fetch jobs'),
       { status: 500 }
     );
   }
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     await ensureDb(request);
     const currentUser = await getCurrentUser(request);
     if (!currentUser) {
-      return NextResponse.json({ error: '需要登录后才能发布职位' }, { status: 401 });
+      return NextResponse.json(errorResponse('需要登录后才能发布职位'), { status: 401 });
     }
 
     const body = await request.json();
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!title || !category || !state || !description || salaryMin === undefined || salaryMax === undefined) {
-      return NextResponse.json({ error: '缺少职位发布必填字段' }, { status: 400 });
+      return NextResponse.json(errorResponse('缺少职位发布必填字段'), { status: 400 });
     }
 
     const companyId = currentUser.companyId || 'company1';
@@ -119,11 +120,11 @@ export async function POST(request: NextRequest) {
       status: 'active',
     });
 
-    return NextResponse.json({ data: job });
+    return NextResponse.json(successResponse(job, '职位发布成功'));
   } catch (error) {
     console.error('Error creating job:', error);
     return NextResponse.json(
-      { error: '职位发布失败，请稍后重试' },
+      errorResponse('职位发布失败，请稍后重试'),
       { status: 500 }
     );
   }
