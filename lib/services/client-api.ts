@@ -1,4 +1,5 @@
 
+import { authHeaders } from '@/lib/utils/auth-client';
 import { Job, Company, User, Category, Location, JobFilters, Pagination, Application, Message, Report } from '@/types';
 
 // API基础URL
@@ -21,7 +22,9 @@ async function fetchApi<T>(endpoint: string, params?: Record<string, string>): P
     });
   }
 
-  const response = await fetch(url.toString());
+  const response = await fetch(url.toString(), {
+    headers: authHeaders(),
+  });
   const json = (await response.json()) as ApiResponse<T>;
   if (!response.ok || json.status === 'error') {
     throw new Error(json.message || `API error: ${response.status} ${response.statusText}`);

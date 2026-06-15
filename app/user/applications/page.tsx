@@ -7,6 +7,7 @@ import { applicationService } from '@/lib/services/data';
 import { Application } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
+import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 
 type ApplicationStatus = 'all' | 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';
 
@@ -34,13 +35,14 @@ export default function UserApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus>('all');
   const [applications, setApplications] = useState<Application[]>([]);
   const tableRef = useRef<LayuiTableInstance | null>(null);
+  const { counts } = useUserCenterCounts();
   const pageSize = 5;
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
-    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications' },
-    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: 12 },
-    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: 5 },
+    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: counts.applications },
+    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: counts.favorites },
+    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: counts.unreadMessages },
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 

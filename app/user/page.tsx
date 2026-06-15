@@ -8,6 +8,7 @@ import { Job, User, Company } from '@/types';
 import { getStoredUser } from '@/lib/utils/auth-client';
 import React, { useEffect, useState } from 'react';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
+import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 
 export default function UserCenterPage() {
   const isAuth = useRequireAuth();
@@ -16,6 +17,7 @@ export default function UserCenterPage() {
   const [loaded, setLoaded] = useState(false);
   const [latestJobs, setLatestJobs] = useState<Job[]>([]);
   const [companyMap, setCompanyMap] = useState<Record<string, Company | undefined>>({});
+  const { counts } = useUserCenterCounts();
 
   useEffect(() => {
     const currentUser = getStoredUser();
@@ -58,21 +60,21 @@ export default function UserCenterPage() {
       label: '我的申请',
       icon: '📝',
       href: '/user/applications',
-      badge: 3,
+      badge: counts.applications,
     },
     {
       key: 'favorites',
       label: '收藏职位',
       icon: '⭐',
       href: '/user/favorites',
-      badge: 12,
+      badge: counts.favorites,
     },
     {
       key: 'messages',
       label: '消息通知',
       icon: '💬',
       href: '/user/messages',
-      badge: 5,
+      badge: counts.unreadMessages,
     },
     {
       key: 'settings',
@@ -109,7 +111,7 @@ export default function UserCenterPage() {
               <Link href="/user/applications" className="layui-text-decoration-none">
                 <div className="layui-card">
                   <div className="layui-card-body layui-text-center">
-                    <div className="layui-stat-number layui-stat-number-cyan">3</div>
+                    <div className="layui-stat-number layui-stat-number-cyan">{counts.applications}</div>
                     <div className="layui-font-sm layui-font-gray layui-mt5">待处理申请</div>
                   </div>
                 </div>
@@ -119,7 +121,7 @@ export default function UserCenterPage() {
               <Link href="/user/favorites" className="layui-text-decoration-none">
                 <div className="layui-card">
                   <div className="layui-card-body layui-text-center">
-                    <div className="layui-stat-number layui-stat-number-blue">12</div>
+                    <div className="layui-stat-number layui-stat-number-blue">{counts.favorites}</div>
                     <div className="layui-font-sm layui-font-gray layui-mt5">收藏职位</div>
                   </div>
                 </div>
@@ -129,7 +131,7 @@ export default function UserCenterPage() {
               <Link href="/user/messages" className="layui-text-decoration-none">
                 <div className="layui-card">
                   <div className="layui-card-body layui-text-center">
-                    <div className="layui-stat-number layui-stat-number-orange">5</div>
+                    <div className="layui-stat-number layui-stat-number-orange">{counts.unreadMessages}</div>
                     <div className="layui-font-sm layui-font-gray layui-mt5">未读消息</div>
                   </div>
                 </div>

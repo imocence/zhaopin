@@ -6,6 +6,7 @@ import { messageService } from '@/lib/services/data';
 import { Message } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
+import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 
 type MessageType = 'all' | 'system' | 'application' | 'interview' | 'company';
 
@@ -35,12 +36,13 @@ export default function UserMessagesPage() {
   const [typeFilter, setTypeFilter] = useState<MessageType>('all');
   const [messages, setMessages] = useState<Message[]>([]);
   const tableRef = useRef<LayuiTableInstance | null>(null);
+  const { counts } = useUserCenterCounts();
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
-    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: 3 },
-    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: 12 },
-    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages' },
+    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: counts.applications },
+    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: counts.favorites },
+    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: counts.unreadMessages },
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 

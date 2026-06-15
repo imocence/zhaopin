@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 import { fetchCaptcha, isCaptchaEnabled, verifyCaptcha } from '@/lib/utils/captcha';
 import { saveAuth } from '@/lib/utils/auth-client';
@@ -122,7 +122,8 @@ export default function LoginPage() {
 
       // 优先使用 URL 参数 next/redirect，其次尝试同源的 document.referrer，最后回到 /user
       try {
-        const nextParam = searchParams?.get('next') || searchParams?.get('redirect');
+        const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const nextParam = params?.get('next') || params?.get('redirect');
         if (nextParam) {
           const decodedNext = decodeURIComponent(nextParam);
           if (decodedNext.startsWith('/')) {

@@ -4,18 +4,20 @@ import React, { useState } from 'react';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
+import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 
 type TabKey = 'account' | 'password' | 'notifications' | 'privacy';
 
 export default function UserSettingsPage() {
   const isAuth = useRequireAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('account');
+  const { counts } = useUserCenterCounts();
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
-    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: 3 },
-    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: 12 },
-    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: 5 },
+    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: counts.applications },
+    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: counts.favorites },
+    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: counts.unreadMessages },
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 

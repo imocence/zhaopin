@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
-import { getStoredUser } from '@/lib/utils/auth-client';
+import { authHeaders, getStoredUser } from '@/lib/utils/auth-client';
 import { User } from '@/types';
-import useRequireAuth from '@/lib/hooks/useRequireAuth';
-
+import useRequireAuth from '@/lib/hooks/useRequireAuth'; import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 export default function UserProfilePage() {
   const isAuth = useRequireAuth();
   const router = useRouter();
@@ -25,6 +24,7 @@ export default function UserProfilePage() {
     expectedSalary: '',
     expectedSalaryType: 'yearly',
   });
+  const { counts } = useUserCenterCounts();
 
   useEffect(() => {
     const currentUser = getStoredUser();
@@ -32,21 +32,91 @@ export default function UserProfilePage() {
       router.push('/login');
       return;
     }
-    setFormData(prev => ({
-      ...prev,
-      username: (currentUser as any).username ?? prev.username,
-      name: currentUser.name,
-      email: currentUser.email,
-      phone: (currentUser as any).phone ?? prev.phone,
-      location: (currentUser as any).location ?? prev.location,
-      bio: (currentUser as any).bio ?? prev.bio,
-      skills: (currentUser as any).skills ?? prev.skills,
-      experience: (currentUser as any).experience ?? prev.experience,
-      education: (currentUser as any).education ?? prev.education,
-      expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
-      expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
-    }));
-    setLoaded(true);
+
+    async function loadUser() {
+      try {
+        const response = await fetch(`/api/users/${currentUser.id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+          },
+        });
+
+        if (!response.ok) {
+          console.error('Failed to fetch real user data', await response.text());
+          setFormData(prev => ({
+            ...prev,
+            username: (currentUser as any).username ?? prev.username,
+            name: currentUser.name,
+            email: currentUser.email,
+            phone: (currentUser as any).phone ?? prev.phone,
+            location: (currentUser as any).location ?? prev.location,
+            bio: (currentUser as any).bio ?? prev.bio,
+            skills: (currentUser as any).skills ?? prev.skills,
+            experience: (currentUser as any).experience ?? prev.experience,
+            education: (currentUser as any).education ?? prev.education,
+            expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
+            expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+          }));
+          return;
+        }
+
+        const result = await response.json();
+        const loadedUser = result?.data as User | null;
+        if (loadedUser) {
+          setFormData(prev => ({
+            ...prev,
+            username: (loadedUser as any).username ?? prev.username,
+            name: loadedUser.name,
+            email: loadedUser.email,
+            phone: (loadedUser as any).phone ?? prev.phone,
+            location: (loadedUser as any).location ?? prev.location,
+            bio: (loadedUser as any).bio ?? prev.bio,
+            skills: (loadedUser as any).skills ?? prev.skills,
+            experience: (loadedUser as any).experience ?? prev.experience,
+            education: (loadedUser as any).education ?? prev.education,
+            expectedSalary: (loadedUser as any).expectedSalary ?? prev.expectedSalary,
+            expectedSalaryType: (loadedUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+          }));
+          localStorage.setItem('user', JSON.stringify(loadedUser));
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            username: (currentUser as any).username ?? prev.username,
+            name: currentUser.name,
+            email: currentUser.email,
+            phone: (currentUser as any).phone ?? prev.phone,
+            location: (currentUser as any).location ?? prev.location,
+            bio: (currentUser as any).bio ?? prev.bio,
+            skills: (currentUser as any).skills ?? prev.skills,
+            experience: (currentUser as any).experience ?? prev.experience,
+            education: (currentUser as any).education ?? prev.education,
+            expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
+            expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        setFormData(prev => ({
+          ...prev,
+          username: (currentUser as any).username ?? prev.username,
+          name: currentUser.name,
+          email: currentUser.email,
+          phone: (currentUser as any).phone ?? prev.phone,
+          location: (currentUser as any).location ?? prev.location,
+          bio: (currentUser as any).bio ?? prev.bio,
+          skills: (currentUser as any).skills ?? prev.skills,
+          experience: (currentUser as any).experience ?? prev.experience,
+          education: (currentUser as any).education ?? prev.education,
+          expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
+          expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+        }));
+      } finally {
+        setLoaded(true);
+      }
+    }
+
+    loadUser();
   }, [router]);
 
   if (!loaded || !isAuth) {
@@ -71,6 +141,7 @@ export default function UserProfilePage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders(),
         },
         body: JSON.stringify({
           name: formData.name,
@@ -99,9 +170,9 @@ export default function UserProfilePage() {
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
-    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: 3 },
-    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: 12 },
-    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: 5 },
+    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: counts.applications },
+    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: counts.favorites },
+    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: counts.unreadMessages },
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 

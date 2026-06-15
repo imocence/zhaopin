@@ -7,6 +7,7 @@ import { favoriteService, companyService } from '@/lib/services/data';
 import { Job, Company } from '@/types';
 import { useLayuiTable } from '@/lib/hooks/useLayuiInit';
 import useRequireAuth from '@/lib/hooks/useRequireAuth';
+import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 
 interface LayuiTableInstance {
   reload: (options: { data: unknown[]; page: { curr: number } }) => void;
@@ -32,13 +33,14 @@ export default function UserFavoritesPage() {
   const [favoriteJobs, setFavoriteJobs] = useState<Job[]>([]);
   const [companyMap, setCompanyMap] = useState<Record<string, Company | undefined>>({});
   const pageSize = 5;
+  const { counts } = useUserCenterCounts();
   const tableRef = useRef<LayuiTableInstance | null>(null);
 
   const sidebarItems = [
     { key: 'profile', label: '个人信息', icon: '👤', href: '/user/profile' },
-    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: 3 },
-    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites' },
-    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: 5 },
+    { key: 'applications', label: '我的申请', icon: '📝', href: '/user/applications', badge: counts.applications },
+    { key: 'favorites', label: '收藏职位', icon: '⭐', href: '/user/favorites', badge: counts.favorites },
+    { key: 'messages', label: '消息通知', icon: '💬', href: '/user/messages', badge: counts.unreadMessages },
     { key: 'settings', label: '账号设置', icon: '⚙️', href: '/user/settings' },
   ];
 
