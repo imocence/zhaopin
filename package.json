@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export -o out",
+    "build": "next build && next export --outdir out",
     "start": "next start",
     "lint": "eslint",
     "db:init": "wrangler d1 execute zhaopin-db --file=./scripts/init-db.sql",
