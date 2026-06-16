@@ -10,7 +10,7 @@ database_id = "9d2553e2-1b87-472d-812d-3da68d5bacba"
 
 # Pages配置
 [site]
-bucket = ".vercel/output/static"
+bucket = "out"
 
 [build]
 command = "npm run build"
