@@ -4,15 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-<<<<<<< HEAD
     "build": "next build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-=======
-    "build": "next build && next export --outdir out",
->>>>>>> 3e7963178cfd4f92df5d18d803a95f6abef60909
     "start": "next start",
     "lint": "eslint",
     "db:init": "wrangler d1 execute zhaopin-db --file=./scripts/init-db.sql",

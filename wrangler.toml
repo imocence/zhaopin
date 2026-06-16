@@ -14,12 +14,5 @@ binding = "DB"
 database_name = "zhaopin"
 database_id = "9d2553e2-1b87-472d-812d-3da68d5bacba"
 
-<<<<<<< HEAD
-=======
-# Pages配置
-[site]
-bucket = "out"
-
->>>>>>> 3e7963178cfd4f92df5d18d803a95f6abef60909
 [build]
 command = "npx opennextjs-cloudflare build"

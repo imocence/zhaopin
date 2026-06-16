@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -7,6 +6,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [],
 };
 
-initOpenNextCloudflareForDev();
+if (process.env.NODE_ENV === "development") {
+  const { initOpenNextCloudflareForDev } = require("@opennextjs/cloudflare");
+  initOpenNextCloudflareForDev();
+}
 
 export default nextConfig;
