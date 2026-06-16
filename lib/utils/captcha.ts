@@ -3,11 +3,28 @@
  * 统一通过 /api/captcha 接口获取和验证验证码
  */
 
+import type { ApiResponse } from '@/lib/utils/api-response';
+
 function isLocalDevelopment(): boolean {
   return typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
 }
 
 export function isCaptchaEnabled(): boolean {
+  // 客户端优先读取 adminSettings（由后台设置页面写入 localStorage）
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('adminSettings');
+      if (raw) {
+        const settings = JSON.parse(raw) as { enableCaptcha?: boolean };
+        if (typeof settings.enableCaptcha === 'boolean') {
+          return Boolean(settings.enableCaptcha);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   return !isLocalDevelopment();
 }
 
@@ -21,11 +38,7 @@ interface VerifyResponse {
   message: string;
 }
 
-interface ApiResponse<T> {
-  status: 'success' | 'error';
-  message: string;
-  data?: T;
-}
+// use shared `ApiResponse<T>` from `lib/utils/api-response`
 
 /**
  * 从接口获取验证码

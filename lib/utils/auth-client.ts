@@ -57,13 +57,33 @@ function dispatchAuthChange(): void {
   window.dispatchEvent(new Event('authChange'));
 }
 
-export function saveAuth(token: string, user: User): void {
+export function saveAuth(token: string, user: User, expiresAt?: number): void {
+  if (typeof window !== 'undefined') {
+    try {
+      // 设置 cookie，供服务端读取（名称与 auth-server.getTokenFromRequest 相对应）
+      if (token) {
+        const cookieOptions: string[] = ['Path=/', 'SameSite=Lax'];
+        if (location.protocol === 'https:') cookieOptions.push('Secure');
+        if (expiresAt) {
+          const expMs = expiresAt < 1e12 ? expiresAt * 1000 : expiresAt;
+          cookieOptions.push(`Expires=${new Date(expMs).toUTCString()}`);
+        }
+        document.cookie = `auth_token=${token}; ${cookieOptions.join('; ')}`;
+      }
+    } catch {}
+  }
+
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   dispatchAuthChange();
 }
 
 export function clearAuth(): void {
+  if (typeof window !== 'undefined') {
+    try {
+      document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+    } catch {}
+  }
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   dispatchAuthChange();

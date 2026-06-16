@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import UnifiedSidebar from '@/components/layout/UnifiedSidebar';
 import { authHeaders, getStoredUser } from '@/lib/utils/auth-client';
+import type { ApiResponse } from '@/lib/utils/api-response';
 import { User } from '@/types';
 import useRequireAuth from '@/lib/hooks/useRequireAuth'; import useUserCenterCounts from '@/lib/hooks/useUserCenterCounts';
 export default function UserProfilePage() {
@@ -27,13 +28,12 @@ export default function UserProfilePage() {
   const { counts } = useUserCenterCounts();
 
   useEffect(() => {
-    const currentUser = getStoredUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-
     async function loadUser() {
+      const currentUser = getStoredUser();
+      if (!currentUser) {
+        router.push('/login');
+        return;
+      }
       try {
         const response = await fetch(`/api/users/${currentUser.id}`, {
           headers: {
@@ -46,70 +46,71 @@ export default function UserProfilePage() {
           console.error('Failed to fetch real user data', await response.text());
           setFormData(prev => ({
             ...prev,
-            username: (currentUser as any).username ?? prev.username,
+            username: currentUser.username ?? prev.username,
             name: currentUser.name,
             email: currentUser.email,
-            phone: (currentUser as any).phone ?? prev.phone,
-            location: (currentUser as any).location ?? prev.location,
-            bio: (currentUser as any).bio ?? prev.bio,
-            skills: (currentUser as any).skills ?? prev.skills,
-            experience: (currentUser as any).experience ?? prev.experience,
-            education: (currentUser as any).education ?? prev.education,
-            expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
-            expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+            phone: currentUser.phone ?? prev.phone,
+            location: currentUser.location ?? prev.location,
+            bio: currentUser.bio ?? prev.bio,
+            skills: prev.skills,
+            experience: prev.experience,
+            education: prev.education,
+            expectedSalary: prev.expectedSalary,
+            expectedSalaryType: prev.expectedSalaryType,
           }));
           return;
         }
 
-        const result = await response.json();
+        const result = (await response.json().catch(() => null)) as ApiResponse<User> | null;
         const loadedUser = result?.data as User | null;
         if (loadedUser) {
           setFormData(prev => ({
             ...prev,
-            username: (loadedUser as any).username ?? prev.username,
+            username: loadedUser.username ?? prev.username,
             name: loadedUser.name,
             email: loadedUser.email,
-            phone: (loadedUser as any).phone ?? prev.phone,
-            location: (loadedUser as any).location ?? prev.location,
-            bio: (loadedUser as any).bio ?? prev.bio,
-            skills: (loadedUser as any).skills ?? prev.skills,
-            experience: (loadedUser as any).experience ?? prev.experience,
-            education: (loadedUser as any).education ?? prev.education,
-            expectedSalary: (loadedUser as any).expectedSalary ?? prev.expectedSalary,
-            expectedSalaryType: (loadedUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+            phone: loadedUser.phone ?? prev.phone,
+            location: loadedUser.location ?? prev.location,
+            bio: loadedUser.bio ?? prev.bio,
+            skills: prev.skills,
+            experience: prev.experience,
+            education: prev.education,
+            expectedSalary: prev.expectedSalary,
+            expectedSalaryType: prev.expectedSalaryType,
           }));
           localStorage.setItem('user', JSON.stringify(loadedUser));
         } else {
           setFormData(prev => ({
             ...prev,
-            username: (currentUser as any).username ?? prev.username,
+            username: currentUser.username ?? prev.username,
             name: currentUser.name,
             email: currentUser.email,
-            phone: (currentUser as any).phone ?? prev.phone,
-            location: (currentUser as any).location ?? prev.location,
-            bio: (currentUser as any).bio ?? prev.bio,
-            skills: (currentUser as any).skills ?? prev.skills,
-            experience: (currentUser as any).experience ?? prev.experience,
-            education: (currentUser as any).education ?? prev.education,
-            expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
-            expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+            phone: currentUser.phone ?? prev.phone,
+            location: currentUser.location ?? prev.location,
+            bio: currentUser.bio ?? prev.bio,
+            skills: prev.skills,
+            experience: prev.experience,
+            education: prev.education,
+            expectedSalary: prev.expectedSalary,
+            expectedSalaryType: prev.expectedSalaryType,
           }));
         }
       } catch (error) {
         console.error('Error loading user data:', error);
+        const fallbackUser = getStoredUser();
         setFormData(prev => ({
           ...prev,
-          username: (currentUser as any).username ?? prev.username,
-          name: currentUser.name,
-          email: currentUser.email,
-          phone: (currentUser as any).phone ?? prev.phone,
-          location: (currentUser as any).location ?? prev.location,
-          bio: (currentUser as any).bio ?? prev.bio,
-          skills: (currentUser as any).skills ?? prev.skills,
-          experience: (currentUser as any).experience ?? prev.experience,
-          education: (currentUser as any).education ?? prev.education,
-          expectedSalary: (currentUser as any).expectedSalary ?? prev.expectedSalary,
-          expectedSalaryType: (currentUser as any).expectedSalaryType ?? prev.expectedSalaryType,
+          username: fallbackUser?.username ?? prev.username,
+          name: fallbackUser?.name ?? prev.name,
+          email: fallbackUser?.email ?? prev.email,
+          phone: fallbackUser?.phone ?? prev.phone,
+          location: fallbackUser?.location ?? prev.location,
+          bio: fallbackUser?.bio ?? prev.bio,
+          skills: prev.skills,
+          experience: prev.experience,
+          education: prev.education,
+          expectedSalary: prev.expectedSalary,
+          expectedSalaryType: prev.expectedSalaryType,
         }));
       } finally {
         setLoaded(true);
@@ -157,7 +158,7 @@ export default function UserProfilePage() {
         return;
       }
 
-      const data = await res.json().catch(() => null) as any;
+      const data = (await res.json().catch(() => null)) as ApiResponse<User> | null;
       const updatedUser = data?.data as User;
       if (updatedUser) {
         localStorage.setItem('user', JSON.stringify(updatedUser));

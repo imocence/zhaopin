@@ -1,15 +1,12 @@
 
 import { authHeaders } from '@/lib/utils/auth-client';
 import { Job, Company, User, Category, Location, JobFilters, Pagination, Application, Message, Report } from '@/types';
+import type { ApiResponse } from '@/lib/utils/api-response';
 
 // API基础URL
 const API_BASE = '/api';
 
-type ApiResponse<T> = {
-  status: 'success' | 'error';
-  message: string;
-  data?: T;
-};
+// use shared `ApiResponse<T>` from `lib/utils/api-response`
 
 // 通用fetch函数
 async function fetchApi<T>(endpoint: string, params?: Record<string, string>): Promise<T> {

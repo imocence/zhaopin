@@ -7,10 +7,10 @@ import { useLayuiForm } from '@/lib/hooks/useLayuiInit';
 import { fetchCaptcha, isCaptchaEnabled, verifyCaptcha } from '@/lib/utils/captcha';
 import { saveAuth } from '@/lib/utils/auth-client';
 import { User } from '@/types';
+import type { ApiResponse } from '@/lib/utils/api-response';
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -106,8 +106,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: formData.username.trim(), password: formData.password }),
       });
-      type LoginApiResponse = { status?: 'success' | 'error'; message?: string; data?: { user: User; token: string; expiresAt?: number } };
-      const data = (await res.json().catch(() => null)) as LoginApiResponse | null;
+      const data = (await res.json().catch(() => null)) as ApiResponse<{ user: User; token: string; expiresAt?: number }> | null;
       if (!res.ok || data?.status === 'error') {
         setLoginError(data?.message || '登录失败，请稍后重试');
         if (enableCaptcha) {
@@ -118,7 +117,7 @@ export default function LoginPage() {
       }
 
       // 后端返回 { status, message, data: { user, token } }
-      saveAuth(data?.data?.token ?? '', data?.data?.user as User);
+      saveAuth(data?.data?.token ?? '', data?.data?.user as User, data?.data?.expiresAt ?? undefined);
 
       // 优先使用 URL 参数 next/redirect，其次尝试同源的 document.referrer，最后回到 /user
       try {

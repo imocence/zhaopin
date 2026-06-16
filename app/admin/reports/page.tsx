@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import type { ApiResponse } from '@/lib/utils/api-response';
 
 interface ReportItem {
   id: string;
@@ -14,6 +15,8 @@ interface ReportItem {
   createdAt: string;
 }
 
+// use `ApiResponse<T>` from `lib/utils/api-response`
+
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
@@ -21,8 +24,8 @@ export default function AdminReportsPage() {
   useEffect(() => {
     async function loadReports() {
       try {
-        const response = await fetch('/api/reports');
-        const json = await response.json();
+        const response = await fetch('/api/reports', { credentials: 'include' });
+        const json = (await response.json()) as ApiResponse<ReportItem[]>;
         if (response.ok && json.status === 'success') {
           setReports(json.data || []);
         } else {
@@ -60,8 +63,9 @@ export default function AdminReportsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: nextStatus }),
+        credentials: 'include',
       });
-      const json = await response.json();
+      const json = (await response.json()) as ApiResponse<ReportItem>;
       if (response.ok && json.status === 'success') {
         const updatedReport = json.data as ReportItem;
         setReports((prev) => prev.map((item) => (item.id === reportId ? updatedReport : item)));

@@ -169,7 +169,7 @@ export default function AdminUsersPage() {
                 title: '角色',
                 width: 100,
                 templet: function (d: User) {
-                  const role = userRoleMap[d.role || 'jobseeker'];
+                  const role = userRoleMap[d?.role || 'jobseeker'] || { text: d?.role || '未知', class: '' };
                   return `<span class="layui-badge ${role.class}">${role.text}</span>`;
                 }
               },
@@ -178,7 +178,7 @@ export default function AdminUsersPage() {
                 title: '状态',
                 width: 100,
                 templet: function (d: User) {
-                  const status = userStatusMap[d.status || 'active'];
+                  const status = userStatusMap[d?.status || 'active'] || { text: d?.status || '未知', class: '' };
                   return `<span class="layui-badge ${status.class}">${status.text}</span>`;
                 }
               },

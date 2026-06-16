@@ -11,6 +11,8 @@ type UserType = 'jobseeker' | 'employer';
 export default function RegisterPage() {
     const router = useRouter();
 
+    const [enableRegister, setEnableRegister] = useState(true);
+
     const [userType, setUserType] = useState<UserType>('jobseeker');
     const [formData, setFormData] = useState({
         username: '',
@@ -43,6 +45,14 @@ export default function RegisterPage() {
         if (!isLocalDev) {
             refreshCaptcha();
         }
+        // 读取管理员设置，控制是否允许注册
+        try {
+            const raw = localStorage.getItem('adminSettings');
+            if (raw) {
+                const s = JSON.parse(raw) as { enableRegister?: boolean };
+                if (typeof s.enableRegister === 'boolean') setEnableRegister(Boolean(s.enableRegister));
+            }
+        } catch { }
     }, [refreshCaptcha, isLocalDev]);
 
     // 初始化 layui form（必须在组件顶层调用 Hook）
@@ -180,219 +190,228 @@ export default function RegisterPage() {
                             </ul>
                             {/* 注册表单 - 根据 userType 动态切换 */}
                             <div className="layui-tab-item layui-show">
-                                <form onSubmit={handleSubmit} className="layui-form layui-p25">
-                                    <input type="hidden" name="userType" value={userType} />
-                                    {/* 用户名/企业名称 */}
-                                    <div className="layui-form-item layui-mb20">
-                                        <div className="layui-input-wrap">
-                                            <div className="layui-input-prefix">
-                                                <i className="layui-icon layui-icon-username"></i>
-                                            </div>
-                                            <input
-                                                type="text"
-                                                name="username"
-                                                value={formData.username}
-                                                onChange={handleInputChange}
-                                                placeholder={userType === 'employer' ? '请输入企业名称' : '3-20位字符'}
-                                                lay-verify="required"
-                                                lay-reqtext={userType === 'employer' ? '请填写企业名称' : '请填写用户名'}
-                                                className={`layui-input ${errors.username ? 'layui-border-red' : ''}`}
-                                                maxLength={userType === 'employer' ? 50 : 20}
-                                            />
+                                {!enableRegister ? (
+                                    <div className="layui-p25">
+                                        <p>当前站点已关闭注册。如需注册请联系管理员。</p>
+                                        <div style={{ marginTop: 12 }}>
+                                            <Link href="/login" className="layui-btn layui-btn-primary">去登录</Link>
                                         </div>
-                                        {errors.username && (
-                                            <p className="layui-font-xs layui-font-red layui-mt5">
-                                                <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                {errors.username}
-                                            </p>
-                                        )}
                                     </div>
-
-                                    {/* 邮箱 */}
-                                    <div className="layui-form-item layui-mb20">
-                                        <div className="layui-row layui-col-space10">
-                                            <div className="layui-col-md8 layui-col-xs7">
-                                                <div className="layui-input-wrap">
-                                                    <div className="layui-input-prefix">
-                                                        <i className="layui-icon layui-icon-email"></i>
-                                                    </div>
-                                                    <input
-                                                        type="email"
-                                                        name="email"
-                                                        value={formData.email}
-                                                        onChange={handleInputChange}
-                                                        placeholder="用于登录和接收通知"
-                                                        lay-verify="required|email"
-                                                        className={`layui-input ${errors.email ? 'layui-border-red' : ''}`}
-                                                    />
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="layui-form layui-p25">
+                                        <input type="hidden" name="userType" value={userType} />
+                                        {/* 用户名/企业名称 */}
+                                        <div className="layui-form-item layui-mb20">
+                                            <div className="layui-input-wrap">
+                                                <div className="layui-input-prefix">
+                                                    <i className="layui-icon layui-icon-username"></i>
                                                 </div>
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    value={formData.username}
+                                                    onChange={handleInputChange}
+                                                    placeholder={userType === 'employer' ? '请输入企业名称' : '3-20位字符'}
+                                                    lay-verify="required"
+                                                    lay-reqtext={userType === 'employer' ? '请填写企业名称' : '请填写用户名'}
+                                                    className={`layui-input ${errors.username ? 'layui-border-red' : ''}`}
+                                                    maxLength={userType === 'employer' ? 50 : 20}
+                                                />
                                             </div>
-                                            <div className="layui-col-md4 layui-col-xs5">
-                                                <button
-                                                    type="button"
-                                                    className="layui-btn layui-btn-fluid layui-btn-primary layui-border"
-                                                    disabled={countdown > 0}
-                                                    onClick={() => {
-                                                        startCountdown();
-                                                        alert(userType === 'employer' ? '验证码已发送至企业邮箱' : '验证码已发送至您的邮箱');
-                                                    }}
-                                                >
-                                                    {countdown > 0 ? `${countdown}s` : '发送验证码'}
-                                                </button>
-                                            </div>
+                                            {errors.username && (
+                                                <p className="layui-font-xs layui-font-red layui-mt5">
+                                                    <i className="layui-icon layui-icon-close layui-mr5"></i>
+                                                    {errors.username}
+                                                </p>
+                                            )}
                                         </div>
-                                        {errors.email && (
-                                            <p className="layui-font-xs layui-font-red layui-mt5">
-                                                <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                {errors.email}
-                                            </p>
-                                        )}
-                                    </div>
 
-                                    {!isLocalDev && (
+                                        {/* 邮箱 */}
                                         <div className="layui-form-item layui-mb20">
                                             <div className="layui-row layui-col-space10">
                                                 <div className="layui-col-md8 layui-col-xs7">
                                                     <div className="layui-input-wrap">
                                                         <div className="layui-input-prefix">
-                                                            <i className="layui-icon layui-icon-vercode"></i>
+                                                            <i className="layui-icon layui-icon-email"></i>
                                                         </div>
                                                         <input
-                                                            type="text"
-                                                            name="emailCode"
-                                                            value={formData.emailCode}
+                                                            type="email"
+                                                            name="email"
+                                                            value={formData.email}
                                                             onChange={handleInputChange}
-                                                            placeholder="请输入验证码"
-                                                            lay-verify="required"
-                                                            lay-reqtext="请填写验证码"
-                                                            className={`layui-input layui-captcha-uppercase ${errors.emailCode ? 'layui-border-red' : ''}`}
-                                                            maxLength={4}
+                                                            placeholder="用于登录和接收通知"
+                                                            lay-verify="required|email"
+                                                            className={`layui-input ${errors.email ? 'layui-border-red' : ''}`}
                                                         />
                                                     </div>
                                                 </div>
                                                 <div className="layui-col-md4 layui-col-xs5">
-                                                    <div
-                                                        className="layui-captcha-box"
-                                                        onClick={refreshCaptcha}
-                                                        title="点击刷新验证码"
+                                                    <button
+                                                        type="button"
+                                                        className="layui-btn layui-btn-fluid layui-btn-primary layui-border"
+                                                        disabled={countdown > 0}
+                                                        onClick={() => {
+                                                            startCountdown();
+                                                            alert(userType === 'employer' ? '验证码已发送至企业邮箱' : '验证码已发送至您的邮箱');
+                                                        }}
                                                     >
-                                                        {captchaCode}
-                                                    </div>
+                                                        {countdown > 0 ? `${countdown}s` : '发送验证码'}
+                                                    </button>
                                                 </div>
                                             </div>
-                                            {errors.emailCode && (
+                                            {errors.email && (
                                                 <p className="layui-font-xs layui-font-red layui-mt5">
                                                     <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                    {errors.emailCode}
+                                                    {errors.email}
                                                 </p>
                                             )}
                                         </div>
-                                    )}
 
-                                    {/* 密码 */}
-                                    <div className="layui-form-item layui-mb20">
-                                        <div className="layui-input-wrap">
-                                            <div className="layui-input-prefix">
-                                                <i className="layui-icon layui-icon-password"></i>
+                                        {!isLocalDev && (
+                                            <div className="layui-form-item layui-mb20">
+                                                <div className="layui-row layui-col-space10">
+                                                    <div className="layui-col-md8 layui-col-xs7">
+                                                        <div className="layui-input-wrap">
+                                                            <div className="layui-input-prefix">
+                                                                <i className="layui-icon layui-icon-vercode"></i>
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                name="emailCode"
+                                                                value={formData.emailCode}
+                                                                onChange={handleInputChange}
+                                                                placeholder="请输入验证码"
+                                                                lay-verify="required"
+                                                                lay-reqtext="请填写验证码"
+                                                                className={`layui-input layui-captcha-uppercase ${errors.emailCode ? 'layui-border-red' : ''}`}
+                                                                maxLength={4}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="layui-col-md4 layui-col-xs5">
+                                                        <div
+                                                            className="layui-captcha-box"
+                                                            onClick={refreshCaptcha}
+                                                            title="点击刷新验证码"
+                                                        >
+                                                            {captchaCode}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {errors.emailCode && (
+                                                    <p className="layui-font-xs layui-font-red layui-mt5">
+                                                        <i className="layui-icon layui-icon-close layui-mr5"></i>
+                                                        {errors.emailCode}
+                                                    </p>
+                                                )}
                                             </div>
-                                            <input
-                                                type={showPassword ? 'text' : 'password'}
-                                                name="password"
-                                                value={formData.password}
-                                                onChange={handleInputChange}
-                                                placeholder="6-20位字符"
-                                                lay-verify="required"
-                                                lay-reqtext="请填写密码"
-                                                className={`layui-input ${errors.password ? 'layui-border-red' : ''}`}
-                                                maxLength={20}
-                                            />
-                                            <div className="layui-input-suffix layui-cursor-pointer"
-                                                onClick={() => setShowPassword(!showPassword)}>
-                                                <i className={`layui-icon ${showPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'}`}></i>
-                                            </div>
-                                        </div>
-                                        {errors.password && (
-                                            <p className="layui-font-xs layui-font-red layui-mt5">
-                                                <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                {errors.password}
-                                            </p>
                                         )}
-                                    </div>
 
-                                    {/* 确认密码 */}
-                                    <div className="layui-form-item layui-mb20">
-                                        <div className="layui-input-wrap">
-                                            <div className="layui-input-prefix">
-                                                <i className="layui-icon layui-icon-password"></i>
+                                        {/* 密码 */}
+                                        <div className="layui-form-item layui-mb20">
+                                            <div className="layui-input-wrap">
+                                                <div className="layui-input-prefix">
+                                                    <i className="layui-icon layui-icon-password"></i>
+                                                </div>
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    name="password"
+                                                    value={formData.password}
+                                                    onChange={handleInputChange}
+                                                    placeholder="6-20位字符"
+                                                    lay-verify="required"
+                                                    lay-reqtext="请填写密码"
+                                                    className={`layui-input ${errors.password ? 'layui-border-red' : ''}`}
+                                                    maxLength={20}
+                                                />
+                                                <div className="layui-input-suffix layui-cursor-pointer"
+                                                    onClick={() => setShowPassword(!showPassword)}>
+                                                    <i className={`layui-icon ${showPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'}`}></i>
+                                                </div>
                                             </div>
-                                            <input
-                                                type="password"
-                                                name="confirmPassword"
-                                                value={formData.confirmPassword}
-                                                onChange={handleInputChange}
-                                                placeholder="再次输入密码"
-                                                lay-verify="required"
-                                                lay-reqtext="请确认密码"
-                                                className={`layui-input ${errors.confirmPassword ? 'layui-border-red' : ''}`}
-                                                maxLength={20}
-                                            />
-                                        </div>
-                                        {errors.confirmPassword && (
-                                            <p className="layui-font-xs layui-font-red layui-mt5">
-                                                <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                {errors.confirmPassword}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* 用户协议 */}
-                                    <div className="layui-form-item layui-mb20 layui-pt20 layui-border-top">
-                                        <div className="layui-input-block">
-                                            <input
-                                                type="checkbox"
-                                                name="agreeTerms"
-                                                lay-skin="primary"
-                                                checked={agreed}
-                                                onChange={(e) => {
-                                                    setAgreed(e.target.checked);
-                                                    if (errors.agreed) {
-                                                        setErrors(prev => ({ ...prev, agreed: '' }));
-                                                    }
-                                                }}
-                                            />
-                                            <span style={{ display: 'inline-block', verticalAlign: '-webkit-baseline-middle' }}>
-                                                我已阅读并同意
-                                                <Link href="/terms" className="layui-font-blue layui-ml5">《用户协议》</Link>和
-                                                <Link href="/privacy" className="layui-font-blue">《隐私政策》</Link>
-                                            </span>
-                                            {errors.agreed && (
+                                            {errors.password && (
                                                 <p className="layui-font-xs layui-font-red layui-mt5">
                                                     <i className="layui-icon layui-icon-close layui-mr5"></i>
-                                                    {errors.agreed}
+                                                    {errors.password}
                                                 </p>
                                             )}
                                         </div>
-                                    </div>
 
-                                    {/* 注册按钮 */}
-                                    <button
-                                        type="submit"
-                                        className="layui-btn layui-btn-fluid layui-btn-lg layui-btn-enhanced layui-btn-gradient-submit"
-                                        disabled={loading}
-                                    >
-                                        {loading ? (
-                                            <span className="layui-flex layui-flex-center">
-                                                <i className="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop layui-mr10"></i>
-                                                注册中...
-                                            </span>
-                                        ) : (
-                                            <span className="layui-flex layui-flex-center">
-                                                <i className="layui-icon layui-icon-ok layui-mr10"></i>
-                                                立即注册
-                                            </span>
-                                        )}
-                                    </button>
-                                </form>
+                                        {/* 确认密码 */}
+                                        <div className="layui-form-item layui-mb20">
+                                            <div className="layui-input-wrap">
+                                                <div className="layui-input-prefix">
+                                                    <i className="layui-icon layui-icon-password"></i>
+                                                </div>
+                                                <input
+                                                    type="password"
+                                                    name="confirmPassword"
+                                                    value={formData.confirmPassword}
+                                                    onChange={handleInputChange}
+                                                    placeholder="再次输入密码"
+                                                    lay-verify="required"
+                                                    lay-reqtext="请确认密码"
+                                                    className={`layui-input ${errors.confirmPassword ? 'layui-border-red' : ''}`}
+                                                    maxLength={20}
+                                                />
+                                            </div>
+                                            {errors.confirmPassword && (
+                                                <p className="layui-font-xs layui-font-red layui-mt5">
+                                                    <i className="layui-icon layui-icon-close layui-mr5"></i>
+                                                    {errors.confirmPassword}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* 用户协议 */}
+                                        <div className="layui-form-item layui-mb20 layui-pt20 layui-border-top">
+                                            <div className="layui-input-block">
+                                                <input
+                                                    type="checkbox"
+                                                    name="agreeTerms"
+                                                    lay-skin="primary"
+                                                    checked={agreed}
+                                                    onChange={(e) => {
+                                                        setAgreed(e.target.checked);
+                                                        if (errors.agreed) {
+                                                            setErrors(prev => ({ ...prev, agreed: '' }));
+                                                        }
+                                                    }}
+                                                />
+                                                <span style={{ display: 'inline-block', verticalAlign: '-webkit-baseline-middle' }}>
+                                                    我已阅读并同意
+                                                    <Link href="/terms" className="layui-font-blue layui-ml5">《用户协议》</Link>和
+                                                    <Link href="/privacy" className="layui-font-blue">《隐私政策》</Link>
+                                                </span>
+                                                {errors.agreed && (
+                                                    <p className="layui-font-xs layui-font-red layui-mt5">
+                                                        <i className="layui-icon layui-icon-close layui-mr5"></i>
+                                                        {errors.agreed}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* 注册按钮 */}
+                                        <button
+                                            type="submit"
+                                            className="layui-btn layui-btn-fluid layui-btn-lg layui-btn-enhanced layui-btn-gradient-submit"
+                                            disabled={loading}
+                                        >
+                                            {loading ? (
+                                                <span className="layui-flex layui-flex-center">
+                                                    <i className="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop layui-mr10"></i>
+                                                    注册中...
+                                                </span>
+                                            ) : (
+                                                <span className="layui-flex layui-flex-center">
+                                                    <i className="layui-icon layui-icon-ok layui-mr10"></i>
+                                                    立即注册
+                                                </span>
+                                            )}
+                                        </button>
+                                    </form>
+                                )}
                             </div>
                         </div>
                     </div>

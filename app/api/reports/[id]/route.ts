@@ -20,7 +20,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const body = await request.json();
+    const body = (await request.json()) as { status?: string } | null;
     const status = body?.status;
     if (!status || !['pending', 'processing', 'resolved'].includes(status)) {
       return NextResponse.json(errorResponse('无效的举报状态'), { status: 400 });

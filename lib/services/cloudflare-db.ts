@@ -1,5 +1,5 @@
 
-import { Job, Company, User, UserWithPassword, Category, Location, JobFilters, Pagination, Application, Favorite } from '@/types';
+import { Job, Company, User, UserWithPassword, Category, Location, JobFilters, Pagination, Application, Favorite, Message, Report } from '@/types';
 import { getDb } from '@/lib/db/cloudflare';
 import { hashPassword, verifyPassword } from '@/lib/utils/password';
 
