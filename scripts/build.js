@@ -56,6 +56,13 @@ if (shouldUseOpenNext) {
   } catch (err) {
     process.exit(err.status || 1);
   }
+  console.log("Step 3: Initializing database...");
+  try {
+    execSync("npm run db:init", { stdio: "inherit" });
+  } catch (err) {
+    console.warn("Database initialization failed, but continuing...");
+    // 如果失败，不中断部署（可能是已有数据）
+  }
 } else {
   console.log("Running standard Next.js build...");
   try {
