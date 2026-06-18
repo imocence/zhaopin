@@ -32,16 +32,33 @@ const envTarget = (process.env.DEPLOY_TARGET || process.env.CLOUDFLARE_TARGET ||
 const forceNext = process.env.FORCE_NEXT === "1";
 const shouldUseOpenNext = !forceNext && (envTarget === "cloudflare" || (hasOpenNextDep && wranglerMainOpenNext));
 
-const command = shouldUseOpenNext ? "npx opennextjs-cloudflare build" : "next build";
-console.log(`Running build command: ${command}`);
-
-try {
-  // 设置环境变量，防止递归
-  process.env.__OPENNEXT_BUILD_RUNNING = "1";
-  execSync(command, { 
-    stdio: "inherit",
-    env: process.env
-  });
-} catch (err) {
-  process.exit(err.status || 1);
+if (shouldUseOpenNext) {
+  console.log("Running OpenNext build for Cloudflare...");
+  
+  // 先执行 next build
+  console.log("Step 1: Building Next.js app...");
+  try {
+    execSync("npx next build", { stdio: "inherit" });
+  } catch (err) {
+    process.exit(err.status || 1);
+  }
+  
+  // 再执行 opennextjs-cloudflare build
+  console.log("Step 2: Building Cloudflare adapter...");
+  try {
+    process.env.__OPENNEXT_BUILD_RUNNING = "1";
+    execSync("npx opennextjs-cloudflare build", { 
+      stdio: "inherit",
+      env: process.env
+    });
+  } catch (err) {
+    process.exit(err.status || 1);
+  }
+} else {
+  console.log("Running standard Next.js build...");
+  try {
+    execSync("npx next build", { stdio: "inherit" });
+  } catch (err) {
+    process.exit(err.status || 1);
+  }
 }
