@@ -22,17 +22,17 @@ wrangler login
 ```bash
 npm run db:create
 # 或者
-wrangler d1 create zhaopin-db
+wrangler d1 create zhaopin
 ```
 
 执行后会输出数据库ID，类似：
 
 ```
-✅ Successfully created DB 'zhaopin-db'
+✅ Successfully created DB 'zhaopin'
 
 [[d1_databases]]
 binding = "DB"
-database_name = "zhaopin-db"
+database_name = "zhaopin"
 database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
 
@@ -43,7 +43,7 @@ database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```toml
 [[d1_databases]]
 binding = "DB"
-database_name = "zhaopin-db"
+database_name = "zhaopin"
 database_id = "你的数据库ID"
 ```
 
@@ -52,7 +52,7 @@ database_id = "你的数据库ID"
 ```bash
 npm run db:init
 # 或者
-wrangler d1 execute zhaopin-db --file=./scripts/init-db.sql
+wrangler d1 execute zhaopin --file=./scripts/init-db.sql
 ```
 
 ### 5. 导入种子数据
@@ -68,7 +68,7 @@ npx tsx scripts/seed-db.ts > scripts/seed-db.sql
 ```bash
 npm run db:seed
 # 或者
-wrangler d1 execute zhaopin-db --file=./scripts/seed-db.sql
+wrangler d1 execute zhaopin --file=./scripts/seed-db.sql
 ```
 
 ### 6. 安装依赖
@@ -124,13 +124,13 @@ npm run dev
 wrangler d1 list
 
 # 查看数据库信息
-wrangler d1 info zhaopin-db
+wrangler d1 info zhaopin
 
 # 执行SQL查询
-wrangler d1 execute zhaopin-db --command="SELECT * FROM jobs LIMIT 10"
+wrangler d1 execute zhaopin --command="SELECT * FROM jobs LIMIT 10"
 
 # 导出数据库
-wrangler d1 export zhaopin-db --output=backup.sql
+wrangler d1 export zhaopin --output=backup.sql
 ```
 
 ## 部署到 Cloudflare Pages

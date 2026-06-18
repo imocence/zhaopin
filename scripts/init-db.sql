@@ -1,6 +1,6 @@
 
 -- 招聘网站数据库初始化脚本
--- 使用方法: npx wrangler d1 execute zhaopin-db --file=./scripts/init-db.sql
+-- 使用方法: npx wrangler d1 execute zhaopin --file=./scripts/init-db.sql
 
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS users (

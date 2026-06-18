@@ -14,9 +14,9 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "eslint",
-    "db:init": "wrangler d1 execute zhaopin-db --file=./scripts/init-db.sql",
-    "db:seed": "wrangler d1 execute zhaopin-db --file=./scripts/seed-db.sql",
-    "db:create": "wrangler d1 create zhaopin-db",
+    "db:init": "wrangler d1 execute zhaopin --file=./scripts/init-db.sql",
+    "db:seed": "wrangler d1 execute zhaopin --file=./scripts/seed-db.sql",
+    "db:create": "wrangler d1 create zhaopin",
     "import:sqlite": "node ./scripts/import-json-to-sqlite.ts"
   },
   "dependencies": {

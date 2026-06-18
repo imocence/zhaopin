@@ -5,9 +5,9 @@
  * 使用方法:
  * 1. 确保已安装wrangler: npm install -g wrangler
  * 2. 登录Cloudflare: wrangler login
- * 3. 创建D1数据库: wrangler d1 create zhaopin-db
+ * 3. 创建D1数据库: wrangler d1 create zhaopin
  * 4. 更新wrangler.toml中的数据库ID
- * 5. 运行此脚本: npx wrangler d1 execute zhaopin-db --file=./scripts/seed-db.sql
+ * 5. 运行此脚本: npx wrangler d1 execute zhaopin --file=./scripts/seed-db.sql
  */
 
 import { Job, Company, User, Category, Location } from '@/types';
