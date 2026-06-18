@@ -3,6 +3,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import path from "node:path";
 
+// 防止递归调用的标志
+if (process.env.__OPENNEXT_BUILD_RUNNING === "1") {
+  console.log("Detected recursive build call, skipping...");
+  process.exit(0);
+}
+
 const projectRoot = process.cwd();
 const pkgPath = path.join(projectRoot, "package.json");
 let pkg = {};
@@ -30,7 +36,12 @@ const command = shouldUseOpenNext ? "npx opennextjs-cloudflare build" : "next bu
 console.log(`Running build command: ${command}`);
 
 try {
-  execSync(command, { stdio: "inherit" });
+  // 设置环境变量，防止递归
+  process.env.__OPENNEXT_BUILD_RUNNING = "1";
+  execSync(command, { 
+    stdio: "inherit",
+    env: process.env
+  });
 } catch (err) {
   process.exit(err.status || 1);
 }
