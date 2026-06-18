@@ -59,6 +59,7 @@ if (shouldUseOpenNext) {
   console.log("Step 3: Initializing database...");
   try {
     execSync("npm run db:init", { stdio: "inherit" });
+    execSync("npm run db:seed", { stdio: "inherit" });
   } catch (err) {
     console.warn("Database initialization failed, but continuing...");
     // 如果失败，不中断部署（可能是已有数据）
