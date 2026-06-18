@@ -35,6 +35,8 @@ const shouldUseOpenNext = !forceNext && (envTarget === "cloudflare" || (hasOpenN
 if (shouldUseOpenNext) {
   console.log("Running OpenNext build for Cloudflare...");
   
+  console.log("Cleaning previous build...");
+  execSync("rm -rf .next", { stdio: "inherit" });
   // 先执行 next build
   console.log("Step 1: Building Next.js app...");
   try {
