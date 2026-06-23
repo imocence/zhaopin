@@ -99,6 +99,8 @@ export default function EmployerJobsPage() {
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-gray-900">职位管理</h1>
               <Link href="/post" prefetch={false} className="layui-btn">
+                ➕ 发布新职位
+              </Link>
             </div>
 
             {/* 筛选栏 */}
