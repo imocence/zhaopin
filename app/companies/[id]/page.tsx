@@ -243,7 +243,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                   已认证企业
                 </button>
               ) : (
-                <Link href="/company/verify" className="layui-btn layui-btn-warm layui-btn-fluid">
+                <Link href="/company/verify" prefetch={false} className="layui-btn layui-btn-warm layui-btn-fluid">
                   申请企业认证
                 </Link>
               )}

@@ -44,7 +44,7 @@ export default function RootLayout({
                                         <Link href="/post" className="layui-font-gray layui-text-decoration-none">发布职位</Link>
                                     </li>
                                     <li className="layui-mb10">
-                                        <Link href="/company/verify" className="layui-font-gray layui-text-decoration-none">企业认证</Link>
+                                        <Link href="/company/verify" prefetch={false} className="layui-font-gray layui-text-decoration-none">企业认证</Link>
                                     </li>
                                 </ul>
                             </div>
