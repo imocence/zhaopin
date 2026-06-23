@@ -7,9 +7,12 @@
  * 2. 登录Cloudflare: wrangler login
  * 3. 创建D1数据库: wrangler d1 create zhaopin
  * 4. 更新wrangler.toml中的数据库ID
- * 5. 运行此脚本: npx wrangler d1 execute zhaopin --file=./scripts/seed-db.sql
+ * 5. 生成 SQL 文件: npx tsx scripts/seed-db.ts -- --out scripts/seed-db.sql
+ *    Windows PowerShell 用户请注意：`>` 重定向默认会生成 UTF-16 文件，建议使用 --out 参数直接写入 UTF-8 文件。
+ * 6. 导入到 D1: npx wrangler d1 execute zhaopin --file=./scripts/seed-db.sql
  */
 
+import fs from 'fs';
 import { Job, Company, User, Category, Location } from '@/types';
 
 // 导入JSON数据
@@ -59,16 +62,23 @@ function generateInsertSQL() {
 
   // 插入地区
   locations.forEach(location => {
+    const stateValue = location.state ? `'${location.state.replace(/'/g, "''")}'` : 'NULL';
+    const stateCodeValue = location.stateCode ? `'${location.stateCode.replace(/'/g, "''")}'` : 'NULL';
     statements.push(
-      `INSERT OR REPLACE INTO locations (id, name, state, state_code, cities) VALUES ('${location.id}', '${location.name.replace(/'/g, "''")}', '${location.state.replace(/'/g, "''")}', '${location.stateCode}', '${JSON.stringify(location.cities).replace(/'/g, "''")}');`
+      `INSERT OR REPLACE INTO locations (id, name, state, state_code, cities) VALUES ('${location.id}', '${location.name.replace(/'/g, "''")}', ${stateValue}, ${stateCodeValue}, '${JSON.stringify(location.cities).replace(/'/g, "''")}');`
     );
   });
 
-  return statements.join('');
+  return statements.map(s => s.trim()).join('\r\n\r\n');
 }
 
-// 输出SQL
-console.log('-- 招聘网站数据库种子数据');
-console.log('-- 生成时间: ' + new Date().toISOString());
-console.log('');
-console.log(generateInsertSQL());
+const sql = ['-- 招聘网站数据库种子数据', '-- 生成时间: ' + new Date().toISOString(), '', generateInsertSQL()].join('\r\n\r\n');
+const outIndex = process.argv.findIndex(arg => arg === '--out');
+const outArg = process.argv.find(arg => arg.startsWith('--out='));
+const outPath = outArg ? outArg.split('=')[1] : outIndex >= 0 ? process.argv[outIndex + 1] : undefined;
+if (outPath) {
+  fs.writeFileSync(outPath, sql, { encoding: 'utf8' });
+  console.log(`Wrote SQL seed file to ${outPath}`);
+} else {
+  process.stdout.write(sql);
+}

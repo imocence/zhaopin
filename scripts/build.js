@@ -59,7 +59,6 @@ if (shouldUseOpenNext) {
   console.log("Step 3: Initializing database...");
   try {
     execSync("npm run db:init", { stdio: "inherit" });
-    execSync("npx ts-node ./zhaopin/scripts/seed-db.ts > ./zhaopin/scripts/seed-db.sql", { stdio: "inherit" });
     execSync("npm run db:seed", { stdio: "inherit" });
   } catch (err) {
     console.warn("Database initialization failed, but continuing...");
