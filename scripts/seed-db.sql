@@ -1,10 +1,10 @@
 -- 招聘网站数据库种子数据
 
--- 生成时间: 2026-06-23T07:24:24.277Z
+-- 生成时间: 2026-06-23T09:29:14.964Z
 
 
 
-INSERT OR REPLACE INTO users (id, email, name, avatar, role, phone, location, state, resume, bio, created_at) VALUES ('1', 'admin@example.com', 'admin', '/images/avatars/default.png', 'root', '+1-415-123-4567', '旧金山', 'CA', '/resumes/demo_resume.pdf', '5年前端开发经验，熟练 React 和 Vue 等前端框架。', '2023-01-01');
+INSERT OR REPLACE INTO users (id, email, name, avatar, role, phone, location, state, resume, bio, created_at) VALUES ('1', 'admin@example.com', 'admin', '/images/avatars/default.png', 'admin', '+1-415-123-4567', '旧金山', 'CA', '/resumes/demo_resume.pdf', '5年前端开发经验，熟练 React 和 Vue 等前端框架。', '2023-01-01');
 
 INSERT OR REPLACE INTO users (id, email, name, avatar, role, phone, location, state, resume, bio, created_at) VALUES ('2', 'lisi@example.com', '李四', '/images/avatars/default.png', 'employer', '+1-650-234-5678', '帕洛阿尔托', 'CA', NULL, '某科技公司 HR，负责技术招聘。', '2023-02-01');
 

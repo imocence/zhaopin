@@ -34,8 +34,12 @@ function generateInsertSQL() {
 
   // 插入用户
   users.forEach(user => {
+    const role = ['jobseeker', 'employer', 'admin'].includes(user.role) ? user.role : 'admin';
+    if (user.role !== role) {
+      console.warn(`Invalid role ${user.role} for user ${user.id} — mapping to ${role}`);
+    }
     statements.push(
-      `INSERT OR REPLACE INTO users (id, email, name, avatar, role, phone, location, state, resume, bio, created_at) VALUES ('${user.id}', '${user.email}', '${user.name.replace(/'/g, "''")}', ${user.avatar ? `'${user.avatar}'` : 'NULL'}, '${user.role}', ${user.phone ? `'${user.phone}'` : 'NULL'}, ${user.location ? `'${user.location}'` : 'NULL'}, ${user.state ? `'${user.state}'` : 'NULL'}, ${user.resume ? `'${user.resume}'` : 'NULL'}, ${user.bio ? `'${user.bio.replace(/'/g, "''")}'` : 'NULL'}, '${user.createdAt}');`
+      `INSERT OR REPLACE INTO users (id, email, name, avatar, role, phone, location, state, resume, bio, created_at) VALUES ('${user.id}', '${user.email}', '${user.name.replace(/'/g, "''")}', ${user.avatar ? `'${user.avatar}'` : 'NULL'}, '${role}', ${user.phone ? `'${user.phone}'` : 'NULL'}, ${user.location ? `'${user.location}'` : 'NULL'}, ${user.state ? `'${user.state}'` : 'NULL'}, ${user.resume ? `'${user.resume}'` : 'NULL'}, ${user.bio ? `'${user.bio.replace(/'/g, "''")}'` : 'NULL'}, '${user.createdAt}');`
     );
   });
 
