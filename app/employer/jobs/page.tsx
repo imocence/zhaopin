@@ -98,9 +98,7 @@ export default function EmployerJobsPage() {
             {/* 页面标题和操作 */}
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-gray-900">职位管理</h1>
-              <Link href="/post" className="layui-btn">
-                ➕ 发布新职位
-              </Link>
+              <Link href="/post" prefetch={false} className="layui-btn">
             </div>
 
             {/* 筛选栏 */}
@@ -224,7 +222,7 @@ export default function EmployerJobsPage() {
                     {searchKeyword || filter !== 'all' ? '没有符合条件的职位' : '还没有发布任何职位'}
                   </p>
                   {!searchKeyword && filter === 'all' && (
-                    <Link href="/post" className="layui-btn">
+                    <Link href="/post" prefetch={false} className="layui-btn">
                       发布第一个职位
                     </Link>
                   )}

@@ -61,20 +61,20 @@ const Header: React.FC = () => {
         </li>
 
         <li className="layui-nav-item">
-          <Link href="/companies" className={isActive('/companies') ? 'layui-this' : ''}>企业大全</Link>
+          <Link href="/companies" prefetch={false} className={isActive('/companies') ? 'layui-this' : ''}>企业大全</Link>
         </li>
 
         <li className="layui-nav-item">
-          <Link href="/post" className={isActive('/post') ? 'layui-this' : ''}>发布职位</Link>
+          <Link href="/post" prefetch={false} className={isActive('/post') ? 'layui-this' : ''}>发布职位</Link>
         </li>
 
         {!isLoggedIn ? (
           <>
             <li className="layui-nav-item" style={{ float: 'right' }}>
-              <Link href={loginHref}>登录</Link>
+              <Link href={loginHref} prefetch={false}>登录</Link>
             </li>
             <li className="layui-nav-item" style={{ float: 'right' }}>
-              <Link href="/register">注册</Link>
+              <Link href="/register" prefetch={false}>注册</Link>
             </li>
           </>
         ) : (

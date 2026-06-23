@@ -50,7 +50,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             <div className="layui-empty-icon-60">😕</div>
             <h1 className="layui-font-title layui-font-bold layui-mb15">公司不存在</h1>
             <p className="layui-font-gray layui-mb20">抱歉，找不到该公司信息</p>
-            <Link href="/companies" className="layui-btn">
+            <Link href="/companies" prefetch={false} className="layui-btn">
               返回企业列表
             </Link>
           </div>

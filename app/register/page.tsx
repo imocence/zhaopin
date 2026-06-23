@@ -194,7 +194,7 @@ export default function RegisterPage() {
                                     <div className="layui-p25">
                                         <p>当前站点已关闭注册。如需注册请联系管理员。</p>
                                         <div style={{ marginTop: 12 }}>
-                                            <Link href="/login" className="layui-btn layui-btn-primary">去登录</Link>
+                                            <Link href="/login" prefetch={false} className="layui-btn layui-btn-primary">去登录</Link>
                                         </div>
                                     </div>
                                 ) : (
@@ -521,7 +521,7 @@ export default function RegisterPage() {
                         <p className="layui-font-sm layui-font-gray-light layui-mb20 layui-text-center">
                             已有账号？
                         </p>
-                        <Link href="/login" className="layui-btn layui-btn-fluid layui-btn-primary layui-btn-enhanced">
+                        <Link href="/login" prefetch={false} className="layui-btn layui-btn-fluid layui-btn-primary layui-btn-enhanced">
                             立即登录
                         </Link>
                     </div>

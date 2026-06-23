@@ -178,12 +178,12 @@ export default function HomePage() {
           <div className="layui-carousel-slide layui-carousel-slide--orange">
             <h1 className="layui-carousel-hero-title">企业招聘首选平台</h1>
             <p className="layui-carousel-hero-desc">快速发布职位，精准匹配人才</p>
-            <Link href="/post" className="layui-btn layui-btn-lg layui-btn-primary">发布职位</Link>
+            <Link href="/post" prefetch={false} className="layui-btn layui-btn-lg layui-btn-primary">发布职位</Link>
           </div>
           <div className="layui-carousel-slide layui-carousel-slide--cyan">
             <h1 className="layui-carousel-hero-title">海量优质企业</h1>
             <p className="layui-carousel-hero-desc">已认证企业，求职更放心</p>
-            <Link href="/companies" className="layui-btn layui-btn-lg">浏览企业</Link>
+            <Link href="/companies" prefetch={false} className="layui-btn layui-btn-lg">浏览企业</Link>
           </div>
         </div>
       </div>
@@ -197,7 +197,7 @@ export default function HomePage() {
                   <span>
                     <i className="layui-icon layui-icon-list"></i> 推荐职位
                   </span>
-                  <Link href="/jobs">更多职位.. </Link>
+                  <Link href="/jobs" prefetch={false}>更多职位.. </Link>
                 </div>
                 <div className="layui-card-body">
                   <div className="layui-tab layui-tab-card" lay-filter="jobTab">

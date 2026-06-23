@@ -201,7 +201,7 @@ export default function UserCenterPage() {
                   </Link>
                 </div>
                 <div className="layui-col-xs6 layui-col-sm3">
-                  <Link href="/post" className="layui-text-decoration-none">
+                  <Link href="/post" prefetch={false} className="layui-text-decoration-none">
                     <div className="layui-card layui-text-center layui-card-click">
                       <div className="layui-card-body">
                         <div className="layui-font-2xl layui-mb10">📝</div>

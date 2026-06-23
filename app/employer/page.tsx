@@ -155,7 +155,7 @@ export default function EmployerDashboardPage() {
               <div className="layui-card-header">快捷操作</div>
               <div className="layui-card-body">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Link href="/post" className="layui-card hover:shadow-md transition-shadow text-center">
+                  <Link href="/post" prefetch={false} className="layui-card hover:shadow-md transition-shadow text-center">
                     <div className="layui-card-body py-6">
                       <div className="text-3xl mb-2">➕</div>
                       <div className="text-sm font-medium">发布新职位</div>
