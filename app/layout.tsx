@@ -37,40 +37,6 @@ export default function RootLayout({
                                     美国华人168招聘网是专为在美华人打造的求职招聘平台，致力于连接优秀人才与企业。
                                 </p>
                             </div>
-                            <div className="layui-col-md2 layui-col-sm6 layui-col-xs6">
-                                <h3 className="layui-font-white layui-font-bold layui-mb15">关于我们</h3>
-                                <ul className="layui-unstyled-list">
-                                    <li className="layui-mb10">
-                                        <Link href="/about" className="layui-font-gray layui-text-decoration-none">平台介绍</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/contact" className="layui-font-gray layui-text-decoration-none">联系我们</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/privacy" className="layui-font-gray layui-text-decoration-none">隐私政策</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/terms" className="layui-font-gray layui-text-decoration-none">服务条款</Link>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="layui-col-md3 layui-col-sm6 layui-col-xs6">
-                                <h3 className="layui-font-white layui-font-bold layui-mb15">求职帮助</h3>
-                                <ul className="layui-unstyled-list">
-                                    <li className="layui-mb10">
-                                        <Link href="/help/search" className="layui-font-gray layui-text-decoration-none">如何搜索</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/help/apply" className="layui-font-gray layui-text-decoration-none">如何申请</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/help/resume" className="layui-font-gray layui-text-decoration-none">简历建议</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/help/interview" className="layui-font-gray layui-text-decoration-none">面试技巧</Link>
-                                    </li>
-                                </ul>
-                            </div>
                             <div className="layui-col-md3 layui-col-sm6 layui-col-xs6">
                                 <h3 className="layui-font-white layui-font-bold layui-mb15">企业服务</h3>
                                 <ul className="layui-unstyled-list">
@@ -78,13 +44,7 @@ export default function RootLayout({
                                         <Link href="/post" className="layui-font-gray layui-text-decoration-none">发布职位</Link>
                                     </li>
                                     <li className="layui-mb10">
-                                        <Link href="/pricing" className="layui-font-gray layui-text-decoration-none">价格方案</Link>
-                                    </li>
-                                    <li className="layui-mb10">
                                         <Link href="/company/verify" className="layui-font-gray layui-text-decoration-none">企业认证</Link>
-                                    </li>
-                                    <li className="layui-mb10">
-                                        <Link href="/api" className="layui-font-gray layui-text-decoration-none">API接口</Link>
                                     </li>
                                 </ul>
                             </div>
