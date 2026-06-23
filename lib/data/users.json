@@ -6,7 +6,7 @@
     "name": "admin",
     "password": "123456",
     "avatar": "/images/avatars/default.png",
-    "role": "root",
+    "role": "admin",
     "phone": "+1-415-123-4567",
     "location": "旧金山",
     "state": "CA",
