@@ -148,7 +148,7 @@ export default function HomePage() {
               </div>
               <div className="layui-col-xs9">
                 <h3 className="layui-font-lg layui-mb10">
-                  <Link href={`/jobs/${job.id}`} className="layui-font-lg layui-font-bold layui-font-dark">{job.title}</Link>
+                  <Link href={`/jobs/${job.id}`} prefetch={false} className="layui-font-lg layui-font-bold layui-font-dark">{job.title}</Link>
                   <span className={`layui-badge layui-fr ${salaryClass}`}>${job.salaryMin}-{job.salaryMax}</span>
                 </h3>
                 <p className="layui-font-sm layui-font-gray layui-mb10">
@@ -224,13 +224,13 @@ export default function HomePage() {
               <div className="layui-card layui-mt20">
                 <div className="layui-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <i className="layui-icon layui-icon-component"></i> 热门企业
-                  <Link href="/companies">更多企业..</Link>
+                  <Link href="/companies" prefetch={false}>更多企业..</Link>
                 </div>
                 <div className="layui-card-body">
                   <div className="layui-row layui-col-space10">
                     {hotCompanies.map((company) => (
                       <div className="layui-col-md3 layui-col-sm6" key={company.id}>
-                        <Link href={`/companies/${company.id}`} className="layui-link-block">
+                        <Link href={`/companies/${company.id}`} prefetch={false} className="layui-link-block">
                           <div className="layui-card">
                             <div className="layui-card-body layui-text-center">
                               <div className="layui-font-2xl layui-mb10">🏢</div>
@@ -259,7 +259,7 @@ export default function HomePage() {
                   <div className="layui-row layui-col-space10">
                     {allStates.map((state) => (
                       <div className="layui-col-md2 layui-col-sm4 layui-col-xs6" key={state.id}>
-                        <Link href={`/jobs?state=${state.id}`} className="layui-link-block">
+                        <Link href={`/jobs?state=${state.id}`} prefetch={false} className="layui-link-block">
                           <div className="layui-card">
                             <div className="layui-card-body layui-text-center">
                               <h3 className="layui-font-lg layui-mb10 layui-font-dark">{state.name}</h3>
@@ -285,7 +285,7 @@ export default function HomePage() {
                   <div className="layui-row layui-col-space10">
                     {categories.map((category) => (
                       <div className="layui-col-md6 layui-col-xs6" key={category.id}>
-                        <Link href={`/jobs?category=${category.id}`} className="layui-link-block">
+                        <Link href={`/jobs?category=${category.id}`} prefetch={false} className="layui-link-block">
                           <div className="layui-tile-category">
                             <div className="layui-font-3xl layui-mb5">{category.icon}</div>
                             <div className="layui-font-sm layui-font-dark">{category.name}</div>

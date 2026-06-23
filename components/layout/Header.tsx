@@ -57,7 +57,7 @@ const Header: React.FC = () => {
         </li>
 
         <li className="layui-nav-item">
-          <Link href="/jobs" className={isActive('/jobs') ? 'layui-this' : ''}>职位搜索</Link>
+          <Link href="/jobs" prefetch={false} className={isActive('/jobs') ? 'layui-this' : ''}>职位搜索</Link>
         </li>
 
         <li className="layui-nav-item">
