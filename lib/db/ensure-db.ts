@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getDb, getDbFromRequest, setDb } from '@/lib/db/cloudflare';
+import { getDb, getDbFromRequest, getDbFromCloudflareContextAsync, setDb } from '@/lib/db/cloudflare';
 import { getLocalD1, initLocalDbPasswords } from '@/lib/db/local-d1';
 
 let localInitialized = false;
@@ -9,6 +9,12 @@ export async function ensureDb(request?: NextRequest): Promise<void> {
     const db = getDbFromRequest(request);
     if (db) {
       setDb(db);
+      return;
+    }
+
+    const asyncDb = await getDbFromCloudflareContextAsync();
+    if (asyncDb) {
+      setDb(asyncDb);
       return;
     }
   }

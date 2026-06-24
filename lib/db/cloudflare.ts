@@ -19,6 +19,39 @@ function getDbFromCloudflareContext(): D1Database | null {
   } catch {
     // not available in this runtime or sync mode not supported
   }
+
+  // Fallback direct global symbol lookup in case the context is injected but the helper fails.
+  try {
+    const ctx = (globalThis as unknown as Record<symbol, unknown>)[Symbol.for('__cloudflare-context__')] as { env?: Record<string, unknown> } | undefined;
+    if (ctx?.env && 'DB' in ctx.env && ctx.env.DB) {
+      return ctx.env.DB as D1Database;
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
+}
+
+export async function getDbFromCloudflareContextAsync(): Promise<D1Database | null> {
+  try {
+    const context = await getCloudflareContext({ async: true }) as unknown as { env?: Record<string, unknown> } | null;
+    if (context?.env && 'DB' in context.env && context.env.DB) {
+      return context.env.DB as D1Database;
+    }
+  } catch {
+    // not available in this runtime or async mode not supported
+  }
+
+  try {
+    const ctx = (globalThis as unknown as Record<symbol, unknown>)[Symbol.for('__cloudflare-context__')] as { env?: Record<string, unknown> } | undefined;
+    if (ctx?.env && 'DB' in ctx.env && ctx.env.DB) {
+      return ctx.env.DB as D1Database;
+    }
+  } catch {
+    // ignore
+  }
+
   return null;
 }
 
