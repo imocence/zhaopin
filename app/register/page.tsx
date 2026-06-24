@@ -530,7 +530,7 @@ export default function RegisterPage() {
 
             {/* 返回首页 */}
             <div className="layui-text-center layui-mt20 layui-mb20">
-                <Link href="/" className="layui-font-sm layui-font-blue layui-mr5">
+                <Link href="/" prefetch={false} className="layui-font-sm layui-font-blue layui-mr5">
                     ← 返回首页
                 </Link>
             </div>

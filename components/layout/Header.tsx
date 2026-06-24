@@ -49,11 +49,11 @@ const Header: React.FC = () => {
     <header className="layui-bg-black" style={{ marginBottom: pathname === '/' ? '0' : '10px' }}>
       <ul className="layui-container layui-nav">
         <li className="layui-nav-item">
-          <Link href="/" className="layui-logo">168招聘网</Link>
+          <Link href="/" prefetch={false} className="layui-logo">168招聘网</Link>
         </li>
 
         <li className="layui-nav-item">
-          <Link href="/" className={isActive('/') ? 'layui-this' : ''}>首页</Link>
+          <Link href="/" prefetch={false} className={isActive('/') ? 'layui-this' : ''}>首页</Link>
         </li>
 
         <li className="layui-nav-item">

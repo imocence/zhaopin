@@ -366,7 +366,7 @@ export default function LoginPage() {
 
         {/* 返回首页 */}
         <p className="layui-text-center layui-mt20">
-          <Link href="/" className="layui-font-sm layui-link-plain layui-font-gray" style={{ opacity: 0.8, transition: 'opacity 0.3s' }}>
+          <Link href="/" prefetch={false} className="layui-font-sm layui-link-plain layui-font-gray" style={{ opacity: 0.8, transition: 'opacity 0.3s' }}>
             <i className="layui-icon layui-icon-return layui-mr5"></i>
             返回首页
           </Link>
