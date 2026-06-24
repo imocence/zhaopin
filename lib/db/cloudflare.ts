@@ -1,18 +1,32 @@
 
 // Cloudflare D1数据库连接配置
+type D1Database = { [key: string]: unknown };
 interface Env {
-  DB: any;
+  DB?: D1Database;
 }
 
 // 全局数据库实例缓存
-let dbInstance: any | null = null;
+let dbInstance: D1Database | null = null;
 import { getLocalD1 } from '@/lib/db/local-d1';
+import { getCloudflareContext } from '@opennextjs/cloudflare/cloudflare-context';
+
+function getDbFromCloudflareContext(): D1Database | null {
+  try {
+    const context = getCloudflareContext({ async: false }) as unknown as { env?: Record<string, unknown> } | null;
+    if (context?.env && 'DB' in context.env && context.env.DB) {
+      return context.env.DB as D1Database;
+    }
+  } catch {
+    // not available in this runtime or sync mode not supported
+  }
+  return null;
+}
 
 /**
  * 设置数据库实例
  * 在API路由中使用，从请求环境中获取数据库连接
  */
-export function setDb(db: any): void {
+export function setDb(db: D1Database): void {
   dbInstance = db;
 }
 
@@ -23,7 +37,7 @@ export function setDb(db: any): void {
  * 2. 使用之前设置的实例
  * 3. 从全局变量获取
  */
-export function getDb(env?: Env): any {
+export function getDb(env?: Env): D1Database {
   // 优先使用传入的env
   if (env && env.DB) {
     return env.DB;
@@ -34,17 +48,30 @@ export function getDb(env?: Env): any {
     return dbInstance;
   }
 
-  // 尝试从全局获取（Cloudflare Workers / Edge 运行环境）
-  const runtimeGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : undefined;
-  if (runtimeGlobal && (runtimeGlobal as any).DB) {
-    dbInstance = (runtimeGlobal as any).DB;
+  // 尝试从Cloudflare OpenNext上下文中读取绑定
+  const cfBinding = getDbFromCloudflareContext();
+  if (cfBinding) {
+    dbInstance = cfBinding;
     return dbInstance;
   }
 
+  // 尝试从全局获取（Cloudflare Workers / Edge 运行环境）
+  const runtimeGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : undefined;
+  if (runtimeGlobal && typeof runtimeGlobal === 'object' && 'DB' in runtimeGlobal) {
+    const candidate = (runtimeGlobal as { DB?: unknown }).DB;
+    if (candidate) {
+      dbInstance = candidate as D1Database;
+      return dbInstance;
+    }
+  }
+
   // 尝试从process.env获取
-  if (typeof process !== 'undefined' && process.env && (process.env as any).DB) {
-    dbInstance = (process.env as any).DB;
-    return dbInstance;
+  if (typeof process !== 'undefined') {
+    const processEnv = (process as unknown as { env?: Record<string, unknown> }).env;
+    if (processEnv && 'DB' in processEnv && processEnv.DB) {
+      dbInstance = processEnv.DB as D1Database;
+      return dbInstance;
+    }
   }
 
   // Fallback to a local in-memory D1 implementation for local builds/dev
@@ -56,7 +83,7 @@ export function getDb(env?: Env): any {
 
   try {
     return getLocalD1();
-  } catch (e) {
+  } catch {
     throw new Error('Database connection not available. Please provide env with DB property or call setDb() first.');
   }
 }
@@ -65,24 +92,46 @@ export function getDb(env?: Env): any {
  * 从Next.js请求中获取Cloudflare环境变量
  * 用于API路由中
  */
-export function getDbFromRequest(request: Request): any | null {
+export function getDbFromRequest(request: Request): D1Database | null {
   // 尝试从请求对象中读取 Cloudflare 绑定的 DB
   if (request && typeof request === 'object') {
-    const env = (request as any).env;
-    if (env && env.DB) {
-      return env.DB;
+    const requestObject = request as unknown as Record<string, unknown>;
+    if ('env' in requestObject) {
+      const env = requestObject.env as Record<string, unknown> | undefined;
+      if (env && 'DB' in env && env.DB) {
+        return env.DB as D1Database;
+      }
+    }
+
+    if ('bindings' in requestObject) {
+      const bindings = requestObject.bindings as Record<string, unknown> | undefined;
+      if (bindings && 'DB' in bindings && bindings.DB) {
+        return bindings.DB as D1Database;
+      }
     }
   }
 
-  // 兼容 Cloudflare Pages / OpenNext 运行时，通过全局对象访问绑定
+  // 尝试从OpenNext Cloudflare上下文中读取绑定
+  const cfBinding = getDbFromCloudflareContext();
+  if (cfBinding) {
+    return cfBinding;
+  }
+
+  // 兼容 Cloudflare Workers / Edge 运行时，通过全局对象访问绑定
   const runtimeGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : undefined;
-  if (runtimeGlobal && (runtimeGlobal as any).DB) {
-    return (runtimeGlobal as any).DB;
+  if (runtimeGlobal && typeof runtimeGlobal === 'object' && 'DB' in runtimeGlobal) {
+    const candidate = (runtimeGlobal as { DB?: unknown }).DB;
+    if (candidate) {
+      return candidate as D1Database;
+    }
   }
 
   // 兼容本地开发或特殊运行时，通过 process.env 访问
-  if (typeof process !== 'undefined' && (process.env as any).DB) {
-    return (process.env as any).DB;
+  if (typeof process !== 'undefined') {
+    const processEnv = (process as unknown as { env?: Record<string, unknown> }).env;
+    if (processEnv && 'DB' in processEnv && processEnv.DB) {
+      return processEnv.DB as D1Database;
+    }
   }
 
   return null;
