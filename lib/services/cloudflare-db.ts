@@ -134,30 +134,10 @@ export const jobService = {
   // 根据ID获取职位
   getById: async (id: string): Promise<Job | undefined> => {
     const db = getDb();
-    const result = await db.prepare('SELECT * FROM jobs WHERE id = ?').bind(id).first();
+    const result = await db.prepare('SELECT * FROM jobs WHERE id = ?').bind(id).first<Record<string, unknown>>();
     if (!result) return undefined;
 
-    return {
-      id: result.id,
-      title: result.title,
-      companyId: result.company_id,
-      category: result.category,
-      location: result.location,
-      state: result.state,
-      salaryMin: result.salary_min,
-      salaryMax: result.salary_max,
-      salaryType: result.salary_type,
-      experience: result.experience,
-      education: result.education,
-      description: result.description,
-      requirements: JSON.parse(result.requirements || '[]'),
-      benefits: JSON.parse(result.benefits || '[]'),
-      status: result.status,
-      views: result.views,
-      applications: result.applications,
-      createdAt: result.created_at,
-      updatedAt: result.updated_at,
-    };
+    return mapJobRow(result);
   },
 
   // 根据公司ID获取职位

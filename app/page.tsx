@@ -20,6 +20,7 @@ export default function HomePage() {
   const [jobsCountByState, setJobsCountByState] = useState<Record<string, number>>({});
   const [stats, setStats] = useState({ totalJobs: 0, totalCompanies: 0, totalLocations: 0 });
   const [categories, setCategories] = useState<Array<{ id: string; name: string; icon: string; count: number }>>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // 加载数据
   useEffect(() => {
@@ -72,6 +73,7 @@ export default function HomePage() {
         });
       } catch (error) {
         console.error('Failed to load data:', error);
+        setLoadError(String(error ?? 'Unknown error'));
       }
     }
     loadData();
@@ -190,6 +192,11 @@ export default function HomePage() {
 
       <div className="layui-main">
         <div className="layui-mt30">
+          {loadError && (
+            <div className="layui-alert layui-bg-red layui-text-white layui-mb20">
+              <p className="layui-font-sm">首页数据加载失败: {loadError}</p>
+            </div>
+          )}
           <div className="layui-row layui-col-space20">
             <div className="layui-col-md9">
               <div className="layui-card">
