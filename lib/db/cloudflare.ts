@@ -1,6 +1,16 @@
 
 // Cloudflare D1数据库连接配置
-type D1Database = { [key: string]: unknown };
+interface D1PreparedStatement {
+  bind: (...params: unknown[]) => D1PreparedStatement;
+  all: () => Promise<{ results: unknown[] }>;
+  first: () => Promise<unknown>;
+  run: () => Promise<unknown>;
+}
+
+interface D1Database {
+  prepare: (sql: string) => D1PreparedStatement;
+}
+
 interface Env {
   DB?: D1Database;
 }
