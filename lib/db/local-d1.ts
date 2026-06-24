@@ -3,8 +3,6 @@ import companiesData from '@/lib/data/companies.json';
 import usersData from '@/lib/data/users.json';
 import categoriesData from '@/lib/data/categories.json';
 import locationsData from '@/lib/data/locations.json';
-import fs from 'fs';
-import path from 'path';
 import { Job, Company, User, Category, Location } from '@/types';
 
 // Local aliases for Cloudflare D1 types to avoid requiring Cloudflare types in local dev

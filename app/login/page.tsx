@@ -357,7 +357,7 @@ export default function LoginPage() {
             {/* 注册链接 */}
             <p className="layui-text-center layui-mt20 layui-font-sm" style={{ color: '#999' }}>
               还没有账号？
-              <Link href="/register" className="layui-font-bold layui-ml5 layui-link-plain" style={{ color: '#009688' }}>
+              <Link href="/register" prefetch={false} className="layui-font-bold layui-ml5 layui-link-plain" style={{ color: '#009688' }}>
                 立即注册
               </Link>
             </p>
