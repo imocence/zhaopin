@@ -2,8 +2,8 @@
 // Cloudflare D1数据库连接配置
 interface D1PreparedStatement {
   bind: (...params: unknown[]) => D1PreparedStatement;
-  all: <T = unknown>() => Promise<{ results: T[] }>;
-  first: <T = unknown>() => Promise<T | null>;
+  all: <T = Record<string, any>>() => Promise<{ results: T[] }>;
+  first: <T = Record<string, any>>() => Promise<T | null>;
   run: () => Promise<unknown>;
 }
 
