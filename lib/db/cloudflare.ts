@@ -34,9 +34,10 @@ export function getDb(env?: Env): any {
     return dbInstance;
   }
 
-  // 尝试从全局获取（Cloudflare Workers环境）
-  if (typeof global !== 'undefined' && (global as any).DB) {
-    dbInstance = (global as any).DB;
+  // 尝试从全局获取（Cloudflare Workers / Edge 运行环境）
+  const runtimeGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : undefined;
+  if (runtimeGlobal && (runtimeGlobal as any).DB) {
+    dbInstance = (runtimeGlobal as any).DB;
     return dbInstance;
   }
 
@@ -65,10 +66,25 @@ export function getDb(env?: Env): any {
  * 用于API路由中
  */
 export function getDbFromRequest(request: Request): any | null {
-  // 在Cloudflare Pages中，环境变量通过process.env访问
+  // 尝试从请求对象中读取 Cloudflare 绑定的 DB
+  if (request && typeof request === 'object') {
+    const env = (request as any).env;
+    if (env && env.DB) {
+      return env.DB;
+    }
+  }
+
+  // 兼容 Cloudflare Pages / OpenNext 运行时，通过全局对象访问绑定
+  const runtimeGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : undefined;
+  if (runtimeGlobal && (runtimeGlobal as any).DB) {
+    return (runtimeGlobal as any).DB;
+  }
+
+  // 兼容本地开发或特殊运行时，通过 process.env 访问
   if (typeof process !== 'undefined' && (process.env as any).DB) {
     return (process.env as any).DB;
   }
+
   return null;
 }
 
